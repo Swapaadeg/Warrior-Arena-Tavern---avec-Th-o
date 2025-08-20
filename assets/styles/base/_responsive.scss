@@ -1,0 +1,163 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+
+// ==========================================================================
+// RESPONSIVE DESIGN - WARRIOR ARENA TAVERNE
+// ==========================================================================
+
+// TABLET & MOBILE GENERAL
+@media (max-width: 768px) {
+    // Hero Banner responsive
+    .hero-banner {
+        height: 80vh;
+        min-height: 500px;
+    }
+    
+    .hero-title {
+        span {
+            letter-spacing: 0.05em;
+        }
+        
+        .arena {
+            margin-left: 1em;
+        }
+        
+        .taverne {
+            margin-left: 0.5em;
+        }
+    }
+    
+    // Hero Navbar responsive (homepage uniquement)
+    .hero-navbar {
+        padding: 1rem;
+        
+        .nav-links {
+            position: fixed !important;
+            top: 0;
+            right: -100%;
+            width: 70%;
+            height: 100vh;
+            background: rgba($primary-dark, 0.95);
+            backdrop-filter: blur(15px);
+            @include flex(column, center, center);
+            transition: right 0.3s ease;
+            z-index: 12;
+            list-style: none;
+            
+            &.active {
+                right: 0;
+            }
+            
+            li {
+                margin: 1rem 0;
+            }
+            
+            a {
+                font-size: 1.2rem;
+                padding: 1rem 2rem;
+                display: block;
+                text-align: center;
+                border-radius: 5px;
+                transition: all 0.3s ease;
+                
+                &:hover {
+                    background: rgba($accent-gold, 0.1);
+                    transform: translateX(10px);
+                }
+            }
+        }
+        
+        .auth-nav {
+            position: fixed !important;
+            bottom: 2rem;
+            right: -100%;
+            width: 70%;
+            transition: right 0.3s ease;
+            z-index: 12;
+            list-style: none;
+            
+            &.active {
+                right: 0;
+            }
+            
+            li {
+                margin: 0.5rem 0;
+                text-align: center;
+            }
+            
+            a, .greeting {
+                font-size: 1rem;
+                padding: 0.8rem 1.5rem;
+                display: block;
+                text-align: center;
+                border-radius: 5px;
+                border: 1px solid $accent-gold;
+                
+                &:hover {
+                    background: rgba($accent-gold, 0.2);
+                }
+            }
+        }
+    }
+    
+    // Navbar générale responsive (autres pages)
+    .navbar {
+        .nav-links,
+        .auth-nav {
+            &.active {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba($primary-dark, 0.95);
+                backdrop-filter: blur(15px);
+                z-index: 999;
+                @include flex(column, center, center);
+                
+                li {
+                    margin: 1rem 0;
+                }
+                
+                a {
+                    font-size: 1.2rem;
+                    padding: 1rem 2rem;
+                }
+            }
+        }
+    }
+}
+
+// MOBILE ONLY (très petits écrans)
+@media (max-width: 480px) {
+    .hero-title {
+        .arena {
+            margin-left: 0.5em;
+        }
+        
+        .taverne {
+            margin-left: 0.2em;
+        }
+    }
+    
+    // Hero navbar pour très petits écrans
+    .hero-navbar {
+        .nav-links {
+            width: 85%;
+            
+            a {
+                font-size: 1rem;
+                padding: 0.8rem 1.5rem;
+            }
+        }
+        
+        .auth-nav {
+            width: 85%;
+            
+            a, .greeting {
+                font-size: 0.9rem;
+                padding: 0.6rem 1rem;
+            }
+        }
+    }
+}

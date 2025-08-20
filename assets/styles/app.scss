@@ -7,7 +7,7 @@
 @use "base/font-face";
 
 // IMPORT COMPONENTS SCSS
-
+@use "components/navbar";
 @use "components/animations";
 @use "components/button";
 @use "components/form";
@@ -18,8 +18,7 @@
 @use "layouts/header";
 
 // IMPORT PAGES SCSS
-@use "pages/homepage";
-
+// Tout est maintenant dans header et navbar
 
 // IMPORT RESPONSIVE SCSS
 @use "base/responsive";

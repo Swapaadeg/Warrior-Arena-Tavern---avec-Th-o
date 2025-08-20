@@ -18,6 +18,19 @@
             letter-spacing: 0.05em;
         }
         
+        // Repositionner les images décoratives sur mobile
+        &::before {
+            left: -60px;
+            width: 50px;
+            height: 50px;
+        }
+        
+        &::after {
+            right: -60px;
+            width: 50px;
+            height: 50px;
+        }
+        
         .arena {
             margin-left: 1em;
         }
@@ -32,7 +45,7 @@
         padding: 1rem;
         
         .nav-links {
-            position: fixed !important;
+            position: fixed;
             top: 0;
             right: -100%;
             width: 70%;
@@ -68,7 +81,7 @@
         }
         
         .auth-nav {
-            position: fixed !important;
+            position: fixed;
             bottom: 2rem;
             right: -100%;
             width: 70%;
@@ -131,6 +144,12 @@
 // MOBILE ONLY (très petits écrans)
 @media (max-width: 480px) {
     .hero-title {
+        // Cacher les images décoratives sur très petits écrans
+        &::before,
+        &::after {
+            display: none;
+        }
+        
         .arena {
             margin-left: 0.5em;
         }

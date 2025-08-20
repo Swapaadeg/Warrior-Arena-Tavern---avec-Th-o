@@ -1,0 +1,136 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+
+// ==========================================================================
+// FOOTER - WARRIOR ARENA TAVERNE
+// ==========================================================================
+
+.site-footer {
+    img {
+        width: 100%;
+    }
+    background: rgba($primary-dark, 0.95);
+    backdrop-filter: blur(15px);
+    margin-top: 0;
+    
+    .footer-content {
+        @include flex(row, space-between, flex-start);
+        max-width: 1200px;
+        margin: 0 auto;
+        gap: 3rem;
+        
+        .footer-section {
+            flex: 1;
+            
+            h3 {
+                font-family: $font-title;
+                font-size: 1.8rem;
+                color: $accent-gold;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+            
+            .footer-line {
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(90deg, 
+                    transparent 0%, 
+                    $accent-gold 20%, 
+                    $primary-brown 50%, 
+                    $accent-gold 80%, 
+                    transparent 100%
+                );
+                margin-bottom: 1.5rem;
+            }
+            
+            .footer-links {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                @include flex(column, center, center);
+                gap: 0.8rem;
+                
+                li {
+                    a {
+                        color: $primary-beige;
+                        text-decoration: none;
+                        font-size: 1rem;
+                        transition: all 0.3s ease;
+                        
+                        &:hover {
+                            color: $accent-gold;
+                            text-shadow: 0 0 8px rgba($accent-gold, 0.6);
+                        }
+                    }
+                }
+            }
+            
+            .footer-contact {
+                text-align: center;
+                color: $primary-beige;
+                line-height: 1.6;
+                
+                p {
+                    margin: 0.5rem 0;
+                    
+                    strong {
+                        color: $accent-gold;
+                        font-family: $font-h2;
+                        font-size: 1.1rem;
+                    }
+                }
+            }
+        }
+        
+        .footer-center {
+            @include flex(column, center, center);
+            
+            .footer-logo {
+                height: 80px;
+                width: auto;
+                filter: brightness(1.2);
+                transition: transform 0.3s ease;
+                
+                &:hover {
+                    transform: scale(1.1);
+                    filter: brightness(1.4);
+                }
+            }
+        }
+    }
+    
+    // Responsive
+    @media (max-width: 768px) {
+        padding: 2rem 5vw;
+        
+        .footer-content {
+            @include flex(column, center, center);
+            gap: 2rem;
+            text-align: center;
+            
+            .footer-section {
+                width: 100%;
+                
+                h3 {
+                    font-size: 1.5rem;
+                }
+                
+                .footer-links {
+                    gap: 0.6rem;
+                    
+                    li a {
+                        font-size: 0.9rem;
+                    }
+                }
+            }
+            
+            .footer-center {
+                order: -1;
+                
+                .footer-logo {
+                    height: 60px;
+                }
+            }
+        }
+    }
+}

@@ -29,11 +29,17 @@
                 </button>
 
                 <ul class="nav-links">
-                    <li><a href="{{ path('home') }}" class="nav-link">Accueil</a></li>
-                    <li><a href="{{ path('contact') }}" class="nav-link">Contact</a></li>
-                    <li><a href="{{ path('register') }}" class="nav-link">Inscription</a></li>
-                    <li><a href="{{ path('login') }}" class="nav-link">Connexion</a></li>
-                    <li><a href="{{ path('personnages') }}" class="nav-link">Personnages</a></li>
+                    <li><a href="{{ path('home') }}">Accueil</a></li>
+                    {#<li><a href="{{ path('caves') }}">Toutes les caves</a></li>
+                    <li>
+                        {% if app.user %}
+                            <a href="{{ path('cave_perso') }}">Ma cave</a>
+                        {% else %}
+
+                        {% endif %}
+                    </li>
+                    <li><a href="{{ path('bouteilles') }}">Nos bouteilles</a></li>
+                    <li><a href="{{ path('contact') }}">Contact</a></li>#}
                 </ul>
  
                  <ul class="auth-nav">
@@ -58,5 +64,34 @@
         <main>
             {% block body %}{% endblock %}
         </main>
+
+        <footer class="site-footer">
+        <img src="bottom.png" alt="">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>À propos</h3>
+                    <div class="footer-line"></div>
+                    <ul class="footer-links">
+                        <li><a href="#">Politique de confidentialité</a></li>
+                        <li><a href="#">Mentions légales</a></li>
+                        <li><a href="#">Conditions générales d'utilisation</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-center">
+                    <a href="{{ path('home') }}"><img src="{{ asset('logo.png') }}" alt="Logo WAT" class="footer-logo"></a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <div class="footer-line"></div>
+                    <div class="footer-contact">
+                        <p><strong>WAT - Warrior Arena Tavern</strong></p>
+                        <p>1664 Rue de la soif</p>
+                        <p>86000 Fisher</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </body>
 </html>

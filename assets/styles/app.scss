@@ -18,7 +18,7 @@
 @use "layouts/header";
 
 // IMPORT PAGES SCSS
-// Tout est maintenant dans header et navbar
+@use "pages/homepage";
 
 // IMPORT RESPONSIVE SCSS
 @use "base/responsive";

@@ -64,5 +64,34 @@
         <main>
             {% block body %}{% endblock %}
         </main>
+
+        <footer class="site-footer">
+        <img src="bottom.png" alt="">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>À propos</h3>
+                    <div class="footer-line"></div>
+                    <ul class="footer-links">
+                        <li><a href="#">Politique de confidentialité</a></li>
+                        <li><a href="#">Mentions légales</a></li>
+                        <li><a href="#">Conditions générales d'utilisation</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-center">
+                    <a href="{{ path('home') }}"><img src="{{ asset('logo.png') }}" alt="Logo WAT" class="footer-logo"></a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <div class="footer-line"></div>
+                    <div class="footer-contact">
+                        <p><strong>WAT - Warrior Arena Tavern</strong></p>
+                        <p>1664 Rue de la soif</p>
+                        <p>86000 Fisher</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </body>
 </html>

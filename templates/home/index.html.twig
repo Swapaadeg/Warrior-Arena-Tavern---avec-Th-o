@@ -32,17 +32,38 @@
                 {% endif %}
             </ul>
         </nav>
+        <div class="hero-content">
+            <div class="title-container">
+                <h1 class="hero-title">
+                    <span class="warrior">WARRIOR</span>
+                    <span class="arena">ARENA</span>
+                    <span class="taverne">TAVERNE</span>
+                </h1>
+            </div>
+            <button class="cta-button">JOUER</button>
+        </div>
+    </div>
     </header>
 
-    <div class="hero-content">
-        <div class="title-container">
-            <h1 class="hero-title">
-                <span class="warrior">WARRIOR</span>
-                <span class="arena">ARENA</span>
-                <span class="taverne">TAVERNE</span>
-            </h1>
+    <section class="rules-section container">
+        <h2>Les règles</h2>
+        <div class="rules-content">
+            <img src="bagarre.png" alt="Illustration de combat" class="rules-image">
+            <div class="rules-text">
+                <h4>Objectif :</h4>
+                <p>Former une équipe de héros de taverne (Tanks, DPS, Healers), les placer stratégiquement sur le plateau, et être le dernier joueur avec des combattants debout.</p>
+
+                <h4>Synergies de taverne</h4>
+                <p>Si Tank + DPS + Heal de la même taverne sont alignés → Buff "À la tienne !" :</p>
+                <ul class="synergy-buffs">
+                    <li>+10% PV pour Tanks,</li>
+                    <li>+20% vitesse d’attaque pour DPS,</li>
+                    <li>+15% soin pour Healers.</li>
+                </ul>
+                <p>Si 3 DPS ivres sont en même temps → attaque critique garantie au 1er tour.
+                Si 2 Healers trinquent → soin renforcé au prochain tour.</p>
+            </div>
         </div>
-        <button class="cta-button">JOUER</button>
-    </div>
-</div>
+        <p class="rules-summary">La partie continue jusqu’à ce qu’il ne reste qu’une équipe debout.</p>
+    </section>
 {% endblock %}

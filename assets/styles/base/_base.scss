@@ -1,4 +1,4 @@
-@use "../abstracts/variables" as v;
+@use "../abstracts/variables" as *;
 
 * {
     box-sizing: border-box;
@@ -16,7 +16,7 @@
 
 
 body {
-    font-family: v.$font-text;
+    font-family: $font-text;
     margin: 0;
     padding: 0;
 }
@@ -24,10 +24,14 @@ li {
     list-style: none;
 }
 
+a {
+    text-decoration: none;
+    color: $primary-dark;
+}
 h2 {
-    font-family: v.$font-h2;
+    font-family: $font-h2;
     padding: 2rem;
     font-size: 2.5rem;
-    color: v.$primary-brown;
+    color: $primary-brown;
     text-align: center;
 }

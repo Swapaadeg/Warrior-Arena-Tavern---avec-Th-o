@@ -1,0 +1,17 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+
+// ==========================================================================
+// BUTTONS STYLES - WARRIOR ARENA TAVERNE
+// ==========================================================================
+
+.cta-button {
+    margin-top: 6REM;
+    background: linear-gradient(90deg, $accent-gold, $primary-beige);
+    color: $primary-dark;
+    padding: 1.5rem 6rem;
+    font-family: $font-h2;
+    &:hover {
+        background: linear-gradient(90deg, $primary-beige, $accent-gold);
+    }
+}

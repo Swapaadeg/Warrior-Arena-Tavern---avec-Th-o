@@ -3,10 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\CharactersRepository;
-use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types as DoctrineTypes;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: CharactersRepository::class)]
 class Characters
@@ -19,15 +19,42 @@ class Characters
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column]
+    private ?int $HP = null;
+
+    #[ORM\Column]
+    private ?int $power = null;
+
+    #[ORM\Column]
+    private ?int $defense = null;
+
+    #[ORM\Column(type: DoctrineTypes::TEXT)]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(inversedBy: 'characters')]
-    private ?Weapons $weapon = null;
+    /**
+     * @var Collection<int, Teams>
+     */
+    #[ORM\ManyToMany(targetEntity: Teams::class, mappedBy: 'characters')]
+    private Collection $teams;
 
-    #[ORM\ManyToOne(inversedBy: 'characters')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Roles $role = null;
+    /**
+     * @var Collection<int, Roles>
+     */
+    #[ORM\OneToMany(targetEntity: Roles::class, mappedBy: 'perso')]
+    private Collection $role;
+
+    /**
+     * @var Collection<int, Types>
+     */
+    #[ORM\OneToMany(targetEntity: Types::class, mappedBy: 'perso')]
+    private Collection $type;
+
+    public function __construct()
+    {
+        $this->teams = new ArrayCollection();
+        $this->role = new ArrayCollection();
+        $this->type = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -46,6 +73,42 @@ class Characters
         return $this;
     }
 
+    public function getHP(): ?int
+    {
+        return $this->HP;
+    }
+
+    public function setHP(int $HP): static
+    {
+        $this->HP = $HP;
+
+        return $this;
+    }
+
+    public function getPower(): ?int
+    {
+        return $this->power;
+    }
+
+    public function setPower(int $power): static
+    {
+        $this->power = $power;
+
+        return $this;
+    }
+
+    public function getDefense(): ?int
+    {
+        return $this->defense;
+    }
+
+    public function setDefense(int $defense): static
+    {
+        $this->defense = $defense;
+
+        return $this;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;
@@ -58,64 +121,89 @@ class Characters
         return $this;
     }
 
-    public function getWeapon(): ?Weapons
+    /**
+     * @return Collection<int, Teams>
+     */
+    public function getTeams(): Collection
     {
-        return $this->weapon;
+        return $this->teams;
     }
 
-    public function setWeapon(?Weapons $weapon): static
+    public function addTeam(Teams $team): static
     {
-        $this->weapon = $weapon;
+        if (!$this->teams->contains($team)) {
+            $this->teams->add($team);
+            $team->addCharacter($this);
+        }
 
         return $this;
     }
 
-    public function getRole(): ?Roles
+    public function removeTeam(Teams $team): static
+    {
+        if ($this->teams->removeElement($team)) {
+            $team->removeCharacter($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Roles>
+     */
+    public function getRole(): Collection
     {
         return $this->role;
     }
 
-    public function setRole(?Roles $role): static
+    public function addRole(Roles $role): static
     {
-        $this->role = $role;
-
-        return $this;
-
-
-    }
-
-    #[Vich\UploadableField(mapping: 'images', fileNameProperty: 'imageName')]
-    private ?File $imageFile = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $imageName = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updatedAt = null;
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
-    {
-        $this->createdAt = $createdAt;
+        if (!$this->role->contains($role)) {
+            $this->role->add($role);
+            $role->setPerso($this);
+        }
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function removeRole(Roles $role): static
     {
-        return $this->updatedAt;
+        if ($this->role->removeElement($role)) {
+            // set the owning side to null (unless already changed)
+            if ($role->getPerso() === $this) {
+                $role->setPerso(null);
+            }
+        }
+
+        return $this;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
+    /**
+     * @return Collection<int, Types>
+     */
+    public function getType(): Collection
     {
-        $this->updatedAt = $updatedAt;
+        return $this->type;
+    }
+
+    public function addType(Types $type): static
+    {
+        if (!$this->type->contains($type)) {
+            $this->type->add($type);
+            $type->setPerso($this);
+        }
+
+        return $this;
+    }
+
+    public function removeType(Types $type): static
+    {
+        if ($this->type->removeElement($type)) {
+            // set the owning side to null (unless already changed)
+            if ($type->getPerso() === $this) {
+                $type->setPerso(null);
+            }
+        }
 
         return $this;
     }

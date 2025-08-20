@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\RolesRepository;
+use App\Repository\TypesRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: RolesRepository::class)]
-class Roles
+#[ORM\Entity(repositoryClass: TypesRepository::class)]
+class Types
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -16,8 +16,7 @@ class Roles
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\ManyToOne(inversedBy: 'role')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'type')]
     private ?Characters $perso = null;
 
     public function getId(): ?int

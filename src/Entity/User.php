@@ -130,15 +130,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->team;
     }
 
-    public function setTeam(Teams $team): static
+    public function setTeam(?Teams $team): static
     {
+        // If setting to null, just break the relation on this side
+        if ($team === null) {
+            $this->team = null;
+            return $this;
+        }
         // set the owning side of the relation if necessary
         if ($team->getUser() !== $this) {
             $team->setUser($this);
         }
-
         $this->team = $team;
-
         return $this;
     }
 

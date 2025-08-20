@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Composer une équipe{% endblock %}
+
+{% block body %}
+    <h1>Composer votre équipe</h1>
+    <form id="team-form" method="post">
+        <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
+            {% for character in characters %}
+                <div class="character-item" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
+                    {% if character.imageName %}
+                        <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
+                    {% else %}
+                        <div style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:2em; margin: 0 auto;">?</div>
+                    {% endif %}
+                    <h3>{{ character.name }}</h3>
+                    <p><strong>PV:</strong> {{ character.HP }}<br><strong>Puissance:</strong> {{ character.power }}<br><strong>Défense:</strong> {{ character.defense }}</p>
+                    <input type="checkbox" name="team[]" value="{{ character.id }}" class="character-checkbox">
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-success mt-3" id="play-btn" disabled>Jouer !</button>
+    </form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.character-checkbox');
+        const playBtn = document.getElementById('play-btn');
+        function updateButton() {
+            const checked = Array.from(checkboxes).filter(cb => cb.checked);
+            playBtn.disabled = checked.length !== 5;
+        }
+        checkboxes.forEach(cb => cb.addEventListener('change', updateButton));
+    });
+    </script>
+{% endblock %}

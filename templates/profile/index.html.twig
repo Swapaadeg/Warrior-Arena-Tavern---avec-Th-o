@@ -43,7 +43,16 @@
                             {% if user.team %}
                                 <div class="detail-item">
                                     <label>Équipe :</label>
-                                    <span>{{ user.team.id }}</span>
+                                    <span>
+                                        {% set teamChars = user.team.getCharacters|default([]) %}
+                                        {% if teamChars|length > 0 %}
+                                            {% for character in teamChars %}
+                                                <span class="badge bg-info">{{ character.name }}</span>{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            Aucune équipe enregistrée
+                                        {% endif %}
+                                    </span>
                                 </div>
                             {% endif %}
                         </div>

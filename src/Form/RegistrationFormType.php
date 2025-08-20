@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Vich\UploaderBundle\Form\Type\VichFileType;
 
 class RegistrationFormType extends AbstractType
 {
@@ -16,12 +17,22 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('username', TextType::class, [
-                'label' => 'Username',
+                'label' => 'Nom d\'utilisateur',
+            ])
+            ->add('profileImageFile', VichFileType::class, [
+                'label' => 'Photo de profil',
+                'required' => false,
+                'allow_delete' => false,
+                'download_uri' => false,
+                'attr' => [
+                    'accept' => 'image/*',
+                    'class' => 'form-control'
+                ]
             ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'first_options'  => ['label' => 'Password'],
-                'second_options' => ['label' => 'Repeat Password'],
+                'first_options'  => ['label' => 'Mot de passe'],
+                'second_options' => ['label' => 'Répéter le mot de passe'],
                 'mapped' => false,
                 'required' => true,
             ])

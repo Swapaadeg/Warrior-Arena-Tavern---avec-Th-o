@@ -164,6 +164,51 @@
             }
         }
     }
+    
+    // Profile avatar styles in navbar
+    .auth-nav .user-profile-nav {
+        .profile-link {
+            @include flex(row, center, center);
+            padding: 0;
+            
+            &:hover {
+                transform: scale(1.05);
+            }
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid $accent-gold;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                border-color: $primary-beige;
+                box-shadow: 0 0 10px rgba($accent-gold, 0.5);
+            }
+        }
+
+        .profile-avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: $accent-gold;
+            color: $primary-dark;
+            @include flex(row, center, center);
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid $accent-gold;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                background: $primary-beige;
+                border-color: $primary-beige;
+                box-shadow: 0 0 10px rgba($accent-gold, 0.5);
+            }
+        }
+    }
 }
 
 // NAVBAR HERO (pour la page d'accueil uniquement)
@@ -303,5 +348,50 @@
         backdrop-filter: blur(10px);
         box-shadow: 0 2px 20px rgba($primary-dark, 0.3);
         transition: all 0.3s ease;
+    }
+    
+    // Profile avatar styles for hero navbar
+    .user-profile-nav {
+        .profile-link {
+            @include flex(row, center, center);
+            padding: 0;
+            
+            &:hover {
+                transform: scale(1.05);
+            }
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid $accent-gold;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                border-color: $primary-beige;
+                box-shadow: 0 0 10px rgba($accent-gold, 0.5);
+            }
+        }
+
+        .profile-avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: $accent-gold;
+            color: $primary-dark;
+            @include flex(row, center, center);
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid $accent-gold;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                background: $primary-beige;
+                border-color: $primary-beige;
+                box-shadow: 0 0 10px rgba($accent-gold, 0.5);
+            }
+        }
     }
 }

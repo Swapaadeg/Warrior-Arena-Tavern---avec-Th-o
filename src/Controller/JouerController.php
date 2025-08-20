@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class JouerController extends AbstractController
 {
-    #[Route('/jouer', name: 'app_jouer')]
+    #[Route('/jouer', name: 'jouer')]
     public function index(Request $request, CharactersRepository $charactersRepository, EntityManagerInterface $entityManager): Response
     {
         $characters = $charactersRepository->findAll();

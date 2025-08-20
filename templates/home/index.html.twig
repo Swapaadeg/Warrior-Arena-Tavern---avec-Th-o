@@ -18,16 +18,27 @@
 
             <ul class="nav-links">
                 <li><a href="{{ path('home') }}">Accueil</a></li>
+                <li><a href="{{ path('contact') }}">Contact</a></li>
+                <li><a href="{{ path('jouer') }}">Jouer</a></li>
+                <li><a href="{{ path('personnages') }}">Personnages</a></li>
             </ul>
  
             <ul class="auth-nav">
                 {% if not is_granted('ROLE_USER') %}
                     <li><a href="{{ path('login') }}">Connexion</a></li>
+                    <li><a href="{{ path('register') }}">Inscription</a></li>
                 {% else %}
-                    {% if app.user %}
-                        <li class="greeting">Bonjour {{ app.user.username }}!</li>
-                    {% endif %}
-                    <li><a href="{{ path('profile') }}">Mon profil</a></li>
+                    <li class="user-profile-nav">
+                        <a href="{{ path('profile') }}" class="profile-link">
+                            {% if app.user.profileImageName %}
+                                <img src="{{ vich_uploader_asset(app.user, 'profileImageFile') }}" alt="Photo de profil" class="profile-avatar">
+                            {% else %}
+                                <div class="profile-avatar-placeholder">
+                                    {{ app.user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                        </a>
+                    </li>
                     <li><a href="{{ path('logout') }}">Se déconnecter</a></li>
                 {% endif %}
             </ul>

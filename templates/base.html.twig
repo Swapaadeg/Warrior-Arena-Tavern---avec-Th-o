@@ -30,9 +30,16 @@
 
                 <ul class="nav-links">
                     <li><a href="{{ path('home') }}">Accueil</a></li>
-                        <li><a href="{{ path('contact') }}">Contact</a></li>
-                        <li><a href="{{ path('jouer') }}">Jouer</a></li>
-                        <li><a href="{{ path('personnages') }}">Personnages</a></li>
+                    {#<li><a href="{{ path('caves') }}">Toutes les caves</a></li>
+                    <li>
+                        {% if app.user %}
+                            <a href="{{ path('cave_perso') }}">Ma cave</a>
+                        {% else %}
+
+                        {% endif %}
+                    </li>
+                    <li><a href="{{ path('bouteilles') }}">Nos bouteilles</a></li>
+                    <li><a href="{{ path('contact') }}">Contact</a></li>#}
                 </ul>
  
                  <ul class="auth-nav">

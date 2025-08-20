@@ -2,17 +2,27 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Form\ContactForm;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class ContactController extends AbstractController
 {
-    #[Route('/contact', name: 'app_contact')]
-    public function index(): Response
+    #[Route('/contact', name: 'contact')]
+    public function index(Request $request): Response
     {
+        $form = $this->createForm(ContactForm::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->addFlash('success', 'Votre message a bien été envoyé.');
+            return $this->redirectToRoute('home');
+        }
+
         return $this->render('contact/index.html.twig', [
-            'controller_name' => 'ContactController',
+            'contactForm' => $form->createView(),
         ]);
     }
 }

@@ -45,7 +45,7 @@
         padding: 1rem;
         
         .nav-links {
-            position: fixed !important;
+            position: fixed;
             top: 0;
             right: -100%;
             width: 70%;
@@ -81,7 +81,7 @@
         }
         
         .auth-nav {
-            position: fixed !important;
+            position: fixed;
             bottom: 2rem;
             right: -100%;
             width: 70%;

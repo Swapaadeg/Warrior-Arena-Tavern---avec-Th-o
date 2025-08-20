@@ -50,7 +50,7 @@
 }
 
 .hero-title {
-    font-family: $font-title, serif;
+    font-family: $font-title;
     margin: 0;
     line-height: 1.2;
     position: relative;
@@ -60,11 +60,11 @@
         content: '';
         position: absolute;
         top: 9%;
-        left: -155px;
+        left: -150px;
         transform: translateY(-50%);
         width: 200px;
         height: 200px;
-        background-image: url(../../img/z1.png); // Remplacez par votre image
+        background-image: url(../../img/z1.png);
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
@@ -90,6 +90,10 @@
     span {
         display: block;
         font-weight: bold;
+        background: linear-gradient(45deg, $accent-gold, $primary-beige);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         color: $accent-gold;
         text-shadow: 
         2px 2px 4px rgba($primary-dark, 0.8),
@@ -100,18 +104,22 @@
     }
     
     .warrior {
-        font-size: clamp(3rem, 8vw, 6rem);
+        font-size: clamp(2rem, 8vw, 6rem);
         margin-bottom: -0.2em;
     }
     
     .arena {
-        font-size: clamp(2rem, 6vw, 4rem);
-        margin-bottom: -0.1em;
-        margin-left: 2em;
+        font-size: clamp(0.8rem, 4vw, 2rem);
+        margin-left: clamp(10rem, 20vw, 20rem);
+        background: none;
+        background-clip: initial;
+        -webkit-background-clip: initial;
+        -webkit-text-fill-color: initial;
+        color: $primary-beige;
     }
     
     .taverne {
-        font-size: clamp(3rem, 8vw, 6rem);
-        margin-left: 1em;
+        font-size: clamp(2rem, 8vw, 6rem);
+        margin-left: clamp(1em, 3vw, 2em);
     }
 }

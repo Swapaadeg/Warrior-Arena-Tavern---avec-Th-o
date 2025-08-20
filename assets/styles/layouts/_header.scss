@@ -53,6 +53,39 @@
     font-family: $font-title, serif;
     margin: 0;
     line-height: 1.2;
+    position: relative;
+    
+    // Image décorative avant le titre
+    &::before {
+        content: '';
+        position: absolute;
+        top: 9%;
+        left: -155px;
+        transform: translateY(-50%);
+        width: 200px;
+        height: 200px;
+        background-image: url(../../img/z1.png); // Remplacez par votre image
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        z-index: 1;
+    }
+    
+    // Image décorative après le titre
+    &::after {
+        content: '';
+        position: absolute;
+        top: 78%;
+        right: -180px;
+        transform: translateY(-50%);
+        width: 200px;
+        height: 200px;
+        background-image: url(../../img/z2.png);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        z-index: 1;
+    }
     
     span {
         display: block;
@@ -62,6 +95,8 @@
         2px 2px 4px rgba($primary-dark, 0.8),
         0 0 10px rgba($accent-gold, 0.3);
         letter-spacing: 0.1em;
+        position: relative;
+        z-index: 2;
     }
     
     .warrior {

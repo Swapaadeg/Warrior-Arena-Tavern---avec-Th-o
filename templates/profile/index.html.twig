@@ -40,10 +40,10 @@
                                 <span>{{ user.createdAt ? user.createdAt|date('d/m/Y') : 'Date inconnue' }}</span>
                             </div>
                             
-                            {% if user.team %}
-                                <div class="detail-item">
-                                    <label>Équipe :</label>
-                                    <span>
+                            <div class="detail-item">
+                                <label>Équipe :</label>
+                                <span>
+                                    {% if user.team %}
                                         {% set teamChars = user.team.getCharacters|default([]) %}
                                         {% if teamChars|length > 0 %}
                                             {% for character in teamChars %}
@@ -52,9 +52,11 @@
                                         {% else %}
                                             Aucune équipe enregistrée
                                         {% endif %}
-                                    </span>
-                                </div>
-                            {% endif %}
+                                    {% else %}
+                                        Aucune équipe enregistrée
+                                    {% endif %}
+                                </span>
+                            </div>
                         </div>
                     </div>
                     

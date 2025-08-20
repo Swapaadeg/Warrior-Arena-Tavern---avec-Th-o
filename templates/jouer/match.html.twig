@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Matchmaking - Duel{% endblock %}
+
+{% block body %}
+    <h1>Matchmaking : Duel</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Votre équipe</h2>
+            <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
+                {% for character in my_team %}
+                    <div class="character-item" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
+                        {% if character.imageName %}
+                            <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
+                        {% else %}
+                            <div style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:2em; margin: 0 auto;">?</div>
+                        {% endif %}
+                        <h3>{{ character.name }}</h3>
+                        <p><strong>PV:</strong> {{ character.HP }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h2>Adversaire : {{ opponent.username }}</h2>
+            <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
+                {% for character in opponent_team %}
+                    <div class="character-item" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
+                        {% if character.imageName %}
+                            <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
+                        {% else %}
+                            <div style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:2em; margin: 0 auto;">?</div>
+                        {% endif %}
+                        <h3>{{ character.name }}</h3>
+                        <p><strong>PV:</strong> {{ character.HP }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

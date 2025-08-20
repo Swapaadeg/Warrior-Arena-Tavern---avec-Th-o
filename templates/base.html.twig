@@ -30,22 +30,15 @@
 
                 <ul class="nav-links">
                     <li><a href="{{ path('home') }}">Accueil</a></li>
-                    {#<li><a href="{{ path('caves') }}">Toutes les caves</a></li>
-                    <li>
-                        {% if app.user %}
-                            <a href="{{ path('cave_perso') }}">Ma cave</a>
-                        {% else %}
-
-                        {% endif %}
-                    </li>
-                    <li><a href="{{ path('bouteilles') }}">Nos bouteilles</a></li>
-                    <li><a href="{{ path('contact') }}">Contact</a></li>#}
+                    <li><a href="{{ path('contact') }}">Contact</a></li>
+                    <li><a href="{{ path('personnages') }}">Personnages</a></li>
+                    <li><a href="{{ path('jouer') }}">Jouer</a></li>
                 </ul>
  
                  <ul class="auth-nav">
                     {% if not is_granted('ROLE_USER') %}
                         <li><a href="{{ path('login') }}">Connexion</a></li>
-                       {#} <li><a href="{{ path('inscription') }}">Inscription</a></li> "#}
+                        <li><a href="{{ path('register') }}">Inscription</a></li>
                     {% else %}
                         {% if app.user %}
                             <li class="greeting">Bonjour {{ app.user.username }}!</li>

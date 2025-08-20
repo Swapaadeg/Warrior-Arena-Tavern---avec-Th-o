@@ -4,10 +4,13 @@ namespace App\Entity;
 
 use App\Repository\CharactersRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types as DoctrineTypes;
 use Doctrine\ORM\Mapping as ORM;
 
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: CharactersRepository::class)]
 class Characters
 {
@@ -49,11 +52,25 @@ class Characters
     #[ORM\OneToMany(targetEntity: Types::class, mappedBy: 'perso')]
     private Collection $type;
 
+    #[Vich\UploadableField(mapping: 'images', fileNameProperty: 'imageName')]
+    private ?File $imageFile = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imageName = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     public function __construct()
     {
         $this->teams = new ArrayCollection();
         $this->role = new ArrayCollection();
         $this->type = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -204,6 +221,55 @@ class Characters
                 $type->setPerso(null);
             }
         }
+
+        return $this;
+    }
+
+    public function setImageFile(?File $imageFile = null): void
+{
+    $this->imageFile = $imageFile;
+
+    if ($imageFile) {
+        // Si un fichier est chargé, met à jour la date
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageName(?string $imageName): void
+    {
+        $this->imageName = $imageName;
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

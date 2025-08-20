@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Éditer mon profil - Warrior Arena Tavern{% endblock %}
+
+{% block body %}
+<div class="profile-edit-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="profile-card">
+                    <h1 class="profile-title">Éditer mon profil</h1>
+                    
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                    
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-danger">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    {{ form_start(form, {'attr': {'class': 'profile-form', 'enctype': 'multipart/form-data'}}) }}
+                        
+                        <div class="current-profile-image">
+                            {% if user.profileImageName %}
+                                <h3>Image actuelle :</h3>
+                                <img src="{{ vich_uploader_asset(user, 'profileImageFile') }}" 
+                                     alt="Photo de profil de {{ user.username }}" 
+                                     class="current-avatar">
+                            {% else %}
+                                <div class="no-avatar">
+                                    <i class="fas fa-user-circle"></i>
+                                    <p>Aucune image de profil</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_label(form.username) }}
+                            {{ form_widget(form.username) }}
+                            {{ form_errors(form.username) }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_label(form.profileImageFile) }}
+                            {{ form_widget(form.profileImageFile) }}
+                            {{ form_errors(form.profileImageFile) }}
+                            <small class="form-text text-muted">
+                                Formats acceptés : JPG, PNG, GIF. Taille maximum : 5MB
+                            </small>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Sauvegarder
+                            </button>
+                            <a href="{{ path('profile') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Retour au profil
+                            </a>
+                        </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

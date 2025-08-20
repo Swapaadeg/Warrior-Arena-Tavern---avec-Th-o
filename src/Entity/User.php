@@ -4,9 +4,12 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -31,8 +34,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[Vich\UploadableField(mapping: 'user_profiles', fileNameProperty: 'profileImageName')]
+    private ?File $profileImageFile = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profileImageName = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Teams $team = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -117,6 +138,55 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->team = $team;
+
+        return $this;
+    }
+
+    public function setProfileImageFile(?File $profileImageFile = null): void
+    {
+        $this->profileImageFile = $profileImageFile;
+
+        if ($profileImageFile) {
+            // Si un fichier est chargé, met à jour la date
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getProfileImageFile(): ?File
+    {
+        return $this->profileImageFile;
+    }
+
+    public function setProfileImageName(?string $profileImageName): void
+    {
+        $this->profileImageName = $profileImageName;
+    }
+
+    public function getProfileImageName(): ?string
+    {
+        return $this->profileImageName;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

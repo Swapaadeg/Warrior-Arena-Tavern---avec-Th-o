@@ -15,6 +15,7 @@
         {% endblock %}
     </head>
     <body>
+        {% if app.request.get('_route') != 'home' %}
         <header>
             <nav class="navbar">
                 <div class="logo">
@@ -29,7 +30,6 @@
 
                 <ul class="nav-links">
                     <li><a href="{{ path('home') }}" class="nav-link">Accueil</a></li>
-                    <li><a href="{{ path('login') }}" class="nav-link">Connexion</a></li>
                     {#<li><a href="{{ path('caves') }}" class="nav-link">Toutes les caves</a></li>
                     <li>
                         {% if app.user %}
@@ -42,23 +42,24 @@
                     <li><a href="{{ path('contact') }}" class="nav-link">Contact</a></li>#}
                 </ul>
  
-                {# <ul class="auth-nav">
+                 <ul class="auth-nav">
                     {% if not is_granted('ROLE_USER') %}
                         <li><a href="{{ path('login') }}">Connexion</a></li>
-                        <li class="separator-li"></li>
-                        <li><a href="{{ path('inscription') }}">Inscription</a></li>
+                       {#} <li><a href="{{ path('inscription') }}">Inscription</a></li> "#}
                     {% else %}
                         {% if app.user %}
                             <li class="greeting">Bonjour {{ app.user.username }}!</li>
                         {% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}
+                        {# {% if is_granted('ROLE_ADMIN') %}
                             <li><a href="{{ path('admin') }}" target="_blank">Pannel Admin</a></li>
-                        {% endif %}
+                        {% endif %} #}
+                        <li><a href="{{ path('profile') }}">Mon profil</a></li>
                         <li><a href="{{ path('logout') }}">Se déconnecter</a></li>
                     {% endif %}
-                </ul>#}
+                </ul>
             </nav>
         </header>
+        {% endif %}
 
         <main>
             {% block body %}{% endblock %}

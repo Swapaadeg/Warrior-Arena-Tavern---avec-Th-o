@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil - Warrior Arena Tavern{% endblock %}
+
+{% block body %}
+<div class="profile-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="profile-card">
+                    <h1 class="profile-title">Mon profil</h1>
+                    
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                    
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            {% if user.profileImageName %}
+                                <img src="{{ vich_uploader_asset(user, 'profileImageFile') }}" 
+                                     alt="Photo de profil de {{ user.username }}" 
+                                     class="avatar-image">
+                            {% else %}
+                                <div class="default-avatar">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="profile-details">
+                            <div class="detail-item">
+                                <label>Nom d'utilisateur :</label>
+                                <span>{{ user.username }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <label>Membre depuis :</label>
+                                <span>{{ user.createdAt ? user.createdAt|date('d/m/Y') : 'Date inconnue' }}</span>
+                            </div>
+                            
+                            {% if user.team %}
+                                <div class="detail-item">
+                                    <label>Équipe :</label>
+                                    <span>{{ user.team.id }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="profile-actions">
+                        <a href="{{ path('profile_edit') }}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Modifier mon profil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

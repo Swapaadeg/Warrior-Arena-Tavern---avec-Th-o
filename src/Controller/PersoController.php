@@ -5,6 +5,8 @@ namespace App\Controller;
 
 use App\Entity\Characters;
 use App\Form\CharacterType;
+use App\Entity\Roles;
+use App\Entity\Types;
 use App\Repository\CharactersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,6 +24,22 @@ final class PersoController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Handle role creation if provided
+            $roleName = $form->get('roleName')->getData();
+            if ($roleName) {
+                $role = new Roles();
+                $role->setName($roleName);
+                $role->setPerso($character);
+                $entityManager->persist($role);
+            }
+            // Handle type creation if provided
+            $typeName = $form->get('typeName')->getData();
+            if ($typeName) {
+                $type = new Types();
+                $type->setName($typeName);
+                $type->setPerso($character);
+                $entityManager->persist($type);
+            }
             $entityManager->persist($character);
             $entityManager->flush();
             $this->addFlash('success', 'Personnage ajouté avec succès !');

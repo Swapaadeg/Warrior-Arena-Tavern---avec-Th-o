@@ -90,14 +90,11 @@
     span {
         display: block;
         font-weight: bold;
-        background: linear-gradient(45deg, $accent-gold, $primary-beige);
+        background: linear-gradient(90deg, $accent-gold, $primary-beige);
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        color: $accent-gold;
-        text-shadow: 
-        2px 2px 4px rgba($primary-dark, 0.8),
-        0 0 10px rgba($accent-gold, 0.3);
+        color: transparent;
         letter-spacing: 0.1em;
         position: relative;
         z-index: 2;

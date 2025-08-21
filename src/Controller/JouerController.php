@@ -2,8 +2,7 @@
 
 namespace App\Controller;
 
-use App\Battle\BattleEngine;
-use App\Dto\{BattleSetupDTO, TeamDTO, UnitDTO};
+use App\Dto\{BattleSetupDTO, TeamDTO, UnitDTO, BattleEngineDTO};
 use App\Entity\Teams;
 use App\Repository\CharactersRepository;
 use App\Repository\UserRepository;
@@ -76,32 +75,40 @@ final class JouerController extends AbstractController
 
         $myTeam = $user->getTeam() ? $user->getTeam()->getCharacters() : [];
         $oppTeam = $opponent->getTeam()->getCharacters();
-        $toDto = function($c, $prefix, $teamId) {
+        // Minimal converter from Entity to DTO. Keep simple so you can implement logic manually.
+        $toDto = function($c, $prefix, $ownerLabel) {
             $hp = $c->getHP() ?? 1; $hp = max(0, (int)$hp);
             $power = $c->getPower() ?? 1; $def = $c->getDefense() ?? 0;
-            return new UnitDTO($prefix.$c->getId(), (string)$c->getName(), $hp, $hp, (int)$power, (int)$def, $teamId);
+            return new UnitDTO($prefix.$c->getId(), (string)$c->getName(), $hp, $hp, (int)$power, (int)$def, $ownerLabel);
         };
         $leftArr = is_array($myTeam) ? $myTeam : (method_exists($myTeam, 'toArray') ? $myTeam->toArray() : []);
         $rightArr = is_array($oppTeam) ? $oppTeam : (method_exists($oppTeam, 'toArray') ? $oppTeam->toArray() : []);
-        $leftDto = new TeamDTO('left', array_map(fn($c) => $toDto($c, 'L', 'left'), $leftArr));
-        $rightDto = new TeamDTO('right', array_map(fn($c) => $toDto($c, 'R', 'right'), $rightArr));
+        $leftDto = new TeamDTO('left', array_map(fn($c) => $toDto($c, 'L', 'You'), $leftArr));
+        $rightDto = new TeamDTO('right', array_map(fn($c) => $toDto($c, 'R', (string)$opponent->getUsername()), $rightArr));
         $setup = new BattleSetupDTO($leftDto, $rightDto, 42);
-        $result = BattleEngine::run($setup);
+
+    // Run the DTO-based engine and build maps for the template.
+    $result = BattleEngineDTO::run($setup);
+
+        $unitMap = array_merge(
+            array_combine(array_map(fn($c) => 'L'.$c->getId(), $leftArr), $leftArr),
+            array_combine(array_map(fn($c) => 'R'.$c->getId(), $rightArr), $rightArr)
+        );
+
+        $unitOwners = array_merge(
+            array_combine(array_map(fn($c) => 'L'.$c->getId(), $leftArr), array_fill(0, count($leftArr), 'You')),
+            array_combine(array_map(fn($c) => 'R'.$c->getId(), $rightArr), array_fill(0, count($rightArr), (string)$opponent->getUsername()))
+        );
 
         return $this->render('jouer/battle.html.twig', [
             'my_team' => $myTeam,
             'opponent' => $opponent,
             'opponent_team' => $oppTeam,
+            'setup' => $setup,
+            'unit_map' => $unitMap,
+            'unit_owners' => $unitOwners,
             'frames' => $result->frames,
             'result' => $result,
-            'unit_map' => array_merge(
-                array_combine(array_map(fn($c) => 'L'.$c->getId(), $leftArr), $leftArr),
-                array_combine(array_map(fn($c) => 'R'.$c->getId(), $rightArr), $rightArr)
-            ),
-            'unit_owners' => array_merge(
-                array_combine(array_map(fn($c) => 'L'.$c->getId(), $leftArr), array_fill(0, count($leftArr), 'You')),
-                array_combine(array_map(fn($c) => 'R'.$c->getId(), $rightArr), array_fill(0, count($rightArr), (string)$opponent->getUsername()))
-            ),
         ]);
     }
 }

@@ -44,9 +44,12 @@
 .dead { opacity: 0.5; filter: grayscale(1); }
 </style>
 <script>
-const frames = {{ frames|json_encode|raw }};
+// Minimal data passed to template: a BattleSetupDTO-like structure and unit maps.
+const setup = {{ setup|json_encode|raw }};
 const unitMap = {{ unit_map|json_encode|raw }};
 const unitOwners = {{ unit_owners|json_encode|raw }};
+// frames/result are no longer produced by the controller. Implement the battle logic here.
+let frames = [];
 let currentFrame = 0;
 let interval = null;
 
@@ -64,7 +67,7 @@ function updateFrame(idx) {
         if (box && hp <= 0) box.classList.add('dead');
     });
     // Animate actions
-    frames[idx].actions.forEach(action => {
+    (frames[idx].actions || []).forEach(action => {
         if (action.kind === 'ATTACK' || action.kind === 'HEAL') {
             const actor = document.getElementById('char-' + action.actorId);
             const target = action.targetId ? document.getElementById('char-' + action.targetId) : null;
@@ -74,40 +77,10 @@ function updateFrame(idx) {
     });
     // Log events (append as a new line)
     const logDiv = document.getElementById('battle-log');
-    if (frames[idx].events.length > 0) {
-        frames[idx].events.forEach(ev => {
-            // Try to match and rewrite log lines
-            let rewritten = ev;
-            // Match attack: "X attacked Y for Z"
-            let m = ev.match(/^(.*?) attacked (.*?) for (\d+)/);
-            if (m) {
-                let actorName = m[1], targetName = m[2], dmg = m[3];
-                let actorId = null, targetId = null;
-                // Find actorId and targetId by name (brute force)
-                for (const [uid, u] of Object.entries(unitMap)) {
-                    if (u.name === actorName) actorId = uid;
-                    if (u.name === targetName) targetId = uid;
-                }
-                let actorOwner = actorId && unitOwners[actorId] ? unitOwners[actorId] : '?';
-                let targetOwner = targetId && unitOwners[targetId] ? unitOwners[targetId] : '?';
-                rewritten = `${actorName} (${actorOwner}) is attacking ${targetName} (${targetOwner}) for ${dmg}`;
-            }
-            // Match heal: "X healed Y for Z"
-            m = ev.match(/^(.*?) healed (.*?) for (\d+)/);
-            if (m) {
-                let actorName = m[1], targetName = m[2], heal = m[3];
-                let actorId = null, targetId = null;
-                for (const [uid, u] of Object.entries(unitMap)) {
-                    if (u.name === actorName) actorId = uid;
-                    if (u.name === targetName) targetId = uid;
-                }
-                let actorOwner = actorId && unitOwners[actorId] ? unitOwners[actorId] : '?';
-                let targetOwner = targetId && unitOwners[targetId] ? unitOwners[targetId] : '?';
-                rewritten = `${actorName} (${actorOwner}) heals ${targetName} (${targetOwner}) for ${heal}`;
-            }
-            // Other events unchanged
+    if ((frames[idx].events || []).length > 0) {
+        (frames[idx].events || []).forEach(ev => {
             const p = document.createElement('div');
-            p.textContent = rewritten;
+            p.textContent = ev;
             logDiv.appendChild(p);
             logDiv.scrollTop = logDiv.scrollHeight;
         });
@@ -115,27 +88,26 @@ function updateFrame(idx) {
 }
 
 document.getElementById('play-battle').addEventListener('click', function() {
+    // Clear any previous run
     if (interval) clearInterval(interval);
     currentFrame = 0;
     document.getElementById('battle-log').innerHTML = '';
     document.getElementById('battle-winner').textContent = '';
+
+    // Example starter: build a trivial single-frame 'frames' array showing initial HPs.
+    frames = [{
+        tick: 0,
+        actions: [],
+        hpByUnit: Object.fromEntries(Object.entries(unitMap).map(([uid, u]) => [uid, u.HP ?? u.hp ?? 1])),
+        events: ['Battle started']
+    }];
+
     updateFrame(0);
     interval = setInterval(() => {
         currentFrame++;
         if (currentFrame >= frames.length) {
             clearInterval(interval);
-            // Show winner
-            let winner = {{ result.winnerTeamId is defined ? result.winnerTeamId|json_encode|raw : 'null' }};
-            let winnerText = '';
-            if (winner === 'left') {
-                winnerText = 'Victoire : Votre équipe !';
-            } else if (winner === 'right') {
-                winnerText = 'Victoire : ' + {{ opponent.username|json_encode|raw }};
-            } else {
-                winnerText = 'Match nul !';
-            }
-            document.getElementById('battle-winner').textContent = winnerText;
-            // Log end
+            document.getElementById('battle-winner').textContent = 'No winner (implement combat logic)';
             const p = document.createElement('div');
             p.textContent = 'Fin du combat.';
             document.getElementById('battle-log').appendChild(p);
@@ -145,4 +117,8 @@ document.getElementById('play-battle').addEventListener('click', function() {
     }, 1200);
 });
 </script>
+
+<div style="margin-top:1em; font-size:0.9em; color:#666;">Debug setup JSON (use this to implement your engine):
+    <pre style="white-space:pre-wrap; max-height:200px; overflow:auto; background:#f6f6f6; padding:0.5em; border-radius:6px;">{{ setup|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}</pre>
+</div>
 {% endblock %}

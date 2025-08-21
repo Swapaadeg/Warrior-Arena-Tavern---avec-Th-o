@@ -3,6 +3,7 @@
 {% block title %}Personnages - Warrior Arena Tavern{% endblock %}
 
 {% block body %}
+<img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
 <div class="form-page">
     <h1 class="form-page-title">Ajouter un personnage</h1>
 
@@ -10,9 +11,6 @@
     {% for message in app.flashes('success') %}
         <div class="alert alert-success">{{ message }}</div>
     {% endfor %}
-
-    {# Cropper.js CSS #}
-    <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.min.css" />
 
     {{ form_start(characterForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
         <div class="form-group">

@@ -1,0 +1,209 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}
+    <h1 class="title">
+        <i class="fas fa-tachometer-alt"></i>
+        Dashboard - Warrior Arena Tavern
+    </h1>
+{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-home"></i> 
+                        Retourner sur le site
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <a href="{{ path('home') }}" class="btn btn-lg btn-outline-primary">
+                        <i class="fas fa-external-link-alt"></i>
+                        Aller sur le site public
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Statistiques générales -->
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-success">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-users"></i>
+                        Personnages Total
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h2 class="display-4">{{ charactersCount }}</h2>
+                    <p class="card-text">Personnages créés</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-info">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-user-friends"></i>
+                        Utilisateurs
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h2 class="display-4">{{ usersCount }}</h2>
+                    <p class="card-text">Inscrits sur le site</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-warning">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Rôles
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h2 class="display-4">{{ rolesCount }}</h2>
+                    <p class="card-text">Rôles disponibles</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-secondary">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-building"></i>
+                        Types
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h2 class="display-4">{{ typesCount }}</h2>
+                    <p class="card-text">Types d'univers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Statistiques par rôles -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Répartition par Rôles
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="text-primary">
+                                <i class="fas fa-shield-alt fa-3x"></i>
+                                <h3 class="mt-2">{{ tankCount }}</h3>
+                                <p class="text-muted">Tank</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-danger">
+                                <i class="fas fa-sword fa-3x"></i>
+                                <h3 class="mt-2">{{ dpsCount }}</h3>
+                                <p class="text-muted">DPS</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-success">
+                                <i class="fas fa-heart fa-3x"></i>
+                                <h3 class="mt-2">{{ healCount }}</h3>
+                                <p class="text-muted">Heal</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques par types -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Répartition par Types
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="text-warning">
+                                <i class="fas fa-beer fa-3x"></i>
+                                <h3 class="mt-2">{{ taverneCount }}</h3>
+                                <p class="text-muted">Taverne</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-info">
+                                <i class="fas fa-graduation-cap fa-3x"></i>
+                                <h3 class="mt-2">{{ academieCount }}</h3>
+                                <p class="text-muted">Académie</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-dark">
+                                <i class="fas fa-mask fa-3x"></i>
+                                <h3 class="mt-2">{{ ombreCount }}</h3>
+                                <p class="text-muted">Ombre</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-cogs"></i>
+                        Actions Rapides
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <a href="{{ path('admin', {crudAction: 'new', crudControllerFqcn: 'App\\Controller\\Admin\\CharactersCrudController'}) }}" class="btn btn-success btn-lg mb-2">
+                                <i class="fas fa-plus"></i><br>
+                                Nouveau Personnage
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <a href="{{ path('admin', {crudAction: 'index', crudControllerFqcn: 'App\\Controller\\Admin\\CharactersCrudController'}) }}" class="btn btn-primary btn-lg mb-2">
+                                <i class="fas fa-list"></i><br>
+                                Voir Personnages
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <a href="{{ path('admin', {crudAction: 'index', crudControllerFqcn: 'App\\Controller\\Admin\\UserCrudController'}) }}" class="btn btn-info btn-lg mb-2">
+                                <i class="fas fa-users"></i><br>
+                                Gérer Utilisateurs
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <a href="{{ path('home') }}" class="btn btn-outline-secondary btn-lg mb-2">
+                                <i class="fas fa-home"></i><br>
+                                Site Public
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -209,6 +209,24 @@
             }
         }
     }
+    
+    // Admin link styles
+    .admin-link {
+        background: rgba($accent-gold, 0.1);
+        border: 1px solid $accent-gold;
+        border-radius: 5px;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        
+        &:hover {
+            background: rgba($accent-gold, 0.2);
+            border-color: $primary-beige;
+            color: $primary-beige;
+            box-shadow: 0 0 10px rgba($accent-gold, 0.3);
+        }
+    }
 }
 
 // NAVBAR HERO (pour la page d'accueil uniquement)

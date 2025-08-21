@@ -51,6 +51,9 @@
                                 {% endif %}
                             </a>
                         </li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li><a href="{{ path('admin') }}" class="admin-link" title="Panel Administrateur">🛡️ Admin</a></li>
+                        {% endif %}
                         <li><a href="{{ path('logout') }}">Se déconnecter</a></li>
                     {% endif %}
                 </ul>

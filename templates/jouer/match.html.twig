@@ -1,41 +1,39 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Matchmaking - Duel{% endblock %}
+{% block title %}Matchmaking{% endblock %}
 
 {% block body %}
-    <h1>Matchmaking : Duel</h1>
-    <div class="row">
-        <div class="col-md-6">
-            <h2>Votre équipe</h2>
-            <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
-                {% for character in my_team %}
-                    <div class="character-item" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
-                        {% if character.imageName %}
-                            <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
-                        {% else %}
-                            <div style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:2em; margin: 0 auto;">?</div>
-                        {% endif %}
-                        <h3>{{ character.name }}</h3>
-                        <p><strong>PV:</strong> {{ character.HP }}</p>
-                    </div>
-                {% endfor %}
-            </div>
+<h1>Matchmaking</h1>
+<div class="row">
+    <div class="col-md-6">
+        <h2>Votre équipe</h2>
+        <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
+            {% for character in my_team %}
+                <div class="character-item" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
+                    <h3>{{ character.name }}</h3>
+                    <div>PV: {{ character.HP }}</div>
+                </div>
+            {% endfor %}
         </div>
-        <div class="col-md-6">
+    </div>
+    <div class="col-md-6">
+        {% if opponent %}
             <h2>Adversaire : {{ opponent.username }}</h2>
             <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
                 {% for character in opponent_team %}
                     <div class="character-item" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
-                        {% if character.imageName %}
-                            <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
-                        {% else %}
-                            <div style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:2em; margin: 0 auto;">?</div>
-                        {% endif %}
                         <h3>{{ character.name }}</h3>
-                        <p><strong>PV:</strong> {{ character.HP }}</p>
+                        <div>PV: {{ character.HP }}</div>
                     </div>
                 {% endfor %}
             </div>
-        </div>
+            <form method="post" action="{{ path('jouer_battle') }}">
+                <input type="hidden" name="opponentId" value="{{ opponent.id }}">
+                <button type="submit" class="btn btn-success mt-3">Lancer la bataille</button>
+            </form>
+        {% else %}
+            <div class="alert alert-warning">Aucun adversaire trouvé pour le matchmaking.</div>
+        {% endif %}
     </div>
+</div>
 {% endblock %}

@@ -224,28 +224,7 @@ input[type="file"] {
     }
 }
 
-// Responsive form design
-@media (max-width: 768px) {
-    .register-wrapper,
-    .login-wrapper,
-    .contact-wrapper,
-    .character-wrapper {
-        margin: 1rem;
-        padding: 3rem 2rem 2rem 2rem;
-        max-width: 90%;
-        min-height: 500px;
-
-        h1, h2 {
-            font-size: 1.8rem;
-        }
-    }
-
-    .btn {
-        width: 100%;
-        padding: 1rem;
-        font-size: 1.1rem;
-    }
-}
+// Media queries déplacées dans _responsive.scss
 
 // Form validation styling
 .form-row {

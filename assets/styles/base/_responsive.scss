@@ -5,6 +5,14 @@
 // RESPONSIVE DESIGN - WARRIOR ARENA TAVERNE
 // ==========================================================================
 
+// DESKTOP - Masquer les burger menus
+@media (min-width: 769px) {
+    .navbar .burger,
+    .hero-navbar .burger {
+        display: none !important;
+    }
+}
+
 // TABLET & MOBILE GENERAL
 @media (max-width: 768px) {
     // Hero Banner responsive
@@ -39,10 +47,48 @@
             margin-left: 0.5em;
         }
     }
-    
+
+    // NAVBAR RESPONSIVE
+    // Navbar générale - Burger menu
+    .navbar {
+        .burger {
+            display: flex;
+        }
+
+        .nav-links,
+        .auth-nav {
+            display: none;
+            
+            &.active {
+                @include flex(column, center, center);
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba($primary-dark, 0.95);
+                backdrop-filter: blur(15px);
+                z-index: 999;
+                
+                li {
+                    margin: 1rem 0;
+                }
+                
+                a {
+                    font-size: 1.2rem;
+                    padding: 1rem 2rem;
+                }
+            }
+        }
+    }
+
     // Hero Navbar responsive (homepage uniquement)
     .hero-navbar {
         padding: 1rem;
+
+        .burger {
+            display: flex;
+        }
         
         .nav-links {
             position: fixed;
@@ -112,32 +158,61 @@
             }
         }
     }
-    
-    // Navbar générale responsive (autres pages)
-    .navbar {
-        .nav-links,
-        .auth-nav {
-            &.active {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba($primary-dark, 0.95);
-                backdrop-filter: blur(15px);
-                z-index: 999;
-                @include flex(column, center, center);
+
+    // FOOTER RESPONSIVE
+    .footer {
+        padding: 2rem 5vw;
+        
+        .footer-content {
+            @include flex(column, center, center);
+            gap: 2rem;
+            text-align: center;
+            
+            .footer-section {
+                width: 100%;
                 
-                li {
-                    margin: 1rem 0;
+                h3 {
+                    font-size: 1.5rem;
                 }
                 
-                a {
-                    font-size: 1.2rem;
-                    padding: 1rem 2rem;
+                .footer-links {
+                    gap: 0.6rem;
+                    
+                    li a {
+                        font-size: 0.9rem;
+                    }
+                }
+            }
+            
+            .footer-center {
+                order: -1;
+                
+                .footer-logo {
+                    height: 60px;
                 }
             }
         }
+    }
+
+    // FORMS RESPONSIVE
+    .register-wrapper,
+    .login-wrapper,
+    .contact-wrapper,
+    .character-wrapper {
+        margin: 1rem;
+        padding: 3rem 2rem 2rem 2rem;
+        max-width: 90%;
+        min-height: 500px;
+
+        h1, h2 {
+            font-size: 1.8rem;
+        }
+    }
+
+    .btn {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
     }
 }
 

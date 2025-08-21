@@ -3,9 +3,10 @@
 {% block title %}Connexion{% endblock %}
 
 {% block body %}
-<div class="login-wrapper">
-    <h2>Se connecter</h2>
+<div class="form-page">
+    <h2 class="form-page-title">Se connecter</h2>
 
+    <div class="login-wrapper">
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
@@ -47,5 +48,6 @@
     <div class="form-links">
         <p><a href="{{ path('register') }}">Pas encore de compte ? S'inscrire</a></p>
     </div>
+</div>
 </div>
 {% endblock %}

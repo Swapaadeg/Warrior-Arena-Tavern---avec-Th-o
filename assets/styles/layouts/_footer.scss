@@ -1,5 +1,6 @@
 @use "../abstracts/variables" as *;
 @use "../abstracts/mixins" as *;
+@use "sass:color";
 
 // ==========================================================================
 // FOOTER - WARRIOR ARENA TAVERNE
@@ -69,14 +70,27 @@
                 text-align: center;
                 color: $primary-beige;
                 line-height: 1.6;
-                
+
                 p {
                     margin: 0.5rem 0;
-                    
+
                     strong {
                         color: $accent-gold;
                         font-family: $font-h2;
                         font-size: 1.1rem;
+                    }
+
+                    a {
+                        color: $accent-gold;
+                        font-family: $font-h2;
+                        font-size: 1.1rem;
+                        text-decoration: none;
+                        transition: all 0.3s ease;
+
+                        &:hover {
+                            color: color.adjust($accent-gold, $lightness: 15%);
+                            text-shadow: 0 0 8px rgba($accent-gold, 0.6);
+                        }
                     }
                 }
             }
@@ -99,6 +113,12 @@
         }
     }
     
+    .footer-copy {
+        text-align: center;
+        color: $primary-beige;
+        font-family: $font-text-italic;
+        font-size: 0.8rem;
+    }
     // Responsive
     @media (max-width: 768px) {
         padding: 2rem 5vw;

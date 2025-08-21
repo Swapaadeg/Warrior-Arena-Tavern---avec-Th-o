@@ -18,6 +18,7 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('username', TextType::class, [
                 'label' => 'Nom d\'utilisateur',
+                'attr' => ['class' => 'form-control']
             ])
             ->add('profileImageFile', VichFileType::class, [
                 'label' => 'Photo de profil',
@@ -31,8 +32,14 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'first_options'  => ['label' => 'Mot de passe'],
-                'second_options' => ['label' => 'Répéter le mot de passe'],
+                'first_options'  => [
+                    'label' => 'Mot de passe',
+                    'attr' => ['class' => 'form-control']
+                ],
+                'second_options' => [
+                    'label' => 'Répéter le mot de passe',
+                    'attr' => ['class' => 'form-control']
+                ],
                 'mapped' => false,
                 'required' => true,
             ])

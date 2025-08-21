@@ -2,38 +2,76 @@
 @use "../abstracts/variables" as *;
 @use "../abstracts/mixins" as *;
 
+// Page background for forms
+.form-page {
+    padding: 2rem 1rem;
+    background-image: url('../../img/img92.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top;
+    position: relative;
+}
+
+// Form page titles
+.form-page-title {
+    font-family: $font-title;
+    color: $accent-gold;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 4px rgba($primary-dark, 0.8);
+    font-weight: 700;
+    position: relative;
+    z-index: 2;
+}
+
 // Forms styling
 .register-wrapper,
-.login-wrapper {
-    max-width: 500px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: rgba($primary-beige, 0.1);
-    border: 2px solid $primary-brown;
-    border-radius: 8px;
-    backdrop-filter: blur(10px);
-
-    h2 {
-        font-family: $font-title;
-        color: $accent-gold;
-        text-align: center;
-        margin-bottom: 2rem;
-        font-size: 2rem;
-        text-shadow: 2px 2px 4px rgba($primary-dark, 0.5);
+.login-wrapper,
+.contact-wrapper,
+.character-wrapper {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto 2rem auto;
+    padding: 4rem 6rem;
+    background-image: url('../../img/form.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 600px;
+    background-color: transparent;
+    border: solid 6px rgba($primary-brown, 0.8);
+    border-radius: 10px;
+    backdrop-filter: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+    // Structure pour centrer sans contraindre la largeur
+    > * {
+        width: 100%;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
     }
 }
 
 // Form groups and labels
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.8rem;
+    width: 100%;
 
     label {
-        font-family: $font-h2;
-        color: $primary-beige;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
+        text-align: left;
+        font-family: $font-accent;
+        color: $primary-dark;
+        margin: 0 auto 0.6rem auto;
+        font-size: 1.2rem;
+        text-shadow: 0.5px 0.5px 1px rgba($primary-beige, 0.6);
+        width: 70%;
+        max-width: 400px;
         display: block;
-        font-size: 1.1rem;
+        font-weight: 700;
     }
 }
 
@@ -45,26 +83,33 @@ input[type="password"],
 input[type="file"],
 textarea,
 select {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 2px solid $primary-brown;
-    border-radius: 6px;
-    background: rgba($primary-beige, 0.9);
+    width: 70%;
+    max-width: 400px;
+    margin: 0 auto;
+    display: block;
+    padding: 0.8rem 1rem;
+    border: 2px solid rgba($primary-brown, 0.6);
+    border-radius: 4px;
+    background: rgba($primary-beige, 0.95);
     color: $primary-dark;
     font-family: $font-text;
     font-size: 1rem;
+    font-weight: 500;
     transition: all 0.3s ease;
+    box-shadow: inset 1px 1px 3px rgba($primary-brown, 0.2);
 
     &:focus {
         outline: none;
-        border-color: $accent-gold;
-        box-shadow: 0 0 10px rgba($accent-gold, 0.3);
-        background: $primary-beige;
+        border-color: rgba($primary-brown, 0.8);
+        box-shadow: inset 1px 1px 3px rgba($primary-brown, 0.3), 
+                    0 0 8px rgba($accent-gold, 0.4);
+        background: rgba($primary-beige, 1);
     }
 
     &::placeholder {
-        color: rgba($primary-dark, 0.6);
+        color: rgba($primary-dark, 0.5);
         font-style: italic;
+        font-weight: 400;
     }
 }
 
@@ -94,83 +139,101 @@ input[type="file"] {
 
 // Form buttons
 .btn {
-    padding: 0.75rem 2rem;
+    padding: 0.9rem 2.5rem;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     font-family: $font-h2;
-    font-weight: 600;
-    font-size: 1.1rem;
+    font-weight: 700;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
-    display: inline-block;
+    display: block;
     text-align: center;
+    margin: 1.5rem auto 0 auto;
+    width: auto;
+    max-width: 60%;
+    box-shadow: 2px 2px 4px rgba($primary-dark, 0.3);
 
     &.btn-primary {
-        background: linear-gradient(135deg, $accent-gold, color.adjust($accent-gold, $lightness: -15%));
+        background: linear-gradient(135deg, $accent-gold, color.adjust($accent-gold, $lightness: -10%));
         color: $primary-dark;
-        border: 2px solid $primary-brown;
+        border: 2px solid rgba($primary-brown, 0.8);
+        text-shadow: 0.5px 0.5px 1px rgba($primary-beige, 0.8);
         
         &:hover {
-            background: linear-gradient(135deg, color.adjust($accent-gold, $lightness: 10%), $accent-gold);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba($accent-gold, 0.3);
+            background: linear-gradient(135deg, color.adjust($accent-gold, $lightness: 8%), color.adjust($accent-gold, $lightness: -5%));
+            transform: translateY(-1px);
+            box-shadow: 2px 4px 8px rgba($primary-dark, 0.4);
         }
 
         &:active {
-            transform: translateY(0);
+            transform: translateY(1px);
+            box-shadow: 1px 1px 2px rgba($primary-dark, 0.3);
         }
     }
 }
 
 // Form errors
 .invalid-feedback {
-    color: #e74c3c;
+    color: color.adjust(#e74c3c, $lightness: -10%);
     font-size: 0.9rem;
     margin-top: 0.25rem;
     font-family: $font-text;
+    font-weight: 600;
+    text-shadow: 0.5px 0.5px 1px rgba($primary-beige, 0.6);
 }
 
 .form-control.is-invalid {
-    border-color: #e74c3c;
-    box-shadow: 0 0 8px rgba(#e74c3c, 0.3);
+    border-color: color.adjust(#e74c3c, $lightness: -10%);
+    box-shadow: inset 1px 1px 3px rgba(#e74c3c, 0.3);
 }
 
 // Success messages
 .alert {
-    padding: 1rem;
-    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    border-radius: 4px;
     margin-bottom: 1.5rem;
     font-family: $font-text;
+    font-weight: 600;
+    border: 2px solid transparent;
+    box-shadow: inset 1px 1px 3px rgba($primary-brown, 0.2);
 
     &.alert-success {
-        background: rgba(#27ae60, 0.1);
-        color: #27ae60;
-        border: 1px solid rgba(#27ae60, 0.3);
+        background: rgba(#27ae60, 0.15);
+        color: color.adjust(#27ae60, $lightness: -15%);
+        border-color: rgba(#27ae60, 0.4);
+        text-shadow: 0.5px 0.5px 1px rgba($primary-beige, 0.8);
     }
 
     &.alert-danger {
-        background: rgba(#e74c3c, 0.1);
-        color: #e74c3c;
-        border: 1px solid rgba(#e74c3c, 0.3);
+        background: rgba(#e74c3c, 0.15);
+        color: color.adjust(#e74c3c, $lightness: -15%);
+        border-color: rgba(#e74c3c, 0.4);
+        text-shadow: 0.5px 0.5px 1px rgba($primary-beige, 0.8);
     }
 }
 
 // Responsive form design
 @media (max-width: 768px) {
     .register-wrapper,
-    .login-wrapper {
+    .login-wrapper,
+    .contact-wrapper,
+    .character-wrapper {
         margin: 1rem;
-        padding: 1.5rem;
+        padding: 3rem 2rem 2rem 2rem;
+        max-width: 90%;
+        min-height: 500px;
 
-        h2 {
-            font-size: 1.5rem;
+        h1, h2 {
+            font-size: 1.8rem;
         }
     }
 
     .btn {
         width: 100%;
         padding: 1rem;
+        font-size: 1.1rem;
     }
 }
 
@@ -253,6 +316,67 @@ fieldset {
         &:hover {
             color: color.adjust($accent-gold, $lightness: 15%);
             text-decoration: underline;
+        }
+    }
+}
+
+// Character list styling
+.characters-list-section {
+    max-width: 1000px;
+    margin: 3rem auto;
+    padding: 2rem;
+    
+    .character-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        
+        .character-item {
+            background: rgba($primary-beige, 0.05);
+            border: 1px solid rgba($primary-brown, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                background: rgba($primary-beige, 0.1);
+                border-color: $accent-gold;
+                box-shadow: 0 4px 12px rgba($accent-gold, 0.2);
+            }
+            
+            h3 {
+                color: $accent-gold;
+                font-family: $font-h2;
+                margin-bottom: 0.5rem;
+            }
+            
+            p {
+                color: $primary-beige;
+                font-family: $font-text;
+                margin: 0.3rem 0;
+                
+                strong {
+                    color: $accent-gold;
+                }
+            }
+            
+            .badge {
+                display: inline-block;
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                
+                &.bg-secondary {
+                    background: rgba($primary-brown, 0.8);
+                    color: $primary-beige;
+                }
+                
+                &.bg-info {
+                    background: rgba($accent-gold, 0.8);
+                    color: $primary-dark;
+                }
+            }
         }
     }
 }

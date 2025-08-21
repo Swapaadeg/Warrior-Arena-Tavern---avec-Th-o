@@ -19,18 +19,22 @@ class ContactForm extends AbstractType
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
                 'required' => true,
+                'attr' => ['class' => 'form-control']
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
                 'required' => true,
+                'attr' => ['class' => 'form-control']
             ])
             ->add('objet', TextType::class, [
-                'label' => 'Object',
+                'label' => 'Objet',
                 'required' => true,
+                'attr' => ['class' => 'form-control']
             ])
             ->add('message', TextareaType::class, [
                 'label' => 'Message',
                 'required' => true,
+                'attr' => ['class' => 'form-control', 'rows' => 6]
             ]);
     }
 

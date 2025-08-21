@@ -1,31 +1,74 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Les personnages{% endblock %}
+{% block title %}Personnages - Warrior Arena Tavern{% endblock %}
 
 {% block body %}
-    <h1>Ajouter un personnage</h1>
+<div class="form-page">
+    <h1 class="form-page-title">Ajouter un personnage</h1>
+
+    <div class="character-wrapper">
     {% for message in app.flashes('success') %}
         <div class="alert alert-success">{{ message }}</div>
     {% endfor %}
-
 
     {# Cropper.js CSS #}
     <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.min.css" />
 
     {{ form_start(characterForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
-        {{ form_row(characterForm.name) }}
-        {{ form_row(characterForm.HP) }}
-        {{ form_row(characterForm.power) }}
-        {{ form_row(characterForm.defense) }}
-        {{ form_row(characterForm.description) }}
-        {{ form_row(characterForm.imageFile) }}
-        {{ form_row(characterForm.roleName) }}
-        {{ form_row(characterForm.typeName) }}
-        <button type="submit" class="btn btn-primary">Ajouter</button>
+        <div class="form-group">
+            {{ form_label(characterForm.name) }}
+            {{ form_widget(characterForm.name) }}
+            {{ form_errors(characterForm.name) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(characterForm.HP) }}
+            {{ form_widget(characterForm.HP) }}
+            {{ form_errors(characterForm.HP) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(characterForm.power) }}
+            {{ form_widget(characterForm.power) }}
+            {{ form_errors(characterForm.power) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(characterForm.defense) }}
+            {{ form_widget(characterForm.defense) }}
+            {{ form_errors(characterForm.defense) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(characterForm.description) }}
+            {{ form_widget(characterForm.description) }}
+            {{ form_errors(characterForm.description) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(characterForm.imageFile) }}
+            {{ form_widget(characterForm.imageFile) }}
+            {{ form_errors(characterForm.imageFile) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(characterForm.roleName) }}
+            {{ form_widget(characterForm.roleName) }}
+            {{ form_errors(characterForm.roleName) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(characterForm.typeName) }}
+            {{ form_widget(characterForm.typeName) }}
+            {{ form_errors(characterForm.typeName) }}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Ajouter le personnage</button>
     {{ form_end(characterForm) }}
+</div>
 
-
-    <h2>Liste des personnages</h2>
+<div class="characters-list-section" style="margin-top: 3rem;">
+    <h2 style="text-align: center; color: var(--accent-gold); font-family: var(--font-title); margin-bottom: 2rem;">Liste des personnages</h2>
     <div class="character-list">
         {% for character in characters %}
             <div class="character-item" style="display: flex; align-items: center; gap: 1em;">
@@ -60,4 +103,6 @@
             <p>Aucun personnage trouvé.</p>
         {% endfor %}
     </div>
+</div>
+</div>
 {% endblock %}

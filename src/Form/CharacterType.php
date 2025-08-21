@@ -18,33 +18,41 @@ class CharacterType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nom du personnage',
+                'attr' => ['class' => 'form-control']
             ])
             ->add('HP', IntegerType::class, [
                 'label' => 'Points de vie',
+                'attr' => ['class' => 'form-control']
             ])
             ->add('power', IntegerType::class, [
                 'label' => 'Puissance',
+                'attr' => ['class' => 'form-control']
             ])
             ->add('defense', IntegerType::class, [
                 'label' => 'Défense',
+                'attr' => ['class' => 'form-control']
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
+                'attr' => ['class' => 'form-control', 'rows' => 4]
             ])
             ->add('roleName', TextType::class, [
                 'label' => 'Rôle du personnage',
                 'mapped' => false,
                 'required' => false,
+                'attr' => ['class' => 'form-control']
             ])
             ->add('typeName', TextType::class, [
                 'label' => 'Type du personnage',
                 'mapped' => false,
                 'required' => false,
+                'attr' => ['class' => 'form-control']
             ])
             ->add('imageFile', FileType::class, [
                 'label' => 'Illustration (JPG, PNG)',
                 'required' => false,
                 'mapped' => true,
+                'attr' => ['class' => 'form-control']
             ])
         ;
     }

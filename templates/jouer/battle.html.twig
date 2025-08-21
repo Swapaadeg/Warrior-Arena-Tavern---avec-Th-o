@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Résultat de la bataille{% endblock %}
+
+{% block body %}
+<h1>Résultat de la bataille</h1>
+<div class="row">
+    <div class="col-md-6">
+        <h2>Votre équipe</h2>
+        <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
+            {% for character in my_team %}
+                <div class="character-item" id="char-L{{ character.id }}" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
+                    <h3>{{ character.name }}</h3>
+                    <div>PV: <span class="hp" id="hp-L{{ character.id }}">{{ character.HP }}</span></div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h2>Adversaire : {{ opponent.username }}</h2>
+        <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
+            {% for character in opponent_team %}
+                <div class="character-item" id="char-R{{ character.id }}" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
+                    <h3>{{ character.name }}</h3>
+                    <div>PV: <span class="hp" id="hp-R{{ character.id }}">{{ character.HP }}</span></div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="mt-4 row">
+    <div class="col-md-8 text-center">
+        <button id="play-battle" class="btn btn-danger btn-lg">Lancer l'animation</button>
+    </div>
+    <div class="col-md-4">
+        <h4>Journal du combat</h4>
+        <div id="battle-log" style="margin-top:1em; min-height:2em; max-height:400px; overflow-y:auto; border:1px solid #ccc; border-radius:8px; background:#fafafa; padding:1em;"></div>
+        <div id="battle-winner" style="margin-top:1em; font-weight:bold; font-size:1.2em;"></div>
+    </div>
+</div>
+<style>
+.glow-red { box-shadow: 0 0 20px 5px #ff0000; background: #ffeaea; }
+.glow-black { box-shadow: 0 0 20px 5px #000; background: #222; color: #fff; }
+.dead { opacity: 0.5; filter: grayscale(1); }
+</style>
+<script>
+const frames = {{ frames|json_encode|raw }};
+const unitMap = {{ unit_map|json_encode|raw }};
+const unitOwners = {{ unit_owners|json_encode|raw }};
+let currentFrame = 0;
+let interval = null;
+
+function updateFrame(idx) {
+    // Reset all glows
+    document.querySelectorAll('.character-item').forEach(el => {
+        el.classList.remove('glow-red','glow-black','dead');
+    });
+    if (!frames[idx]) return;
+    // Update HP
+    Object.entries(frames[idx].hpByUnit).forEach(([uid, hp]) => {
+        const el = document.getElementById('hp-' + uid);
+        if (el) el.textContent = hp;
+        const box = document.getElementById('char-' + uid);
+        if (box && hp <= 0) box.classList.add('dead');
+    });
+    // Animate actions
+    frames[idx].actions.forEach(action => {
+        if (action.kind === 'ATTACK' || action.kind === 'HEAL') {
+            const actor = document.getElementById('char-' + action.actorId);
+            const target = action.targetId ? document.getElementById('char-' + action.targetId) : null;
+            if (actor) actor.classList.add('glow-red');
+            if (target) target.classList.add(action.kind === 'ATTACK' ? 'glow-black' : 'glow-red');
+        }
+    });
+    // Log events (append as a new line)
+    const logDiv = document.getElementById('battle-log');
+    if (frames[idx].events.length > 0) {
+        frames[idx].events.forEach(ev => {
+            // Try to match and rewrite log lines
+            let rewritten = ev;
+            // Match attack: "X attacked Y for Z"
+            let m = ev.match(/^(.*?) attacked (.*?) for (\d+)/);
+            if (m) {
+                let actorName = m[1], targetName = m[2], dmg = m[3];
+                let actorId = null, targetId = null;
+                // Find actorId and targetId by name (brute force)
+                for (const [uid, u] of Object.entries(unitMap)) {
+                    if (u.name === actorName) actorId = uid;
+                    if (u.name === targetName) targetId = uid;
+                }
+                let actorOwner = actorId && unitOwners[actorId] ? unitOwners[actorId] : '?';
+                let targetOwner = targetId && unitOwners[targetId] ? unitOwners[targetId] : '?';
+                rewritten = `${actorName} (${actorOwner}) is attacking ${targetName} (${targetOwner}) for ${dmg}`;
+            }
+            // Match heal: "X healed Y for Z"
+            m = ev.match(/^(.*?) healed (.*?) for (\d+)/);
+            if (m) {
+                let actorName = m[1], targetName = m[2], heal = m[3];
+                let actorId = null, targetId = null;
+                for (const [uid, u] of Object.entries(unitMap)) {
+                    if (u.name === actorName) actorId = uid;
+                    if (u.name === targetName) targetId = uid;
+                }
+                let actorOwner = actorId && unitOwners[actorId] ? unitOwners[actorId] : '?';
+                let targetOwner = targetId && unitOwners[targetId] ? unitOwners[targetId] : '?';
+                rewritten = `${actorName} (${actorOwner}) heals ${targetName} (${targetOwner}) for ${heal}`;
+            }
+            // Other events unchanged
+            const p = document.createElement('div');
+            p.textContent = rewritten;
+            logDiv.appendChild(p);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        });
+    }
+}
+
+document.getElementById('play-battle').addEventListener('click', function() {
+    if (interval) clearInterval(interval);
+    currentFrame = 0;
+    document.getElementById('battle-log').innerHTML = '';
+    document.getElementById('battle-winner').textContent = '';
+    updateFrame(0);
+    interval = setInterval(() => {
+        currentFrame++;
+        if (currentFrame >= frames.length) {
+            clearInterval(interval);
+            // Show winner
+            let winner = {{ result.winnerTeamId is defined ? result.winnerTeamId|json_encode|raw : 'null' }};
+            let winnerText = '';
+            if (winner === 'left') {
+                winnerText = 'Victoire : Votre équipe !';
+            } else if (winner === 'right') {
+                winnerText = 'Victoire : ' + {{ opponent.username|json_encode|raw }};
+            } else {
+                winnerText = 'Match nul !';
+            }
+            document.getElementById('battle-winner').textContent = winnerText;
+            // Log end
+            const p = document.createElement('div');
+            p.textContent = 'Fin du combat.';
+            document.getElementById('battle-log').appendChild(p);
+            return;
+        }
+        updateFrame(currentFrame);
+    }, 1200);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,520 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+@use "sass:color";
+
+// ==========================================================================
+// PAGE JOUER - WARRIOR ARENA TAVERNE
+// ==========================================================================
+
+.play-page {
+    padding: 2rem;
+    min-height: 100vh;
+    background-image: url(../../img/img92.jpg);
+    background-size: cover;
+    background-position: top;
+
+    .play-title {
+        text-align: center;
+        font-family: $font-title;
+        font-size: 3rem;
+        color: $accent-gold;
+        text-shadow: 3px 3px 6px rgba($primary-dark, 0.7);
+        margin-bottom: 3rem;
+    }
+}
+
+// Plateau de jeu en haut
+.battle-board {
+    width: 100%;
+    max-width: 800px;
+    height: 300px;
+    margin: 0 auto 4rem auto;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba($primary-dark, 0.4);
+    position: relative;
+    border: 4px solid $accent-gold;
+    
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: sepia(20%) saturate(1.2) contrast(1.1);
+    }
+    
+    .board-overlay {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba($primary-dark, 0.8);
+        color: $accent-gold;
+        padding: 0.5rem 1.5rem;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        text-shadow: 1px 1px 2px rgba($primary-dark, 0.8);
+    }
+}
+
+// Grille des personnages
+.characters-selection {
+    margin-bottom: 3rem;
+    
+    .section-title {
+        text-align: center;
+        font-family: $font-title;
+        font-size: 2rem;
+        color: $primary-dark;
+        margin-bottom: 2rem;
+    }
+    
+    .subtitle {
+        display: block;
+        font-size: 1rem;
+        color: $primary-brown;
+        font-weight: normal;
+        font-style: italic;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .character-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
+
+// Carte de personnage
+.character-card {
+    background: rgba($primary-beige, 0.95);
+    border: 3px solid transparent;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 4px 15px rgba($primary-dark, 0.2);
+    
+    // Indicateur "clic pour voir détails"
+    &::after {
+        content: "👁️ Clic pour détails";
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.7rem;
+        color: $primary-brown;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        background: rgba($primary-beige, 0.9);
+        padding: 0.2rem 0.5rem;
+        border-radius: 10px;
+        white-space: nowrap;
+    }
+    
+    &:hover {
+        transform: translateY(-8px) scale(1.02);
+        border-color: $accent-gold;
+        box-shadow: 0 12px 35px rgba($primary-dark, 0.3);
+        background: rgba($primary-beige, 1);
+        
+        &::after {
+            opacity: 1;
+        }
+        
+        .character-avatar {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba($accent-gold, 0.4);
+        }
+        
+        .role-icon {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 10px rgba($accent-gold, 0.6));
+        }
+    }
+    
+    &.selected {
+        border-color: $accent-gold;
+        background: linear-gradient(135deg, rgba($accent-gold, 0.1), rgba($primary-beige, 0.95));
+        box-shadow: 0 8px 25px rgba($accent-gold, 0.3);
+        
+        .selection-indicator {
+            opacity: 1;
+            transform: scale(1);
+            background: $accent-gold;
+            
+            &::before {
+                content: "✓";
+            }
+        }
+    }
+    
+    // Indicateur de sélection
+    .selection-indicator {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        background: rgba($accent-gold, 0.8);
+        border: 2px solid $primary-beige;
+        border-radius: 50%;
+        @include flex(row, center, center);
+        opacity: 0.3;
+        transform: scale(0.8);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        
+        &::before {
+            content: "+";
+            color: $primary-dark;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        &:hover {
+            opacity: 1;
+            transform: scale(1.1);
+            background: $accent-gold;
+        }
+    }
+    
+    .character-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid $accent-gold;
+        margin: 0 auto 1rem auto;
+        transition: all 0.3s ease;
+        display: block;
+        
+        &.placeholder {
+            background: linear-gradient(135deg, $primary-beige, $primary-brown);
+            @include flex(row, center, center);
+            color: $accent-gold;
+            font-size: 2em;
+            font-weight: bold;
+        }
+    }
+    
+    .character-name {
+        font-family: $font-title;
+        font-size: 1.3rem;
+        color: $primary-dark;
+        margin-bottom: 0.5rem;
+        text-shadow: 1px 1px 2px rgba($accent-gold, 0.3);
+    }
+    
+    .character-role {
+        @include flex(row, center, center);
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        
+        .role-icon {
+            width: 24px;
+            height: 24px;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            filter: drop-shadow(1px 1px 2px rgba($primary-dark, 0.3));
+            
+            // Font Awesome specific styling
+            &.fa-solid {
+                display: inline-block;
+                width: auto;
+                height: auto;
+            }
+        }
+        
+        .role-name {
+            font-size: 0.9rem;
+            color: $primary-brown;
+            font-weight: 600;
+        }
+    }
+    
+    .character-quick-stats {
+        @include flex(row, center, center);
+        gap: 1rem;
+        font-size: 0.8rem;
+        
+        .stat {
+            @include flex(column, center, center);
+            gap: 0.2rem;
+            
+            .stat-label {
+                color: $primary-brown;
+                font-weight: 600;
+                font-size: 0.7rem;
+                text-transform: uppercase;
+            }
+            
+            .stat-value {
+                color: $primary-dark;
+                font-weight: bold;
+                font-size: 1rem;
+            }
+        }
+    }
+}
+
+// Bouton de jeu
+.play-section {
+    text-align: center;
+    margin-top: 3rem;
+    
+    .play-btn {
+        background: linear-gradient(135deg, $accent-gold, color.adjust($accent-gold, $lightness: 10%));
+        color: $primary-dark;
+        border: none;
+        padding: 1rem 3rem;
+        font-size: 1.3rem;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba($accent-gold, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        
+        &:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba($accent-gold, 0.4);
+            background: linear-gradient(135deg, color.adjust($accent-gold, $lightness: 5%), $accent-gold);
+        }
+        
+        &:disabled {
+            background: $primary-brown;
+            color: rgba($primary-beige, 0.7);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        &:active {
+            transform: translateY(-1px);
+        }
+    }
+    
+    .team-counter {
+        margin-top: 1rem;
+        color: $primary-brown;
+        font-size: 1.1rem;
+        
+        .count {
+            color: $accent-gold;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+    }
+}
+
+// Modale de détails du personnage
+.character-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba($primary-dark, 0.8);
+    @include flex(row, center, center);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    
+    &.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+    
+    .modal-content {
+        background: $primary-beige;
+        border-radius: 20px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        border: 4px solid $accent-gold;
+        box-shadow: 0 20px 60px rgba($primary-dark, 0.5);
+        transform: scale(0.8);
+        transition: transform 0.3s ease;
+        
+        .modal-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            
+            .modal-avatar {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 4px solid $accent-gold;
+                margin: 0 auto 1rem auto;
+                display: block;
+            }
+            
+            .modal-name {
+                font-family: $font-title;
+                font-size: 2rem;
+                color: $primary-dark;
+                margin-bottom: 0.5rem;
+            }
+            
+            .modal-role {
+                @include flex(row, center, center);
+                gap: 0.8rem;
+                margin-bottom: 1rem;
+                
+                .role-icon {
+                    width: 32px;
+                    height: 32px;
+                }
+                
+                .role-name {
+                    font-size: 1.1rem;
+                    color: $primary-brown;
+                    font-weight: 600;
+                }
+            }
+        }
+        
+        .modal-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            
+            .stat {
+                text-align: center;
+                background: rgba($accent-gold, 0.1);
+                padding: 1rem;
+                border-radius: 10px;
+                border: 2px solid rgba($accent-gold, 0.3);
+                
+                .stat-value {
+                    display: block;
+                    font-size: 1.8rem;
+                    font-weight: bold;
+                    color: $primary-dark;
+                    margin-bottom: 0.5rem;
+                }
+                
+                .stat-label {
+                    font-size: 0.9rem;
+                    color: $primary-brown;
+                    text-transform: uppercase;
+                    font-weight: 600;
+                }
+            }
+        }
+        
+        .modal-description {
+            background: rgba($primary-dark, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid $accent-gold;
+            margin-bottom: 1.5rem;
+            
+            h4 {
+                color: $primary-dark;
+                margin-bottom: 1rem;
+                font-family: $font-title;
+            }
+            
+            p {
+                color: $primary-brown;
+                line-height: 1.6;
+                margin: 0;
+            }
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: $primary-brown;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                color: $accent-gold;
+                transform: scale(1.2);
+            }
+        }
+    }
+    
+    &.active .modal-content {
+        transform: scale(1);
+    }
+}
+
+// Icônes des rôles (à utiliser avec des SVG ou font-icons)
+.role-icon {
+    &.tank {
+        filter: hue-rotate(200deg); // Bleu pour tank
+    }
+    
+    &.healer {
+        filter: hue-rotate(120deg); // Vert pour healer
+    }
+    
+    &.dps {
+        filter: hue-rotate(0deg); // Rouge pour DPS
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .play-page {
+        padding: 1rem;
+        
+        .play-title {
+            font-size: 2rem;
+        }
+    }
+    
+    .battle-board {
+        height: 200px;
+        margin-bottom: 2rem;
+    }
+    
+    .character-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+    
+    .character-card {
+        padding: 1rem;
+        
+        .character-avatar {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .character-name {
+            font-size: 1.1rem;
+        }
+    }
+    
+    .modal-content {
+        padding: 1.5rem;
+        
+        .modal-header .modal-avatar {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .modal-stats {
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+        }
+    }
+}

@@ -13,6 +13,9 @@
     @include flex(row, space-between, center);
     box-shadow: 0 2px 10px rgba($primary-dark, 0.3);
     
+    .burger {
+        display: none;
+    }
     .logo {
         @include flex(row, flex-start, center);
         
@@ -73,98 +76,6 @@
         }
     }
     
-    .burger {
-        @include flex(column, space-between, stretch);
-        width: 25px;
-        height: 18px;
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        z-index: 15;
-        
-        span {
-            display: block;
-            height: 2px;
-            width: 100%;
-            background-color: $accent-gold;
-            border-radius: 1px;
-            transition: all 0.3s ease;
-            transform-origin: center;
-            box-shadow: 0 0 3px rgba($accent-gold, 0.5);
-            
-            &:nth-child(1) {
-                transform: translateY(0);
-            }
-            
-            &:nth-child(2) {
-                opacity: 1;
-            }
-            
-            &:nth-child(3) {
-                transform: translateY(0);
-            }
-        }
-        
-        &:hover span {
-            background-color: $primary-beige;
-            box-shadow: 0 0 8px rgba($accent-gold, 0.8);
-        }
-        
-        &.active span {
-            &:nth-child(1) {
-                transform: translateY(8px) rotate(45deg);
-            }
-            
-            &:nth-child(2) {
-                opacity: 0;
-            }
-            
-            &:nth-child(3) {
-                transform: translateY(-8px) rotate(-45deg);
-            }
-        }
-        
-        // Affiché seulement sur mobile
-        @media (max-width: 768px) {
-            display: flex;
-        }
-        
-        // Caché sur desktop
-        @media (min-width: 769px) {
-            display: none;
-        }
-    }
-    
-    // Masquer les liens en mobile
-    @media (max-width: 768px) {
-        .nav-links,
-        .auth-nav {
-            display: none;
-            
-            &.active {
-                @include flex(column, center, center);
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba($primary-dark, 0.95);
-                backdrop-filter: blur(15px);
-                z-index: 999;
-                
-                li {
-                    margin: 1rem 0;
-                }
-                
-                a {
-                    font-size: 1.2rem;
-                    padding: 1rem 2rem;
-                }
-            }
-        }
-    }
-    
     // Profile avatar styles in navbar
     .auth-nav .user-profile-nav {
         .profile-link {
@@ -207,6 +118,31 @@
                 border-color: $primary-beige;
                 box-shadow: 0 0 10px rgba($accent-gold, 0.5);
             }
+        }
+    }
+    
+    // Admin link styles (unifié pour navbar et bouton flottant)
+    .admin-link {
+        background: transparent;
+        color: $accent-gold;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 0.9rem;
+        border: 2px solid $accent-gold;
+        transition: all 0.3s ease;
+        @include flex(row, center, center);
+        gap: 0.3rem;
+        
+        &:hover {
+            background: rgba($accent-gold, 0.1);
+            color: $accent-gold;
+            box-shadow: 0 0 15px rgba($accent-gold, 0.3);
+        }
+        
+        &:active {
+            transform: scale(0.95);
         }
     }
 }
@@ -279,69 +215,6 @@
         }
     }
     
-    .burger {
-        @include flex(column, space-between, stretch);
-        width: 25px;
-        height: 18px;
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        z-index: 15;
-        
-        span {
-            display: block;
-            height: 2px;
-            width: 100%;
-            background-color: $accent-gold;
-            border-radius: 1px;
-            transition: all 0.3s ease;
-            transform-origin: center;
-            box-shadow: 0 0 3px rgba($accent-gold, 0.5);
-            
-            &:nth-child(1) {
-                transform: translateY(0);
-            }
-            
-            &:nth-child(2) {
-                opacity: 1;
-            }
-            
-            &:nth-child(3) {
-                transform: translateY(0);
-            }
-        }
-        
-        &:hover span {
-            background-color: $primary-beige;
-            box-shadow: 0 0 8px rgba($accent-gold, 0.8);
-        }
-        
-        &.active span {
-            &:nth-child(1) {
-                transform: translateY(8px) rotate(45deg);
-            }
-            
-            &:nth-child(2) {
-                opacity: 0;
-            }
-            
-            &:nth-child(3) {
-                transform: translateY(-8px) rotate(-45deg);
-            }
-        }
-        
-        // Affiché seulement sur mobile
-        @media (max-width: 768px) {
-            display: flex;
-        }
-        
-        // Caché sur desktop
-        @media (min-width: 769px) {
-            display: none;
-        }
-    }
-    
     // État scrolled
     &.scrolled {
         background: rgba($primary-dark, 0.95);
@@ -394,4 +267,15 @@
             }
         }
     }
+}
+
+// MODIFICATIONS POUR LA PAGE D'ACCUEIL
+.navbar.hero-navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: rgba($primary-dark, 0.3);
+    backdrop-filter: blur(10px);
 }

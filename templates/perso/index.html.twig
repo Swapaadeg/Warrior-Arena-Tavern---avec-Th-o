@@ -5,100 +5,117 @@
 {% block body %}
 <img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
 <div class="form-page">
-    <h1 class="form-page-title">Ajouter un personnage</h1>
+    {% if canAddCharacter %}
+        <h1 class="form-page-title">Ajouter un personnage</h1>
 
-    <div class="character-wrapper">
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">{{ message }}</div>
-    {% endfor %}
+        <div class="character-wrapper">
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
 
-    {{ form_start(characterForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
-        <div class="form-group">
-            {{ form_label(characterForm.name) }}
-            {{ form_widget(characterForm.name) }}
-            {{ form_errors(characterForm.name) }}
+        {% if characterForm %}
+            {{ form_start(characterForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+                <div class="form-group">
+                    {{ form_label(characterForm.name) }}
+                    {{ form_widget(characterForm.name) }}
+                    {{ form_errors(characterForm.name) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.HP) }}
+                    {{ form_widget(characterForm.HP) }}
+                    {{ form_errors(characterForm.HP) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.power) }}
+                    {{ form_widget(characterForm.power) }}
+                    {{ form_errors(characterForm.power) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.defense) }}
+                    {{ form_widget(characterForm.defense) }}
+                    {{ form_errors(characterForm.defense) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.description) }}
+                    {{ form_widget(characterForm.description) }}
+                    {{ form_errors(characterForm.description) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.imageFile) }}
+                    {{ form_widget(characterForm.imageFile) }}
+                    {{ form_errors(characterForm.imageFile) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.roleName) }}
+                    {{ form_widget(characterForm.roleName) }}
+                    {{ form_errors(characterForm.roleName) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.typeName) }}
+                    {{ form_widget(characterForm.typeName) }}
+                    {{ form_errors(characterForm.typeName) }}
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Ajouter le personnage</button>
+            {{ form_end(characterForm) }}
+        {% endif %}
         </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.HP) }}
-            {{ form_widget(characterForm.HP) }}
-            {{ form_errors(characterForm.HP) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.power) }}
-            {{ form_widget(characterForm.power) }}
-            {{ form_errors(characterForm.power) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.defense) }}
-            {{ form_widget(characterForm.defense) }}
-            {{ form_errors(characterForm.defense) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.description) }}
-            {{ form_widget(characterForm.description) }}
-            {{ form_errors(characterForm.description) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.imageFile) }}
-            {{ form_widget(characterForm.imageFile) }}
-            {{ form_errors(characterForm.imageFile) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.roleName) }}
-            {{ form_widget(characterForm.roleName) }}
-            {{ form_errors(characterForm.roleName) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.typeName) }}
-            {{ form_widget(characterForm.typeName) }}
-            {{ form_errors(characterForm.typeName) }}
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Ajouter le personnage</button>
-    {{ form_end(characterForm) }}
-</div>
+    {% endif %}
 
-<div class="characters-list-section" style="margin-top: 3rem;">
-    <h2 style="text-align: center; color: var(--accent-gold); font-family: var(--font-title); margin-bottom: 2rem;">Liste des personnages</h2>
+<div class="characters-list-section">
+    <h2>Liste des personnages</h2>
     <div class="character-list">
         {% for character in characters %}
-            <div class="character-item" style="display: flex; align-items: center; gap: 1em;">
+            <div class="character-item">
                 {% if character.imageName %}
-                    <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
+                    <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" class="character-avatar">
                 {% else %}
-                    <div style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:2em;">?</div>
+                    <div class="character-avatar placeholder">?</div>
                 {% endif %}
-                <div>
+                <div class="character-info">
                     <h3>{{ character.name }}</h3>
-                    <p><strong>PV:</strong> {{ character.HP }} | <strong>Puissance:</strong> {{ character.power }} | <strong>Défense:</strong> {{ character.defense }}</p>
-                    <p>{{ character.description }}</p>
-                    {% set roles = character.role|default([]) %}
-                    {% if roles|length > 0 %}
-                        <p><strong>Rôle :</strong>
-                            {% for role in roles %}
-                                <span class="badge bg-secondary">{{ role.name }}</span>{% if not loop.last %}, {% endif %}
-                            {% endfor %}
-                        </p>
+                    <div class="character-stats">
+                        <div class="stat">
+                            <span class="stat-label">PV:</span>
+                            <span class="stat-value">{{ character.HP }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Puissance:</span>
+                            <span class="stat-value">{{ character.power }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Défense:</span>
+                            <span class="stat-value">{{ character.defense }}</span>
+                        </div>
+                    </div>
+                    {% if character.description %}
+                        <div class="character-description">{{ character.description }}</div>
                     {% endif %}
-                    {% set types = character.type|default([]) %}
-                    {% if types|length > 0 %}
-                        <p><strong>Type :</strong>
-                            {% for type in types %}
-                                <span class="badge bg-info">{{ type.name }}</span>{% if not loop.last %}, {% endif %}
-                            {% endfor %}
-                        </p>
-                    {% endif %}
+                    <div class="character-tags">
+                        {% if character.role %}
+                            <div class="tag-group">
+                                <span class="tag-label">Rôle :</span>
+                                <span class="badge bg-secondary">{{ character.role.name }}</span>
+                            </div>
+                        {% endif %}
+                        {% if character.type %}
+                            <div class="tag-group">
+                                <span class="tag-label">Type :</span>
+                                <span class="badge bg-info">{{ character.type.name }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         {% else %}
-            <p>Aucun personnage trouvé.</p>
+            <div class="no-characters">Aucun personnage trouvé.</div>
         {% endfor %}
     </div>
 </div>

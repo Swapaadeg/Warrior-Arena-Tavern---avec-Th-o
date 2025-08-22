@@ -2,49 +2,124 @@
 
 namespace App\Controller\Admin;
 
-use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
-use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use App\Entity\Characters;
+use App\Entity\Roles;
+use App\Entity\Types;
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 
+#[IsGranted('ROLE_ADMIN')]
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
+    private EntityManagerInterface $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
+
     public function index(): Response
     {
-        return parent::index();
+        $charactersCount = $this->em->getRepository(Characters::class)->count([]);
+        $usersCount = $this->em->getRepository(User::class)->count([]);
+        $rolesCount = $this->em->getRepository(Roles::class)->count([]);
+        $typesCount = $this->em->getRepository(Types::class)->count([]);
 
-        // Option 1. You can make your dashboard redirect to some common page of your backend
-        //
-        // 1.1) If you have enabled the "pretty URLs" feature:
-        // return $this->redirectToRoute('admin_user_index');
-        //
-        // 1.2) Same example but using the "ugly URLs" that were used in previous EasyAdmin versions:
-        // $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-        // return $this->redirect($adminUrlGenerator->setController(OneOfYourCrudController::class)->generateUrl());
+        // Statistiques par rôles
+        $tankCount = $this->em->createQueryBuilder()
+            ->select('COUNT(c.id)')
+            ->from(Characters::class, 'c')
+            ->join('c.role', 'r')
+            ->where('r.name = :role')
+            ->setParameter('role', 'Tank')
+            ->getQuery()
+            ->getSingleScalarResult();
 
-        // Option 2. You can make your dashboard redirect to different pages depending on the user
-        //
-        // if ('jane' === $this->getUser()->getUsername()) {
-        //     return $this->redirectToRoute('...');
-        // }
+        $dpsCount = $this->em->createQueryBuilder()
+            ->select('COUNT(c.id)')
+            ->from(Characters::class, 'c')
+            ->join('c.role', 'r')
+            ->where('r.name = :role')
+            ->setParameter('role', 'DPS')
+            ->getQuery()
+            ->getSingleScalarResult();
 
-        // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
-        // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
-        //
-        // return $this->render('some/path/my-dashboard.html.twig');
+        $healCount = $this->em->createQueryBuilder()
+            ->select('COUNT(c.id)')
+            ->from(Characters::class, 'c')
+            ->join('c.role', 'r')
+            ->where('r.name = :role')
+            ->setParameter('role', 'Heal')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Statistiques par types
+        $taverneCount = $this->em->createQueryBuilder()
+            ->select('COUNT(c.id)')
+            ->from(Characters::class, 'c')
+            ->join('c.type', 't')
+            ->where('t.name = :type')
+            ->setParameter('type', 'Taverne')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $academieCount = $this->em->createQueryBuilder()
+            ->select('COUNT(c.id)')
+            ->from(Characters::class, 'c')
+            ->join('c.type', 't')
+            ->where('t.name = :type')
+            ->setParameter('type', 'Académie')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $ombreCount = $this->em->createQueryBuilder()
+            ->select('COUNT(c.id)')
+            ->from(Characters::class, 'c')
+            ->join('c.type', 't')
+            ->where('t.name = :type')
+            ->setParameter('type', 'Ombre')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $this->render('admin/index.html.twig', [
+            'charactersCount' => $charactersCount,
+            'usersCount' => $usersCount,
+            'rolesCount' => $rolesCount,
+            'typesCount' => $typesCount,
+            // Stats par rôles
+            'tankCount' => $tankCount,
+            'dpsCount' => $dpsCount,
+            'healCount' => $healCount,
+            // Stats par types
+            'taverneCount' => $taverneCount,
+            'academieCount' => $academieCount,
+            'ombreCount' => $ombreCount,
+        ]);
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Hackaton');
+            ->setTitle('⚔️ Warrior Arena Tavern');
     }
 
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
+        yield MenuItem::section('Navigation');
+        yield MenuItem::linkToUrl('🏠 Retourner sur le site', 'fas fa-external-link-alt', '/');
+        yield MenuItem::section('Gestion des entités');
+        yield MenuItem::linkToCrud('🧙‍♂️ Personnages', 'fas fa-users', Characters::class);
+        yield MenuItem::linkToCrud('🛡️ Rôles', 'fas fa-shield-alt', Roles::class);
+        yield MenuItem::linkToCrud('🏛️ Types', 'fas fa-building', Types::class);
+        yield MenuItem::section('Utilisateurs');
+        yield MenuItem::linkToCrud('👤 Utilisateurs', 'fas fa-user', User::class);
     }
 }

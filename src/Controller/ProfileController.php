@@ -35,6 +35,13 @@ final class ProfileController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifier si l'utilisateur veut supprimer l'image
+            $deleteImage = $form->get('deleteImage')->getData();
+            if ($deleteImage === '1') {
+                $user->setProfileImageFile(null);
+                $user->setProfileImageName(null);
+            }
+            
             $user->setUpdatedAt(new \DateTimeImmutable());
             $entityManager->flush();
 

@@ -3,10 +3,11 @@
 {% block title %}Mon profil - Warrior Arena Tavern{% endblock %}
 
 {% block body %}
+<img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
 <div class="profile-container">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
+            <div class="col-md-10 col-lg-8">
                 <div class="profile-card">
                     <h1 class="profile-title">Mon profil</h1>
                     
@@ -47,7 +48,7 @@
                                         {% set teamChars = user.team.getCharacters|default([]) %}
                                         {% if teamChars|length > 0 %}
                                             {% for character in teamChars %}
-                                                <span class="badge bg-info">{{ character.name }}</span>{% if not loop.last %}, {% endif %}
+                                                <span class="badge bg-info">{{ character.name }}</span>{% if not loop.last %} {% endif %}
                                             {% endfor %}
                                         {% else %}
                                             Aucune équipe enregistrée

@@ -198,4 +198,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    /**
+     * Serialize the user for session storage, excluding the File object
+     * @return array<string>
+     */
+    public function __sleep(): array
+    {
+        return [
+            'id',
+            'username',
+            'roles', 
+            'password',
+            'profileImageName',
+            'createdAt',
+            'updatedAt',
+            'team'
+        ];
+    }
+
+    /**
+     * Unserialize the user, ensuring File object is null
+     */
+    public function __wakeup(): void
+    {
+        $this->profileImageFile = null;
+    }
 }

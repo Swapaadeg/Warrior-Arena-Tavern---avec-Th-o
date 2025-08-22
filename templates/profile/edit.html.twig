@@ -4,66 +4,88 @@
 
 {% block body %}
 <div class="profile-edit-container">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="profile-card">
-                    <h1 class="profile-title">Éditer mon profil</h1>
+    <img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="profile-container">
+                <h1 class="profile-title">Éditer mon profil</h1>
+                
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                
+                {% for message in app.flashes('error') %}
+                    <div class="alert alert-danger">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+
+                {{ form_start(form, {'attr': {'class': 'profile-form', 'enctype': 'multipart/form-data'}}) }}
                     
-                    {% for message in app.flashes('success') %}
-                        <div class="alert alert-success">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                    
-                    {% for message in app.flashes('error') %}
-                        <div class="alert alert-danger">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-
-                    {{ form_start(form, {'attr': {'class': 'profile-form', 'enctype': 'multipart/form-data'}}) }}
-                        
-                        <div class="current-profile-image">
-                            {% if user.profileImageName %}
-                                <h3>Image actuelle :</h3>
-                                <img src="{{ vich_uploader_asset(user, 'profileImageFile') }}" 
-                                     alt="Photo de profil de {{ user.username }}" 
-                                     class="current-avatar">
-                            {% else %}
-                                <div class="no-avatar">
-                                    <i class="fas fa-user-circle"></i>
-                                    <p>Aucune image de profil</p>
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group">
-                            {{ form_label(form.username) }}
-                            {{ form_widget(form.username) }}
-                            {{ form_errors(form.username) }}
-                        </div>
-
-                        <div class="form-group">
-                            {{ form_label(form.profileImageFile) }}
-                            {{ form_widget(form.profileImageFile) }}
-                            {{ form_errors(form.profileImageFile) }}
-                            <small class="form-text text-muted">
-                                Formats acceptés : JPG, PNG, GIF. Taille maximum : 5MB
-                            </small>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Sauvegarder
+                    <div class="current-profile-image">
+                        {% if user.profileImageName %}
+                            <h3>Image actuelle :</h3>
+                            <img src="{{ vich_uploader_asset(user, 'profileImageFile') }}" 
+                                    alt="Photo de profil de {{ user.username }}" 
+                                    class="current-avatar">
+                            <button type="button" class="btn-delete-image" onclick="deleteCurrentImage()">
+                                <i class="fas fa-trash"></i> Supprimer l'image
                             </button>
-                            <a href="{{ path('profile') }}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Retour au profil
-                            </a>
-                        </div>
+                        {% else %}
+                            <div class="no-avatar">
+                                <i class="fas fa-user-circle"></i>
+                                <p>Aucune image de profil</p>
+                            </div>
+                        {% endif %}
+                    </div>
 
-                    {{ form_end(form) }}
-                </div>
+                    {{ form_widget(form.deleteImage) }}
+
+                    <div class="form-group">
+                        {{ form_label(form.username) }}
+                        {{ form_widget(form.username) }}
+                        {{ form_errors(form.username) }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.profileImageFile) }}
+                        {{ form_widget(form.profileImageFile) }}
+                        {{ form_errors(form.profileImageFile) }}
+                        <small class="form-text text-muted">
+                            Formats acceptés : JPG, PNG, GIF. Taille maximum : 5MB
+                        </small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Sauvegarder
+                        </button>
+                        <a href="{{ path('profile') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour au profil
+                        </a>
+                    </div>
+
+                {{ form_end(form) }}
+
+                <script>
+                function deleteCurrentImage() {
+                    if (confirm('Êtes-vous sûr de vouloir supprimer votre image de profil ?')) {
+                        document.querySelector('#user_profile_deleteImage').value = '1';
+                        
+                        // Masquer l'image actuelle et afficher un message
+                        const imageContainer = document.querySelector('.current-profile-image');
+                        imageContainer.innerHTML = `
+                            <div class="image-will-be-deleted">
+                                <i class="fas fa-trash" style="font-size: 3rem; color: #ff6b6b; margin-bottom: 1rem;"></i>
+                                <p style="color: #ff6b6b; font-weight: bold;">Image marquée pour suppression</p>
+                                <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Cliquez sur "Sauvegarder" pour confirmer</p>
+                            </div>
+                        `;
+                    }
+                }
+                </script>
             </div>
         </div>
     </div>

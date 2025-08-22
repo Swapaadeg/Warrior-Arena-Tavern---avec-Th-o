@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Vich\UploaderBundle\Form\Type\VichImageType;
@@ -21,18 +22,20 @@ class UserProfileType extends AbstractType
                 ]
             ])
             ->add('profileImageFile', VichImageType::class, [
-                'label' => 'Image de profil',
+                'label' => 'Nouvelle image de profil',
                 'required' => false,
-                'allow_delete' => true,
-                'delete_label' => 'Supprimer l\'image',
-                'download_label' => 'Télécharger',
-                'download_uri' => true,
-                'image_uri' => true,
-                'imagine_pattern' => 'squared_thumbnail_small',
+                'allow_delete' => false,
+                'download_label' => false,
+                'download_uri' => false,
+                'image_uri' => false,
                 'asset_helper' => true,
                 'attr' => [
                     'class' => 'form-control-file'
                 ]
+            ])
+            ->add('deleteImage', HiddenType::class, [
+                'mapped' => false,
+                'data' => false
             ]);
     }
 

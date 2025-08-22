@@ -5,65 +5,69 @@
 {% block body %}
 <img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
 <div class="form-page">
-    <h1 class="form-page-title">Ajouter un personnage</h1>
+    {% if canAddCharacter %}
+        <h1 class="form-page-title">Ajouter un personnage</h1>
 
-    <div class="character-wrapper">
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">{{ message }}</div>
-    {% endfor %}
+        <div class="character-wrapper">
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
 
-    {{ form_start(characterForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
-        <div class="form-group">
-            {{ form_label(characterForm.name) }}
-            {{ form_widget(characterForm.name) }}
-            {{ form_errors(characterForm.name) }}
+        {% if characterForm %}
+            {{ form_start(characterForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+                <div class="form-group">
+                    {{ form_label(characterForm.name) }}
+                    {{ form_widget(characterForm.name) }}
+                    {{ form_errors(characterForm.name) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.HP) }}
+                    {{ form_widget(characterForm.HP) }}
+                    {{ form_errors(characterForm.HP) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.power) }}
+                    {{ form_widget(characterForm.power) }}
+                    {{ form_errors(characterForm.power) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.defense) }}
+                    {{ form_widget(characterForm.defense) }}
+                    {{ form_errors(characterForm.defense) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.description) }}
+                    {{ form_widget(characterForm.description) }}
+                    {{ form_errors(characterForm.description) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.imageFile) }}
+                    {{ form_widget(characterForm.imageFile) }}
+                    {{ form_errors(characterForm.imageFile) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.roleName) }}
+                    {{ form_widget(characterForm.roleName) }}
+                    {{ form_errors(characterForm.roleName) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(characterForm.typeName) }}
+                    {{ form_widget(characterForm.typeName) }}
+                    {{ form_errors(characterForm.typeName) }}
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Ajouter le personnage</button>
+            {{ form_end(characterForm) }}
+        {% endif %}
         </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.HP) }}
-            {{ form_widget(characterForm.HP) }}
-            {{ form_errors(characterForm.HP) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.power) }}
-            {{ form_widget(characterForm.power) }}
-            {{ form_errors(characterForm.power) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.defense) }}
-            {{ form_widget(characterForm.defense) }}
-            {{ form_errors(characterForm.defense) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.description) }}
-            {{ form_widget(characterForm.description) }}
-            {{ form_errors(characterForm.description) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.imageFile) }}
-            {{ form_widget(characterForm.imageFile) }}
-            {{ form_errors(characterForm.imageFile) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.roleName) }}
-            {{ form_widget(characterForm.roleName) }}
-            {{ form_errors(characterForm.roleName) }}
-        </div>
-        
-        <div class="form-group">
-            {{ form_label(characterForm.typeName) }}
-            {{ form_widget(characterForm.typeName) }}
-            {{ form_errors(characterForm.typeName) }}
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Ajouter le personnage</button>
-    {{ form_end(characterForm) }}
-</div>
+    {% endif %}
 
 <div class="characters-list-section">
     <h2>Liste des personnages</h2>

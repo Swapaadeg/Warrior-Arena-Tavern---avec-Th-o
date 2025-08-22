@@ -31,6 +31,10 @@
 <div class="mt-4 row">
     <div class="col-md-8 text-center">
         <button id="play-battle" class="btn btn-danger btn-lg">Lancer l'animation</button>
+        <button id="pause-battle" class="btn btn-secondary btn-lg" style="margin-left:1em;">Pause Battle</button>
+    </div>
+    <div class="col-md-4 text-center">
+        <div id="round-counter" style="font-weight:bold; font-size:1.2em;">Round: 0</div>
     </div>
     <div class="col-md-4">
         <h4>Journal du combat</h4>
@@ -39,82 +43,275 @@
     </div>
 </div>
 <style>
-.glow-red { box-shadow: 0 0 20px 5px #ff0000; background: #ffeaea; }
-.glow-black { box-shadow: 0 0 20px 5px #000; background: #222; color: #fff; }
-.dead { opacity: 0.5; filter: grayscale(1); }
+    .glow-left { box-shadow: 0 0 18px 6px rgba(0,150,255,0.35); background: #e8f6ff; }
+    .glow-right { box-shadow: 0 0 18px 6px rgba(255,80,80,0.25); background: #fff0f0; }
+    .glow-action { box-shadow: 0 0 12px 4px rgba(0,0,0,0.12); }
+    /* When a unit acts, scale it up slightly */
+    .acting { transform: scale(1.08); z-index: 5; transition: transform 220ms ease; }
+    /* When a unit is targeted, scale up a bit less */
+    .targeted { transform: scale(1.04); z-index: 4; transition: transform 220ms ease; }
+    /* Heal visual - both healer and healed turn green briefly */
+    .heal { box-shadow: 0 0 18px 6px rgba(60,180,80,0.25); background: #eefdf0; }
+    .dead { opacity: 0.5; filter: grayscale(1); }
 </style>
 <script>
-// Minimal data passed to template: a BattleSetupDTO-like structure and unit maps.
+// Data passed from the controller
 const setup = {{ setup|json_encode|raw }};
+const frames = {{ frames|json_encode|raw }};
 const unitMap = {{ unit_map|json_encode|raw }};
 const unitOwners = {{ unit_owners|json_encode|raw }};
-// frames/result are no longer produced by the controller. Implement the battle logic here.
-let frames = [];
-let currentFrame = 0;
-let interval = null;
+let playTimeouts = [];
+let isPaused = false;
+let currentFrameIdx = 0;
+let currentActionIdx = 0;
+let currentFrame = null;
+let currentActions = [];
+let currentEvents = [];
+let processNextActionRef = null;
 
-function updateFrame(idx) {
-    // Reset all glows
+// Build a map of unit max HP for clamping heals
+const unitMaxHp = {};
+if (setup) {
+    (setup.left || []).forEach(u => unitMaxHp[u.id] = u.maxHp);
+    (setup.right || []).forEach(u => unitMaxHp[u.id] = u.maxHp);
+}
+
+function clearAllTimeouts() {
+    playTimeouts.forEach(id => clearTimeout(id));
+    playTimeouts = [];
+}
+
+function resetVisuals() {
     document.querySelectorAll('.character-item').forEach(el => {
-        el.classList.remove('glow-red','glow-black','dead');
+        el.classList.remove('glow-left','glow-right','glow-action','acting','targeted','heal');
     });
-    if (!frames[idx]) return;
-    // Update HP
-    Object.entries(frames[idx].hpByUnit).forEach(([uid, hp]) => {
+}
+
+function resetTemporaryVisuals() {
+    // Like resetVisuals but keep dead class
+    document.querySelectorAll('.character-item').forEach(el => {
+        el.classList.remove('glow-left','glow-right','glow-action','acting','targeted','heal');
+    });
+}
+
+function syncHpSnapshot(hpByUnit) {
+    Object.entries(hpByUnit || {}).forEach(([uid, hp]) => {
         const el = document.getElementById('hp-' + uid);
         if (el) el.textContent = hp;
         const box = document.getElementById('char-' + uid);
-        if (box && hp <= 0) box.classList.add('dead');
-    });
-    // Animate actions
-    (frames[idx].actions || []).forEach(action => {
-        if (action.kind === 'ATTACK' || action.kind === 'HEAL') {
-            const actor = document.getElementById('char-' + action.actorId);
-            const target = action.targetId ? document.getElementById('char-' + action.targetId) : null;
-            if (actor) actor.classList.add('glow-red');
-            if (target) target.classList.add(action.kind === 'ATTACK' ? 'glow-black' : 'glow-red');
+        if (box) {
+            if (hp <= 0) box.classList.add('dead');
+            else box.classList.remove('dead');
         }
     });
-    // Log events (append as a new line)
-    const logDiv = document.getElementById('battle-log');
-    if ((frames[idx].events || []).length > 0) {
-        (frames[idx].events || []).forEach(ev => {
+}
+
+function playFrame(idx) {
+    if (!frames || idx >= frames.length) {
+        // finished
+        // Show winner from server result
+        let winner = {{ result.winnerTeamId is defined ? result.winnerTeamId|json_encode|raw : 'null' }};
+        let winnerText = '';
+        if (winner === 'left') {
+            winnerText = 'Victoire : Votre équipe !';
+        } else if (winner === 'right') {
+            winnerText = 'Victoire : ' + {{ opponent.username|json_encode|raw }};
+        } else {
+            winnerText = 'Match nul !';
+        }
+        document.getElementById('battle-winner').textContent = winnerText;
+        const p = document.createElement('div');
+        p.textContent = 'Fin du combat.';
+        document.getElementById('battle-log').appendChild(p);
+        return;
+    }
+
+    resetTemporaryVisuals();
+    currentFrameIdx = idx;
+    resetVisuals();
+    const frame = frames[idx];
+    currentFrame = frame;
+
+    // Update round counter if present
+    if (typeof frame.round !== 'undefined') {
+        const rc = document.getElementById('round-counter');
+        if (rc) rc.textContent = 'Round: ' + frame.round;
+    }
+
+    // If frame contains roundEvents (global AoE from round), render them first
+    if (frame.roundEvents && frame.roundEvents.length) {
+        const logDiv = document.getElementById('battle-log');
+        frame.roundEvents.forEach(ev => { const p = document.createElement('div'); p.textContent = ev; logDiv.appendChild(p); });
+        logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    // clear any previous team-wide glow (we'll set it per-action)
+    Object.keys(unitMap).forEach(uid => {
+        const el = document.getElementById('char-' + uid);
+        if (el) { el.classList.remove('glow-left','glow-right'); }
+    });
+
+    // local hp map to incrementally update UI
+    const localHp = {};
+    Object.keys(unitMap).forEach(uid => {
+        const el = document.getElementById('hp-' + uid);
+        localHp[uid] = el ? parseInt(el.textContent || '0', 10) : (frame.hpByUnit && frame.hpByUnit[uid] ? frame.hpByUnit[uid] : 0);
+    });
+
+    currentActions = frame.actions || [];
+    currentEvents = frame.events || [];
+    currentActionIdx = 0;
+
+    function processNextAction() {
+        if (isPaused) return; // paused, do nothing
+
+        // If there are no actions, just sync snapshot and advance after 1s
+        if (!currentActions || currentActions.length === 0) {
+            if (currentEvents.length) {
+                const logDiv = document.getElementById('battle-log');
+                currentEvents.forEach(ev => { const p = document.createElement('div'); p.textContent = ev; logDiv.appendChild(p); });
+                logDiv.scrollTop = logDiv.scrollHeight;
+            }
+            syncHpSnapshot(frame.hpByUnit);
+            const t = setTimeout(() => playFrame(currentFrameIdx + 1), 1000);
+            playTimeouts.push(t);
+            return;
+        }
+
+        if (currentActionIdx >= currentActions.length) {
+            // end of actions for this frame: sync snapshot then go to next frame after 1s
+            setTimeout(() => {
+                syncHpSnapshot(frame.hpByUnit);
+                if (!isPaused) {
+                    const t = setTimeout(() => playFrame(currentFrameIdx + 1), 1000);
+                    playTimeouts.push(t);
+                }
+            }, 300);
+            return;
+        }
+
+        const action = currentActions[currentActionIdx];
+
+        // perform this action immediately
+        const actorEl = document.getElementById('char-' + action.actorId);
+        const targetEl = action.targetId ? document.getElementById('char-' + action.targetId) : null;
+        if (actorEl) {
+            actorEl.classList.add('acting');
+            // highlight actor's team while acting
+            const teamPrefix = action.actorId.startsWith('L') ? 'L' : 'R';
+            Object.keys(unitMap).forEach(uid => {
+                if (uid.startsWith(teamPrefix)) {
+                    const el = document.getElementById('char-' + uid);
+                    if (el) el.classList.add(teamPrefix === 'L' ? 'glow-left' : 'glow-right');
+                }
+            });
+        }
+        if (targetEl) targetEl.classList.add('targeted');
+        if (action.kind === 'HEAL') {
+            if (actorEl) actorEl.classList.add('heal');
+            if (targetEl) targetEl.classList.add('heal');
+        }
+
+        // update HP display incrementally
+        if (action.kind === 'ATTACK') {
+            const tid = action.targetId;
+            if (typeof localHp[tid] !== 'undefined') {
+                localHp[tid] = Math.max(0, localHp[tid] - action.amount);
+                const hpEl = document.getElementById('hp-' + tid);
+                if (hpEl) hpEl.textContent = localHp[tid];
+                const box = document.getElementById('char-' + tid);
+                if (box && localHp[tid] <= 0) box.classList.add('dead');
+            }
+        } else if (action.kind === 'HEAL') {
+            const tid = action.targetId;
+            if (typeof localHp[tid] !== 'undefined') {
+                const maxHp = unitMaxHp[tid] || 9999;
+                localHp[tid] = Math.min(maxHp, localHp[tid] + action.amount);
+                const hpEl = document.getElementById('hp-' + tid);
+                if (hpEl) hpEl.textContent = localHp[tid];
+                const box = document.getElementById('char-' + tid);
+                if (box && localHp[tid] > 0) box.classList.remove('dead');
+            }
+        }
+
+        // append corresponding event if available
+        const logDiv = document.getElementById('battle-log');
+        if (currentEvents[currentActionIdx]) {
             const p = document.createElement('div');
-            p.textContent = ev;
+            p.textContent = currentEvents[currentActionIdx];
             logDiv.appendChild(p);
             logDiv.scrollTop = logDiv.scrollHeight;
-        });
+        }
+
+        // schedule cleanup for this action
+        const cleanup = setTimeout(() => {
+            if (actorEl) actorEl.classList.remove('acting');
+            if (targetEl) targetEl.classList.remove('targeted');
+            if (actorEl) actorEl.classList.remove('heal');
+            if (targetEl) targetEl.classList.remove('heal');
+            // remove the team-wide highlight after action finishes
+            const teamPrefix = action.actorId.startsWith('L') ? 'L' : 'R';
+            Object.keys(unitMap).forEach(uid => {
+                if (uid.startsWith(teamPrefix)) {
+                    const el = document.getElementById('char-' + uid);
+                    if (el) el.classList.remove(teamPrefix === 'L' ? 'glow-left' : 'glow-right');
+                }
+            });
+        }, 700);
+        playTimeouts.push(cleanup);
+
+        // schedule next action after 1s (if not paused)
+        const nextTimer = setTimeout(() => {
+            currentActionIdx++;
+            processNextAction();
+        }, 1000);
+        playTimeouts.push(nextTimer);
     }
+
+    // Start processing actions for this frame
+    processNextActionRef = processNextAction;
+    processNextAction();
 }
 
 document.getElementById('play-battle').addEventListener('click', function() {
-    // Clear any previous run
-    if (interval) clearInterval(interval);
-    currentFrame = 0;
+    // Stop any previous run
+    clearAllTimeouts();
+    resetVisuals();
     document.getElementById('battle-log').innerHTML = '';
     document.getElementById('battle-winner').textContent = '';
+    isPaused = false;
+    processNextActionRef = null;
 
-    // Example starter: build a trivial single-frame 'frames' array showing initial HPs.
-    frames = [{
-        tick: 0,
-        actions: [],
-        hpByUnit: Object.fromEntries(Object.entries(unitMap).map(([uid, u]) => [uid, u.HP ?? u.hp ?? 1])),
-        events: ['Battle started']
-    }];
+    if (!frames || frames.length === 0) {
+        const logDiv = document.getElementById('battle-log');
+        const p = document.createElement('div');
+        p.textContent = 'No frames available.';
+        logDiv.appendChild(p);
+        return;
+    }
 
-    updateFrame(0);
-    interval = setInterval(() => {
-        currentFrame++;
-        if (currentFrame >= frames.length) {
-            clearInterval(interval);
-            document.getElementById('battle-winner').textContent = 'No winner (implement combat logic)';
-            const p = document.createElement('div');
-            p.textContent = 'Fin du combat.';
-            document.getElementById('battle-log').appendChild(p);
-            return;
+    playFrame(0);
+});
+
+document.getElementById('pause-battle').addEventListener('click', function() {
+    isPaused = !isPaused;
+    this.textContent = isPaused ? 'Resume Battle' : 'Pause Battle';
+    if (!isPaused) {
+        // resume: continue processing current frame/action
+        if (currentFrameIdx < frames.length) {
+            // clear any lingering timeouts and continue
+            clearAllTimeouts();
+            // resume action processing at currentActionIdx
+            // small delay to allow visuals to settle
+            setTimeout(() => {
+                // continue from the stored processNextActionRef which preserves indices
+                if (processNextActionRef) processNextActionRef();
+            }, 120);
         }
-        updateFrame(currentFrame);
-    }, 1200);
+    } else {
+        // paused: stop scheduling future timers
+        clearAllTimeouts();
+    }
 });
 </script>
 

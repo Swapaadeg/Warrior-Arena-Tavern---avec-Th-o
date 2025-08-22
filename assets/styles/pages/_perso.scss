@@ -21,6 +21,15 @@
         text-shadow: 2px 2px 4px rgba($primary-dark, 0.7);
     }
 }
+.battle-page{
+    .character-list{
+        flex-direction: row;
+        .character-item{
+            flex-wrap: wrap;
+        }
+    }
+}
+
 
 .character-list {
     @include flex(column, flex-start, stretch);

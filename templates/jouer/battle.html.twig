@@ -3,14 +3,24 @@
 {% block title %}Résultat de la bataille{% endblock %}
 
 {% block body %}
-<h1>Résultat de la bataille</h1>
-<div class="row">
+<div class="battle-page">
+    <h1>Résultat de la bataille</h1>
+    <div class="row">
     <div class="col-md-6">
         <h2>Votre équipe</h2>
-        <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
+        <div class="character-list">
             {% for character in my_team %}
-                <div class="character-item" id="char-L{{ character.id }}" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
-                    <h3>{{ character.name }}</h3>
+                <div class="character-item" id="char-L{{ character.id }}">
+                    <h3>{{ character.name }}
+                        {% if character.role %}
+                            {% set roleClass = 'role-badge--' ~ (character.role.name|lower)|replace({' ':'-'}) %}
+                            {% set roleKey = (character.role.name|lower)|replace({' ':'-'}) %}
+                            <img src="{{ asset('build/images/roles/' ~ roleKey ~ '.png') }}" alt="{{ character.role.name }}" class="role-icon-img {{ roleKey }}" onerror="this.style.display='none'; this.nextElementSibling && (this.nextElementSibling.style.display='inline-block');" />
+                            <span class="role-badge {{ roleClass }}" style="display:none">{{ character.role.name }}</span>
+                        {% else %}
+                            <span class="role-badge">&nbsp;</span>
+                        {% endif %}
+                    </h3>
                     <div>PV: <span class="hp" id="hp-L{{ character.id }}">{{ character.HP }}</span></div>
                 </div>
             {% endfor %}
@@ -18,10 +28,19 @@
     </div>
     <div class="col-md-6">
         <h2>Adversaire : {{ opponent.username }}</h2>
-        <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
+        <div class="character-list">
             {% for character in opponent_team %}
-                <div class="character-item" id="char-R{{ character.id }}" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
-                    <h3>{{ character.name }}</h3>
+                <div class="character-item" id="char-R{{ character.id }}">
+                    <h3>{{ character.name }}
+                        {% if character.role %}
+                            {% set roleClass = 'role-badge--' ~ (character.role.name|lower)|replace({' ':'-'}) %}
+                            {% set roleKey = (character.role.name|lower)|replace({' ':'-'}) %}
+                            <img src="{{ asset('build/images/roles/' ~ roleKey ~ '.png') }}" alt="{{ character.role.name }}" class="role-icon-img {{ roleKey }}" onerror="this.style.display='none'; this.nextElementSibling && (this.nextElementSibling.style.display='inline-block');" />
+                            <span class="role-badge {{ roleClass }}" style="display:none">{{ character.role.name }}</span>
+                        {% else %}
+                            <span class="role-badge">&nbsp;</span>
+                        {% endif %}
+                    </h3>
                     <div>PV: <span class="hp" id="hp-R{{ character.id }}">{{ character.HP }}</span></div>
                 </div>
             {% endfor %}
@@ -29,31 +48,22 @@
     </div>
 </div>
 <div class="mt-4 row">
-    <div class="col-md-8 text-center">
+    <div class="col-md-8 text-center controls">
         <button id="play-battle" class="btn btn-danger btn-lg">Lancer l'animation</button>
-        <button id="pause-battle" class="btn btn-secondary btn-lg" style="margin-left:1em;">Pause Battle</button>
+        <button id="pause-battle" class="btn btn-secondary btn-lg">Pause Battle</button>
+    <button id="speed-toggle" class="btn btn-info btn-lg">Accelerate</button>
+    <button id="reset-battle" class="btn btn-warning btn-lg">Reset Battle</button>
     </div>
     <div class="col-md-4 text-center">
-        <div id="round-counter" style="font-weight:bold; font-size:1.2em;">Round: 0</div>
+        <div id="round-counter">Round: 0</div>
     </div>
     <div class="col-md-4">
         <h4>Journal du combat</h4>
-        <div id="battle-log" style="margin-top:1em; min-height:2em; max-height:400px; overflow-y:auto; border:1px solid #ccc; border-radius:8px; background:#fafafa; padding:1em;"></div>
-        <div id="battle-winner" style="margin-top:1em; font-weight:bold; font-size:1.2em;"></div>
+        <div id="battle-log"></div>
+        <div id="battle-winner"></div>
     </div>
 </div>
-<style>
-    .glow-left { box-shadow: 0 0 18px 6px rgba(0,150,255,0.35); background: #e8f6ff; }
-    .glow-right { box-shadow: 0 0 18px 6px rgba(255,80,80,0.25); background: #fff0f0; }
-    .glow-action { box-shadow: 0 0 12px 4px rgba(0,0,0,0.12); }
-    /* When a unit acts, scale it up slightly */
-    .acting { transform: scale(1.08); z-index: 5; transition: transform 220ms ease; }
-    /* When a unit is targeted, scale up a bit less */
-    .targeted { transform: scale(1.04); z-index: 4; transition: transform 220ms ease; }
-    /* Heal visual - both healer and healed turn green briefly */
-    .heal { box-shadow: 0 0 18px 6px rgba(60,180,80,0.25); background: #eefdf0; }
-    .dead { opacity: 0.5; filter: grayscale(1); }
-</style>
+    </div>
 <script>
 // Data passed from the controller
 const setup = {{ setup|json_encode|raw }};
@@ -68,6 +78,13 @@ let currentFrame = null;
 let currentActions = [];
 let currentEvents = [];
 let processNextActionRef = null;
+
+// Timing configuration (ms)
+let actionDelay = 1000; // delay between actions
+let cleanupDelay = 300; // cleanup before frame snapshot
+const acceleratedDelay = 200;
+const normalDelay = 1000;
+let isAccelerated = false;
 
 // Build a map of unit max HP for clamping heals
 const unitMaxHp = {};
@@ -138,6 +155,14 @@ function playFrame(idx) {
         if (rc) rc.textContent = 'Round: ' + frame.round;
     }
 
+    // Append a clear round-start entry to the log
+    const logDiv = document.getElementById('battle-log');
+    const roundHeader = document.createElement('div');
+    roundHeader.textContent = '--- Round ' + (typeof frame.round !== 'undefined' ? frame.round : currentFrameIdx+1) + ' start (' + (frame.starter ? (frame.starter === 'left' ? 'Your team' : 'Opponent') : 'N/A') + ') ---';
+    roundHeader.classList.add('log-round');
+    logDiv.appendChild(roundHeader);
+    logDiv.scrollTop = logDiv.scrollHeight;
+
     // If frame contains roundEvents (global AoE from round), render them first
     if (frame.roundEvents && frame.roundEvents.length) {
         const logDiv = document.getElementById('battle-log');
@@ -173,7 +198,7 @@ function playFrame(idx) {
                 logDiv.scrollTop = logDiv.scrollHeight;
             }
             syncHpSnapshot(frame.hpByUnit);
-            const t = setTimeout(() => playFrame(currentFrameIdx + 1), 1000);
+            const t = setTimeout(() => playFrame(currentFrameIdx + 1), actionDelay);
             playTimeouts.push(t);
             return;
         }
@@ -183,10 +208,10 @@ function playFrame(idx) {
             setTimeout(() => {
                 syncHpSnapshot(frame.hpByUnit);
                 if (!isPaused) {
-                    const t = setTimeout(() => playFrame(currentFrameIdx + 1), 1000);
+                    const t = setTimeout(() => playFrame(currentFrameIdx + 1), actionDelay);
                     playTimeouts.push(t);
                 }
-            }, 300);
+            }, cleanupDelay);
             return;
         }
 
@@ -239,16 +264,26 @@ function playFrame(idx) {
         if (currentEvents[currentActionIdx]) {
             const p = document.createElement('div');
             p.textContent = currentEvents[currentActionIdx];
+            // highlight critical hits
+            if (action && action.critical) {
+                p.classList.add('log-crit');
+                // add a visible crit flash to actor/target
+                if (actorEl) actorEl.classList.add('crit-flash');
+                if (targetEl) targetEl.classList.add('crit-flash');
+            }
             logDiv.appendChild(p);
             logDiv.scrollTop = logDiv.scrollHeight;
         }
 
         // schedule cleanup for this action
-        const cleanup = setTimeout(() => {
+    const cleanup = setTimeout(() => {
             if (actorEl) actorEl.classList.remove('acting');
             if (targetEl) targetEl.classList.remove('targeted');
             if (actorEl) actorEl.classList.remove('heal');
             if (targetEl) targetEl.classList.remove('heal');
+            // ensure critical flash is removed after action
+            if (actorEl) actorEl.classList.remove('crit-flash');
+            if (targetEl) targetEl.classList.remove('crit-flash');
             // remove the team-wide highlight after action finishes
             const teamPrefix = action.actorId.startsWith('L') ? 'L' : 'R';
             Object.keys(unitMap).forEach(uid => {
@@ -257,14 +292,14 @@ function playFrame(idx) {
                     if (el) el.classList.remove(teamPrefix === 'L' ? 'glow-left' : 'glow-right');
                 }
             });
-        }, 700);
+    }, Math.max(120, Math.round(cleanupDelay * 1.5)));
         playTimeouts.push(cleanup);
 
-        // schedule next action after 1s (if not paused)
-        const nextTimer = setTimeout(() => {
+    // schedule next action after actionDelay (if not paused)
+    const nextTimer = setTimeout(() => {
             currentActionIdx++;
             processNextAction();
-        }, 1000);
+    }, actionDelay);
         playTimeouts.push(nextTimer);
     }
 
@@ -313,9 +348,58 @@ document.getElementById('pause-battle').addEventListener('click', function() {
         clearAllTimeouts();
     }
 });
+
+document.getElementById('speed-toggle').addEventListener('click', function() {
+    isAccelerated = !isAccelerated;
+    actionDelay = isAccelerated ? acceleratedDelay : normalDelay;
+    this.textContent = isAccelerated ? 'Normal Speed' : 'Accelerate';
+    // If currently playing, clear pending timeouts so new delays apply immediately
+    if (!isPaused && processNextActionRef) {
+        clearAllTimeouts();
+        // small delay to settle visuals, then resume
+        setTimeout(() => { if (processNextActionRef) processNextActionRef(); }, 80);
+    }
+});
+
+// Reset button: restore all units to full HP and clear dead visuals/logs
+document.getElementById('reset-battle').addEventListener('click', function() {
+    // Stop any running timers and animations
+    clearAllTimeouts();
+    // Reset internal indices and processing refs
+    isPaused = true;
+    currentFrameIdx = 0;
+    currentActionIdx = 0;
+    currentFrame = null;
+    currentActions = [];
+    currentEvents = [];
+    processNextActionRef = null;
+
+    // Restore HP from setup (uses unitMaxHp computed earlier)
+    Object.keys(unitMaxHp).forEach(uid => {
+        const hpEl = document.getElementById('hp-' + uid);
+        if (hpEl) hpEl.textContent = unitMaxHp[uid];
+        const box = document.getElementById('char-' + uid);
+        if (box) box.classList.remove('dead');
+    });
+
+    // Clear visuals and log/winner/round
+    resetVisuals();
+    const logDiv = document.getElementById('battle-log');
+    if (logDiv) logDiv.innerHTML = '';
+    const winnerDiv = document.getElementById('battle-winner');
+    if (winnerDiv) winnerDiv.textContent = '';
+    const rc = document.getElementById('round-counter');
+    if (rc) rc.textContent = 'Round: 0';
+
+    // Un-accelerate to default speed for clarity
+    isAccelerated = false;
+    actionDelay = normalDelay;
+    const speedBtn = document.getElementById('speed-toggle');
+    if (speedBtn) speedBtn.textContent = 'Accelerate';
+});
 </script>
 
-<div style="margin-top:1em; font-size:0.9em; color:#666;">Debug setup JSON (use this to implement your engine):
-    <pre style="white-space:pre-wrap; max-height:200px; overflow:auto; background:#f6f6f6; padding:0.5em; border-radius:6px;">{{ setup|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}</pre>
+<div class="debug-setup">Debug setup JSON (use this to implement your engine):
+    <pre class="debug-pre">{{ setup|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}</pre>
 </div>
 {% endblock %}

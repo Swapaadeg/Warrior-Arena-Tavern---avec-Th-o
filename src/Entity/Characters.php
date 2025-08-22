@@ -40,17 +40,13 @@ class Characters
     #[ORM\ManyToMany(targetEntity: Teams::class, mappedBy: 'characters')]
     private Collection $teams;
 
-    /**
-     * @var Collection<int, Roles>
-     */
-    #[ORM\OneToMany(targetEntity: Roles::class, mappedBy: 'perso')]
-    private Collection $role;
+    #[ORM\ManyToOne(targetEntity: Roles::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Roles $role = null;
 
-    /**
-     * @var Collection<int, Types>
-     */
-    #[ORM\OneToMany(targetEntity: Types::class, mappedBy: 'perso')]
-    private Collection $type;
+    #[ORM\ManyToOne(targetEntity: Types::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Types $type = null;
 
     #[Vich\UploadableField(mapping: 'images', fileNameProperty: 'imageName')]
     private ?File $imageFile = null;
@@ -67,8 +63,6 @@ class Characters
     public function __construct()
     {
         $this->teams = new ArrayCollection();
-        $this->role = new ArrayCollection();
-        $this->type = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
@@ -165,63 +159,25 @@ class Characters
         return $this;
     }
 
-    /**
-     * @return Collection<int, Roles>
-     */
-    public function getRole(): Collection
+    public function getRole(): ?Roles
     {
         return $this->role;
     }
 
-    public function addRole(Roles $role): static
+    public function setRole(?Roles $role): static
     {
-        if (!$this->role->contains($role)) {
-            $this->role->add($role);
-            $role->setPerso($this);
-        }
-
+        $this->role = $role;
         return $this;
     }
 
-    public function removeRole(Roles $role): static
-    {
-        if ($this->role->removeElement($role)) {
-            // set the owning side to null (unless already changed)
-            if ($role->getPerso() === $this) {
-                $role->setPerso(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Types>
-     */
-    public function getType(): Collection
+    public function getType(): ?Types
     {
         return $this->type;
     }
 
-    public function addType(Types $type): static
+    public function setType(?Types $type): static
     {
-        if (!$this->type->contains($type)) {
-            $this->type->add($type);
-            $type->setPerso($this);
-        }
-
-        return $this;
-    }
-
-    public function removeType(Types $type): static
-    {
-        if ($this->type->removeElement($type)) {
-            // set the owning side to null (unless already changed)
-            if ($type->getPerso() === $this) {
-                $type->setPerso(null);
-            }
-        }
-
+        $this->type = $type;
         return $this;
     }
 

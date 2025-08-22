@@ -158,6 +158,12 @@ final class JouerController extends AbstractController
             $events = [];
             $roundEvents = [];
 
+            // per-round aggregates
+            $damageTakenLeft = 0;
+            $damageTakenRight = 0;
+            $healedLeft = 0;
+            $healedRight = 0;
+
             // helper to check alive counts
             $aliveLeft = array_filter($stateLeft, fn($s) => $s['alive']);
             $aliveRight = array_filter($stateRight, fn($s) => $s['alive']);
@@ -165,7 +171,7 @@ final class JouerController extends AbstractController
 
             // Round-based global damage: starting from round 3, all alive units lose roundNumber * 5 HP
             $roundNumber = $tick + 1;
-            if ($roundNumber >= 3) {
+        if ($roundNumber >= 3) {
                 $roundDamage = $roundNumber * 5;
                 // Apply to left
                 foreach ($stateLeft as $id => &$s) {
@@ -174,6 +180,8 @@ final class JouerController extends AbstractController
                     $s['alive'] = $s['hp'] > 0;
                     $owner = 'You';
                     $roundEvents[] = $s['name'] . ' (' . $owner . ') took ' . $roundDamage . ' damage from round effect';
+            // count round AoE as damage received for left
+            $damageTakenLeft += $roundDamage;
                 }
                 unset($s);
                 // Apply to right
@@ -183,6 +191,8 @@ final class JouerController extends AbstractController
                     $s['alive'] = $s['hp'] > 0;
                     $owner = (string)$opponent->getUsername();
                     $roundEvents[] = $s['name'] . ' (' . $owner . ') took ' . $roundDamage . ' damage from round effect';
+            // count round AoE as damage received for right
+            $damageTakenRight += $roundDamage;
                 }
                 unset($s);
                 // re-check alive counts early
@@ -202,14 +212,16 @@ final class JouerController extends AbstractController
             $firstTeam = random_int(0, 1) === 0 ? 'left' : 'right';
 
             // closure to play actions for a team
-            $playTeamActions = function(string $team, array &$actorState, array &$enemyState) use (&$actions, &$events, $opponent) {
+            $playTeamActions = function(string $team, array &$actorState, array &$enemyState) use (&$actions, &$events, $opponent, &$damageTakenLeft, &$damageTakenRight, &$healedLeft, &$healedRight) {
                 $order = array_keys(array_filter($actorState, fn($s) => $s['alive']));
                 shuffle($order);
                 foreach ($order as $actorId) {
                     if (!$actorState[$actorId]['alive']) continue;
                     $role = strtolower($actorState[$actorId]['role'] ?? '');
                     if (str_contains($role, 'heal')) {
-                        $teammates = array_keys(array_filter($actorState, fn($s, $k) => $s['alive'] && $k !== $actorId, ARRAY_FILTER_USE_BOTH));
+                        // only heal teammates that are damaged
+                        $teammates = array_keys(array_filter($actorState, fn($s, $k) => $s['alive'] && $k !== $actorId && $s['hp'] < $s['maxHp'], ARRAY_FILTER_USE_BOTH));
+                        // if no damaged teammates, healer skips
                         if (count($teammates) === 0) continue;
                         $targetId = $teammates[array_rand($teammates)];
                         $amount = max(1, (int)$actorState[$actorId]['power']);
@@ -219,17 +231,37 @@ final class JouerController extends AbstractController
                         $targetOwner = $actorOwner;
                         $actions[] = ['actorId' => $actorId, 'kind' => 'HEAL', 'targetId' => $targetId, 'amount' => $amount];
                         $events[] = $actorState[$actorId]['name'] . ' (' . $actorOwner . ') healed ' . $actorState[$targetId]['name'] . ' (' . $targetOwner . ') for ' . $amount;
+                        // aggregate heal stats
+                        if ($team === 'left') $healedLeft += $amount; else $healedRight += $amount;
                     } else {
-                        $enemies = array_keys(array_filter($enemyState, fn($s) => $s['alive']));
-                        if (count($enemies) === 0) break;
-                        $targetId = $enemies[array_rand($enemies)];
-                        $dmg = max(1, $actorState[$actorId]['power'] - (int)floor($enemyState[$targetId]['defense'] * 0.5));
+                        // Prefer alive tanks on the enemy team if any exist
+                        $aliveEnemies = array_keys(array_filter($enemyState, fn($s) => $s['alive']));
+                        if (count($aliveEnemies) === 0) break;
+                        $tankCandidates = array_keys(array_filter($enemyState, fn($s) => $s['alive'] && str_contains(strtolower($s['role'] ?? ''), 'tank')));
+                        if (count($tankCandidates) > 0) {
+                            $targetId = $tankCandidates[array_rand($tankCandidates)];
+                        } else {
+                            $targetId = $aliveEnemies[array_rand($aliveEnemies)];
+                        }
+                        // 10% chance to land a critical hit: deals 50% more damage and ignores defense
+                        $isCrit = random_int(1, 100) <= 10;
+                        if ($isCrit) {
+                            $dmg = max(1, (int) floor($actorState[$actorId]['power'] * 1.5));
+                        } else {
+                            $dmg = max(1, $actorState[$actorId]['power'] - (int)floor($enemyState[$targetId]['defense'] * 0.5));
+                        }
                         $enemyState[$targetId]['hp'] = max(0, $enemyState[$targetId]['hp'] - $dmg);
                         $enemyState[$targetId]['alive'] = $enemyState[$targetId]['hp'] > 0;
                         $actorOwner = $team === 'left' ? 'You' : (string)$opponent->getUsername();
                         $targetOwner = $team === 'left' ? (string)$opponent->getUsername() : 'You';
-                        $actions[] = ['actorId' => $actorId, 'kind' => 'ATTACK', 'targetId' => $targetId, 'amount' => $dmg];
-                        $events[] = $actorState[$actorId]['name'] . ' (' . $actorOwner . ') attacked ' . $enemyState[$targetId]['name'] . ' (' . $targetOwner . ') for ' . $dmg;
+                        $actions[] = ['actorId' => $actorId, 'kind' => 'ATTACK', 'targetId' => $targetId, 'amount' => $dmg, 'critical' => $isCrit];
+                        $events[] = $actorState[$actorId]['name'] . ' (' . $actorOwner . ') attacked ' . $enemyState[$targetId]['name'] . ' (' . $targetOwner . ') for ' . $dmg . ($isCrit ? ' (CRIT!)' : '');
+                        // aggregate damage taken for the target's team
+                        if ($team === 'left') {
+                            $damageTakenRight += $dmg;
+                        } else {
+                            $damageTakenLeft += $dmg;
+                        }
                     }
                 }
             };
@@ -248,6 +280,10 @@ final class JouerController extends AbstractController
             foreach ($stateRight as $id => $s) $hpByUnit[$id] = $s['hp'];
 
             // include starter and round info so the template can highlight whose turn it was this tick
+            // append per-team summary of damage/heal to events so it appears at end of round in the log
+            $events[] = 'Summary: Your team took ' . $damageTakenLeft . ' damage and was healed for ' . $healedLeft . ' this round.';
+            $events[] = 'Summary: ' . (string)$opponent->getUsername() . "'s team took " . $damageTakenRight . ' damage and was healed for ' . $healedRight . ' this round.';
+
             $frames[] = ['tick' => $tick, 'round' => $roundNumber, 'starter' => $firstTeam, 'actions' => $actions, 'hpByUnit' => $hpByUnit, 'events' => $events, 'roundEvents' => $roundEvents];
 
             // stop if one side down

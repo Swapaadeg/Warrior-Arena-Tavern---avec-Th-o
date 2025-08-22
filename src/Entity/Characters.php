@@ -40,12 +40,12 @@ class Characters
     #[ORM\ManyToMany(targetEntity: Teams::class, mappedBy: 'characters')]
     private Collection $teams;
 
-    #[ORM\ManyToOne(targetEntity: Roles::class)]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\ManyToOne(targetEntity: Roles::class, inversedBy: 'characters')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Roles $role = null;
 
-    #[ORM\ManyToOne(targetEntity: Types::class)]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\ManyToOne(targetEntity: Types::class, inversedBy: 'characters')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Types $type = null;
 
     #[Vich\UploadableField(mapping: 'images', fileNameProperty: 'imageName')]
@@ -167,6 +167,7 @@ class Characters
     public function setRole(?Roles $role): static
     {
         $this->role = $role;
+
         return $this;
     }
 
@@ -178,6 +179,7 @@ class Characters
     public function setType(?Types $type): static
     {
         $this->type = $type;
+
         return $this;
     }
 

@@ -3,37 +3,39 @@
 {% block title %}Matchmaking{% endblock %}
 
 {% block body %}
-<h1>Matchmaking</h1>
-<div class="row">
-    <div class="col-md-6">
-        <h2>Votre équipe</h2>
-        <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
-            {% for character in my_team %}
-                <div class="character-item" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
-                    <h3>{{ character.name }}</h3>
-                    <div>PV: {{ character.HP }}</div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    <div class="col-md-6">
-        {% if opponent %}
-            <h2>Adversaire : {{ opponent.username }}</h2>
-            <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
-                {% for character in opponent_team %}
-                    <div class="character-item" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
-                        <h3>{{ character.name }}</h3>
-                        <div>PV: {{ character.HP }}</div>
+<div class="match-page">
+    <h1 class="match-title">Matchmaking</h1>
+    <div class="match-container">
+        <div class="team-section">
+            <h2 class="team-title">Votre équipe</h2>
+            <div class="character-list">
+                {% for character in my_team %}
+                    <div class="character-item">
+                        <h3 class="character-name">{{ character.name }}</h3>
+                        <div class="character-stat">PV: {{ character.HP }}</div>
                     </div>
                 {% endfor %}
             </div>
-            <form method="post" action="{{ path('jouer_battle') }}">
-                <input type="hidden" name="opponentId" value="{{ opponent.id }}">
-                <button type="submit" class="btn btn-success mt-3">Lancer la bataille</button>
-            </form>
-        {% else %}
-            <div class="alert alert-warning">Aucun adversaire trouvé pour le matchmaking.</div>
-        {% endif %}
+        </div>
+        <div class="team-section">
+            {% if opponent %}
+                <h2 class="team-title">Adversaire : {{ opponent.username }}</h2>
+                <div class="character-list">
+                    {% for character in opponent_team %}
+                        <div class="character-item">
+                            <h3 class="character-name">{{ character.name }}</h3>
+                            <div class="character-stat">PV: {{ character.HP }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <form method="post" action="{{ path('jouer_battle') }}" class="battle-form">
+                    <input type="hidden" name="opponentId" value="{{ opponent.id }}">
+                    <button type="submit" class="battle-button">Lancer la bataille</button>
+                </form>
+            {% else %}
+                <div class="no-opponent">Aucun adversaire trouvé pour le matchmaking.</div>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

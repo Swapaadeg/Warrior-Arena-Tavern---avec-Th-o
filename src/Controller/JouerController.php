@@ -5,9 +5,12 @@ namespace App\Controller;
 // No DTOs for the battle engine: implement simulation in the controller using entities.
 use App\Entity\Teams;
 use App\Repository\CharactersRepository;
+use App\Repository\RolesRepository;
+use App\Repository\TypesRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -15,9 +18,44 @@ use Symfony\Component\Routing\Attribute\Route;
 final class JouerController extends AbstractController
 {
     #[Route('/jouer', name: 'jouer')]
-    public function index(Request $request, CharactersRepository $charactersRepository, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    public function index(Request $request, CharactersRepository $charactersRepository, RolesRepository $rolesRepository, TypesRepository $typesRepository, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
-        $characters = $charactersRepository->findAll();
+        // Récupérer les filtres depuis la requête
+        $roleFilter = $request->query->get('role');
+        $typeFilter = $request->query->get('type');
+        
+        // Récupérer tous les rôles et types pour les filtres
+        $allRoles = $rolesRepository->findAll();
+        $allTypes = $typesRepository->findAll();
+        
+        // Construire la requête avec tri par rôle (Tank > Heal > DPS)
+        $qb = $charactersRepository->createQueryBuilder('c')
+            ->leftJoin('c.role', 'r')
+            ->leftJoin('c.type', 't')
+            ->addSelect('r', 't');
+            
+        // Appliquer les filtres si présents
+        if ($roleFilter) {
+            $qb->andWhere('r.id = :role')->setParameter('role', $roleFilter);
+        }
+        if ($typeFilter) {
+            $qb->andWhere('t.id = :type')->setParameter('type', $typeFilter);
+        }
+        
+        // Tri personnalisé : Tank (1) > Heal (2) > DPS (3)
+        $qb->addOrderBy('CASE 
+            WHEN LOWER(r.name) = \'tank\' THEN 1 
+            WHEN LOWER(r.name) IN (\'heal\', \'healer\', \'soigneur\') THEN 2 
+            ELSE 3 
+        END', 'ASC')
+        ->addOrderBy('c.name', 'ASC'); // Tri secondaire par nom
+        
+        $characters = $qb->getQuery()->getResult();
+        
+        // Si c'est une requête Ajax, retourner seulement les personnages en JSON
+        if ($request->headers->get('X-Requested-With') === 'XMLHttpRequest') {
+            return $this->json($this->serializeCharacters($characters));
+        }
 
         if ($request->isMethod('POST')) {
             $teamIds = $request->request->all('team');
@@ -60,6 +98,10 @@ final class JouerController extends AbstractController
 
         return $this->render('jouer/index.html.twig', [
             'characters' => $characters,
+            'roles' => $allRoles,
+            'types' => $allTypes,
+            'current_role' => $roleFilter,
+            'current_type' => $typeFilter,
         ]);
     }
 
@@ -250,5 +292,33 @@ final class JouerController extends AbstractController
             'frames' => $frames,
             'result' => $result,
         ]);
+    }
+    
+    /**
+     * Sérialise les personnages pour les requêtes Ajax
+     */
+    private function serializeCharacters(array $characters): array
+    {
+        $serialized = [];
+        foreach ($characters as $character) {
+            $serialized[] = [
+                'id' => $character->getId(),
+                'name' => $character->getName(),
+                'hp' => $character->getHP(),
+                'power' => $character->getPower(),
+                'defense' => $character->getDefense(),
+                'description' => $character->getDescription(),
+                'imageName' => $character->getImageName(),
+                'role' => $character->getRole() ? [
+                    'id' => $character->getRole()->getId(),
+                    'name' => $character->getRole()->getName()
+                ] : null,
+                'type' => $character->getType() ? [
+                    'id' => $character->getType()->getId(),
+                    'name' => $character->getType()->getName()
+                ] : null,
+            ];
+        }
+        return $serialized;
     }
 }

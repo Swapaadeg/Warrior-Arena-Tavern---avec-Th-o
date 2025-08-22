@@ -21,8 +21,6 @@
             <span class="subtitle">Sélectionner 5 champions, ctrl+click pour sélectionner</span>
         </div>
         
-        <!-- Formulaire de sélection d'équipe -->
-        <form method="POST" id="team-form">
         <!-- Grille des personnages -->
         <div class="character-grid" id="character-grid">
             {% for character in characters %}
@@ -66,18 +64,16 @@
                         </div>
                     </div>
                     
-                    <input type="checkbox" name="team[]" value="{{ character.id }}" class="character-checkbox">
+                    <input type="checkbox" name="team[]" value="{{ character.id }}" class="character-checkbox" style="display:none;">
                 </div>
             {% endfor %}
         </div>
         
         <!-- Bouton de jeu -->
+        <form method="POST" id="team-form">
             <div class="team-controls">
                 <div class="team-info">
                     <span class="team-counter">Équipe: <span id="team-count">0</span>/5</span>
-                    <div class="team-roles-preview" id="team-roles-preview">
-                        <!-- Les icônes des rôles apparaîtront ici -->
-                    </div>
                 </div>
                 <button type="submit" id="play-btn" class="play-button" disabled>
                     <i class="fas fa-play"></i> Commencer le Combat !
@@ -150,39 +146,13 @@ document.addEventListener('DOMContentLoaded', function() {
         teamCountEl.textContent = selectedCount;
         playBtn.disabled = selectedCount !== 5;
         
-        // Mettre à jour l'aperçu des rôles
-        const rolePreview = document.getElementById('team-roles-preview');
-        rolePreview.innerHTML = '';
-        
-        // Récupérer les rôles des personnages sélectionnés
-        const selectedRoles = [];
+        // Mettre à jour l'apparence des cartes
         characterCards.forEach((card, idx) => {
             if (checkboxes[idx].checked) {
                 card.classList.add('selected');
-                const characterId = card.dataset.characterId;
-                const character = charactersData[characterId];
-                if (character.role) {
-                    selectedRoles.push(character.role.toLowerCase());
-                }
             } else {
                 card.classList.remove('selected');
             }
-        });
-        
-        // Afficher les icônes des rôles sélectionnés
-        selectedRoles.forEach(role => {
-            const roleIcon = document.createElement('i');
-            roleIcon.className = 'role-icon-small';
-            
-            if (role === 'tank') {
-                roleIcon.classList.add('fa-solid', 'fa-shield-halved', 'tank');
-            } else if (role === 'heal' || role === 'healer' || role === 'soigneur') {
-                roleIcon.classList.add('fa-solid', 'fa-heart', 'healer');
-            } else {
-                roleIcon.classList.add('fa-solid', 'fa-burst', 'dps');
-            }
-            
-            rolePreview.appendChild(roleIcon);
         });
     }
 

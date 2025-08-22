@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-
 use App\Entity\Characters;
 use App\Form\CharacterType;
 use App\Entity\Roles;
@@ -29,19 +28,22 @@ final class PersoController extends AbstractController
             if ($roleName) {
                 $role = new Roles();
                 $role->setName($roleName);
-                $role->setPerso($character);
                 $entityManager->persist($role);
+                $character->setRole($role);
             }
+
             // Handle type creation if provided
             $typeName = $form->get('typeName')->getData();
             if ($typeName) {
                 $type = new Types();
                 $type->setName($typeName);
-                $type->setPerso($character);
                 $entityManager->persist($type);
+                $character->setType($type);
             }
+
             $entityManager->persist($character);
             $entityManager->flush();
+
             $this->addFlash('success', 'Personnage ajouté avec succès !');
             return $this->redirectToRoute('personnages');
         }

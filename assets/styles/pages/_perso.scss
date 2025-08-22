@@ -1,0 +1,185 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+@use "sass:color";
+
+// ==========================================================================
+// PAGE PERSONNAGES - WARRIOR ARENA TAVERNE
+// ==========================================================================
+
+.characters-list-section {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: rgba($primary-dark, 0.1);
+    border-radius: 15px;
+    
+    h2 {
+        text-align: center;
+        color: $accent-gold;
+        font-family: $font-title;
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        text-shadow: 2px 2px 4px rgba($primary-dark, 0.7);
+    }
+}
+
+.character-list {
+    @include flex(column, flex-start, stretch);
+    gap: 1.5rem;
+    
+    .character-item {
+        @include flex(row, flex-start, flex-start);
+        gap: 1.5rem;
+        background: rgba($primary-beige, 0.9);
+        border: 2px solid $accent-gold;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba($primary-dark, 0.2);
+        transition: all 0.3s ease;
+        
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba($primary-dark, 0.3);
+            border-color: $primary-brown;
+        }
+        
+        .character-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid $accent-gold;
+            box-shadow: 0 2px 8px rgba($primary-dark, 0.3);
+            
+            &.placeholder {
+                background: linear-gradient(135deg, $primary-beige, $primary-brown);
+                @include flex(row, center, center);
+                color: $accent-gold;
+                font-size: 2em;
+                font-weight: bold;
+            }
+        }
+        
+        .character-info {
+            flex: 1;
+            
+            h3 {
+                font-family: $font-title;
+                font-size: 1.8rem;
+                color: $primary-dark;
+                margin-bottom: 0.5rem;
+                text-shadow: 1px 1px 2px rgba($accent-gold, 0.3);
+            }
+            
+            .character-stats {
+                @include flex(row, flex-start, center);
+                gap: 1rem;
+                margin-bottom: 0.8rem;
+                flex-wrap: wrap;
+                
+                .stat {
+                    background: rgba($primary-dark, 0.1);
+                    padding: 0.3rem 0.8rem;
+                    border-radius: 20px;
+                    font-weight: bold;
+                    color: $primary-dark;
+                    border: 1px solid $accent-gold;
+                    
+                    .stat-label {
+                        color: $primary-brown;
+                        font-size: 0.9rem;
+                    }
+                    
+                    .stat-value {
+                        color: $primary-dark;
+                        font-size: 1.1rem;
+                        margin-left: 0.2rem;
+                    }
+                }
+            }
+            
+            .character-description {
+                color: $primary-dark;
+                font-style: italic;
+                margin-bottom: 0.8rem;
+                line-height: 1.4;
+                background: rgba($accent-gold, 0.1);
+                padding: 0.8rem;
+                border-radius: 8px;
+                border-left: 3px solid $accent-gold;
+            }
+            
+            .character-tags {
+                @include flex(row, flex-start, center);
+                gap: 0.8rem;
+                flex-wrap: wrap;
+                
+                .tag-group {
+                    @include flex(row, flex-start, center);
+                    gap: 0.5rem;
+                    
+                    .tag-label {
+                        font-weight: bold;
+                        color: $primary-dark;
+                    }
+                    
+                    .badge {
+                        padding: 0.4rem 0.8rem;
+                        border-radius: 15px;
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        
+                        &.bg-secondary {
+                            background: $primary-brown;
+                            color: $primary-beige;
+                            border: 1px solid color.adjust($primary-brown, $lightness: -10%);
+                        }
+                        
+                        &.bg-info {
+                            background: $accent-gold;
+                            color: $primary-dark;
+                            border: 1px solid color.adjust($accent-gold, $lightness: -10%);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Message d'absence de personnages
+.no-characters {
+    text-align: center;
+    color: $primary-brown;
+    font-size: 1.2rem;
+    font-style: italic;
+    padding: 3rem;
+    background: rgba($primary-beige, 0.5);
+    border-radius: 15px;
+    border: 2px dashed $accent-gold;
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .character-item {
+        flex-direction: column;
+        text-align: center;
+        
+        .character-info {
+            .character-stats {
+                justify-content: center;
+            }
+            
+            .character-tags {
+                justify-content: center;
+            }
+        }
+    }
+    
+    .characters-list-section {
+        padding: 1rem;
+        
+        h2 {
+            font-size: 2rem;
+        }
+    }
+}

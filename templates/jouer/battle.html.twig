@@ -205,6 +205,19 @@ function playFrame(idx) {
 
         if (currentActionIdx >= currentActions.length) {
             // end of actions for this frame: sync snapshot then go to next frame after 1s
+            // append any remaining events that didn't map to actions (e.g. summaries)
+            if (currentEvents && currentEvents.length > currentActionIdx) {
+                const logDiv = document.getElementById('battle-log');
+                for (let i = currentActionIdx; i < currentEvents.length; i++) {
+                    const p = document.createElement('div');
+                    p.textContent = currentEvents[i];
+                    // mark critical entries if the corresponding action exists
+                    if (currentActions[i] && currentActions[i].critical) p.classList.add('log-crit');
+                    logDiv.appendChild(p);
+                }
+                logDiv.scrollTop = logDiv.scrollHeight;
+            }
+
             setTimeout(() => {
                 syncHpSnapshot(frame.hpByUnit);
                 if (!isPaused) {

@@ -12,7 +12,6 @@
             <span class="player-name gold-animated">{{ opponent.username }}</span>
         {% endif %}
     </div>
-    <h1 class="play-title">Matchmaking</h1>
     <div class="team-avatars">
         {# Team 1: tanks #}
         {% set tanks1 = my_team|filter(c => c.role and c.role.name|lower == 'tank') %}
@@ -47,12 +46,6 @@
         {% endfor %}
     </div>
     <div class="match-info">
-        <div class="team-labels">
-            <div class="team-label">Votre équipe</div>
-            {% if opponent %}
-                <div class="team-label">Adversaire : {{ opponent.username }}</div>
-            {% endif %}
-        </div>
         <form method="post" action="{{ path('jouer_battle') }}">
             {% if opponent %}
                 <input type="hidden" name="opponentId" value="{{ opponent.id }}">

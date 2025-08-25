@@ -4,40 +4,55 @@
 
 {% block body %}
 <h1>Bataille</h1>
-<div class="row">
-  <div class="col-md-6">
-    <h2>Votre équipe</h2>
-    <div class="character-list" style="display:flex; flex-wrap:wrap; gap:1em;">
-      {% set my = my_team is iterable ? my_team : [] %}
-      {% for character in my %}
-        <div class="character-item" style="border:1px solid #ccc; padding:1em; border-radius:8px; width:180px; text-align:center;">
-          {% if character.imageName %}
-            <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
-          {% else %}
-            <div style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:2em; margin:0 auto;">?</div>
-          {% endif %}
-          <h3>{{ character.name }}</h3>
-          <div>PV: {{ character.HP }}</div>
-        </div>
-      {% endfor %}
-    </div>
-  </div>
-  <div class="col-md-6">
-    <h2>Adversaire : {{ opponent.username }}</h2>
-    <div class="character-list" style="display:flex; flex-wrap:wrap; gap:1em;">
-      {% set opp = opponent_team is iterable ? opponent_team : [] %}
-      {% for character in opp %}
-        <div class="character-item" style="border:1px solid #ccc; padding:1em; border-radius:8px; width:180px; text-align:center;">
-          {% if character.imageName %}
-            <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
-          {% else %}
-            <div style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:2em; margin:0 auto;">?</div>
-          {% endif %}
-          <h3>{{ character.name }}</h3>
-          <div>PV: {{ character.HP }}</div>
-        </div>
-      {% endfor %}
-    </div>
+<div class="battle-page">
+  <div class="team-avatars">
+    {# --- Equipe 1 --- #}
+    {% set my = my_team is iterable ? my_team : [] %}
+    {% set tankIndex = 0 %}
+    {% set healIndex = 0 %}
+    {% set dpsIndex = 0 %}
+    {% for character in my %}
+      {% set roleClass = '' %}
+      {% set offsetClass = '' %}
+      {% if character.role == 'tank' %}
+        {% set tankIndex = tankIndex + 1 %}
+        {% set roleClass = 'team1-1' %}
+        {% if tankIndex > 1 %}{% set offsetClass = 'offset-' ~ (tankIndex - 1) %}{% endif %}
+      {% elseif character.role == 'heal' %}
+        {% set healIndex = healIndex + 1 %}
+        {% set roleClass = 'team1-2' %}
+        {% if healIndex > 1 %}{% set offsetClass = 'offset-' ~ (healIndex - 1) %}{% endif %}
+      {% elseif character.role == 'dps' %}
+        {% set dpsIndex = dpsIndex + 1 %}
+        {% set roleClass = 'team1-3' %}
+        {% if dpsIndex > 1 %}{% set offsetClass = 'offset-' ~ (dpsIndex - 1) %}{% endif %}
+      {% endif %}
+      <img class="avatar {{ roleClass }} {{ offsetClass }}" src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}">
+    {% endfor %}
+
+    {# --- Equipe 2 --- #}
+    {% set tankIndex2 = 0 %}
+    {% set healIndex2 = 0 %}
+    {% set dpsIndex2 = 0 %}
+    {% set opp = opponent_team is iterable ? opponent_team : [] %}
+    {% for character in opp %}
+      {% set roleClass = '' %}
+      {% set offsetClass = '' %}
+      {% if character.role == 'tank' %}
+        {% set tankIndex2 = tankIndex2 + 1 %}
+        {% set roleClass = 'team2-1' %}
+        {% if tankIndex2 > 1 %}{% set offsetClass = 'offset-' ~ (tankIndex2 - 1) %}{% endif %}
+      {% elseif character.role == 'heal' %}
+        {% set healIndex2 = healIndex2 + 1 %}
+        {% set roleClass = 'team2-2' %}
+        {% if healIndex2 > 1 %}{% set offsetClass = 'offset-' ~ (healIndex2 - 1) %}{% endif %}
+      {% elseif character.role == 'dps' %}
+        {% set dpsIndex2 = dpsIndex2 + 1 %}
+        {% set roleClass = 'team2-4' %}
+        {% if dpsIndex2 > 1 %}{% set offsetClass = 'offset-' ~ (dpsIndex2 - 1) %}{% endif %}
+      {% endif %}
+      <img class="avatar {{ roleClass }} {{ offsetClass }}" src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}">
+    {% endfor %}
   </div>
 </div>
 

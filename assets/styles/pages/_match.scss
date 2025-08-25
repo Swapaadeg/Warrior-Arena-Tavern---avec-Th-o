@@ -1,0 +1,192 @@
+
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+// ==========================================================================
+// MATCH STYLES - WARRIOR ARENA TAVERNE
+// ==========================================================================
+
+
+// Styles pour la page match
+.match-page {
+  position: relative;
+  min-height: 100vh;
+  background: url('../../img/mapgemini.png') center center/cover no-repeat;
+  padding: 2rem;
+
+  .team-avatars {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .avatar {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid $accent-gold;
+    box-shadow: 0 4px 15px rgba($primary-dark, 0.2);
+    background: $primary-beige;
+    transition: transform 0.3s;
+    z-index: 2;
+  }
+
+  // Exemple de positionnement (à adapter dynamiquement)
+  // TEAM 1
+  .avatar.team1-1 { left: 40%; top: 50%; }
+  .avatar.team1-2 { left: 35%; top: 40%; }
+  .avatar.team1-3 { left: 35%; top: 60%; }
+  .avatar.team1-4 { left: 30%; top: 70%; }
+  .avatar.team1-5 { left: 30%; top: 50%; }
+
+  // TEAM 2
+  .avatar.team2-1 { right: 40%; top: 45%; } // tank
+  .avatar.team2-2 { right: 30%; top: 55%; } // heal
+  .avatar.team2-4 { right: 35%; top: 55%; } // dps
+
+
+.players-names {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.player-name {
+  font-family: $font-title;
+  font-size: 2.2rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  position: relative;
+  background: linear-gradient(90deg, #fffbe6 0%, $accent-gold 40%, #ffd700 60%, #fffbe6 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow:
+    0 0 18px #ffd700,
+    0 0 32px #fffbe6,
+    0 0 8px #fffbe6,
+    0 0 2px #ffd700;
+  filter: drop-shadow(0 0 8px #ffd700);
+  animation: neon-glow 2.5s infinite alternate, gold-glow 2.5s infinite alternate;
+}
+
+@keyframes neon-glow {
+  0% {
+    text-shadow:
+      0 0 18px #ffd700,
+      0 0 32px #fffbe6,
+      0 0 8px #fffbe6,
+      0 0 2px #ffd700;
+    filter: drop-shadow(0 0 8px #ffd700);
+  }
+  100% {
+    text-shadow:
+      0 0 32px #ffd700,
+      0 0 64px #fffbe6,
+      0 0 16px #fffbe6,
+      0 0 4px #ffd700;
+    filter: drop-shadow(0 0 16px #ffd700);
+  }
+}
+}
+
+@keyframes gold-glow {
+  0% { text-shadow: 0 0 12px rgba($accent-gold, 0.7), 0 0 32px rgba($accent-gold, 0.3); }
+  100% { text-shadow: 0 0 32px rgba($accent-gold, 1), 0 0 64px rgba($accent-gold, 0.6); }
+}
+
+.vs-label {
+  font-size: 2rem;
+  color: $accent-gold;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba($accent-gold, 0.5);
+  margin: 0 1.5rem;
+}
+
+.match-btn {
+  display: block;
+  margin: 2rem auto 0 auto;
+  background: $accent-gold;
+    color: $primary-dark;
+    font-family: $font-title;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 16px;
+    padding: 0.7rem 2.2rem;
+    box-shadow: 0 4px 18px rgba($accent-gold, 0.25);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 2rem;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.match-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: none;
+  transition: left 0.5s;
+}
+
+.match-btn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 8px 32px rgba($accent-gold, 0.35);
+}
+
+.match-btn:hover::after {
+  left: 100%;
+}
+
+// Décalage vertical si plusieurs tanks/dps/heals
+.avatar.offset-1 { top: calc(50% + 10%) !important; }
+.avatar.offset-2 { top: calc(50% + 15%) !important; }
+.avatar.offset-3 { top: calc(50% + 20%) !important; }
+.avatar.offset-4 { top: calc(50% + 25%) !important; }
+// Décalage vertical pour les dps de gauche
+.avatar.team1-3.offset-1 { top: calc(60% + 10%) !important; }
+.avatar.team1-3.offset-2 { top: calc(60% + 15%) !important; }
+.avatar.team1-3.offset-3 { top: calc(60% + 20%) !important; }
+.avatar.team1-3.offset-4 { top: calc(60% + 25%) !important; }
+
+// Décalage vertical pour les tanks de droite
+.avatar.team2-1.offset-1 { top: calc(45% + 10%) !important; }
+.avatar.team2-1.offset-2 { top: calc(45% + 20%) !important; }
+.avatar.team2-1.offset-3 { top: calc(45% + 30%) !important; }
+.avatar.team2-1.offset-4 { top: calc(45% + 40%) !important; }
+
+// Décalage vertical pour les heals de droite
+.avatar.team2-2.offset-1 { top: calc(55% + 10%) !important; }
+.avatar.team2-2.offset-2 { top: calc(55% + 20%) !important; }
+.avatar.team2-2.offset-3 { top: calc(55% + 30%) !important; }
+.avatar.team2-2.offset-4 { top: calc(55% + 40%) !important; }
+
+// Décalage vertical pour les dps de droite
+.avatar.team2-4.offset-1 { top: calc(55% + 10%) !important; }
+.avatar.team2-4.offset-2 { top: calc(55% + 20%) !important; }
+.avatar.team2-4.offset-3 { top: calc(55% + 30%) !important; }
+.avatar.team2-4.offset-4 { top: calc(55% + 40%) !important; }
+
+// Décalages TEAM 2
+.avatar.team2-tank.offset-1 { top: calc(45% + 10%) !important; }
+.avatar.team2-tank.offset-2 { top: calc(45% + 20%) !important; }
+.avatar.team2-tank.offset-3 { top: calc(45% + 30%) !important; }
+.avatar.team2-tank.offset-4 { top: calc(45% + 40%) !important; }
+.avatar.team2-heal.offset-1 { top: calc(55% + 10%) !important; }
+.avatar.team2-heal.offset-2 { top: calc(55% + 20%) !important; }
+.avatar.team2-heal.offset-3 { top: calc(55% + 30%) !important; }
+.avatar.team2-heal.offset-4 { top: calc(55% + 40%) !important; }
+.avatar.team2-dps.offset-1 { top: calc(55% + 10%) !important; }
+.avatar.team2-dps.offset-2 { top: calc(55% + 20%) !important; }
+.avatar.team2-dps.offset-3 { top: calc(55% + 30%) !important; }
+.avatar.team2-dps.offset-4 { top: calc(55% + 40%) !important; }

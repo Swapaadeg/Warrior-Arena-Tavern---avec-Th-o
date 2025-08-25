@@ -17,7 +17,7 @@ final class JouerController extends AbstractController
     #[Route('/jouer', name: 'jouer')]
     public function index(Request $request, CharactersRepository $charactersRepository, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
-        $characters = $charactersRepository->findAll();
+    $characters = $charactersRepository->findAllOrderedByRole();
 
         if ($request->isMethod('POST')) {
             $teamIds = $request->request->all('team');

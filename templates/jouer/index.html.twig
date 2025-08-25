@@ -87,6 +87,9 @@
             <img src="" alt="" class="modal-avatar" id="modal-avatar">
             <h3 class="modal-name" id="modal-name"></h3>
             <div class="modal-role" id="modal-role"></div>
+            <div class="character-tags">
+                <div class="tag-group" id="modal-type"></div>
+            </div>
         </div>
         <div class="modal-stats" id="modal-stats">
             <div class="stat">
@@ -128,7 +131,8 @@ document.addEventListener('DOMContentLoaded', function() {
             defense: {{ character.defense }},
             description: "{{ character.description|escape('js') }}",
             imageName: "{{ character.imageName }}",
-            role: {% if character.role %}"{{ character.role.name }}"{% else %}null{% endif %}
+            role: {% if character.role %}"{{ character.role.name }}"{% else %}null{% endif %},
+            type: {% if character.type %}"{{ character.type.name }}"{% else %}null{% endif %}
         }{% if not loop.last %},{% endif %}
         {% endfor %}
     };
@@ -195,6 +199,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 modalRole.style.display = 'flex';
             } else {
                 modalRole.style.display = 'none';
+            }
+            // Type
+            const modalType = document.getElementById('modal-type');
+            if (character.type) {
+                modalType.innerHTML = '<span class="tag-label">Type :</span> <span class="badge bg-info">' + character.type + '</span>';
+                modalType.style.display = 'flex';
+            } else {
+                modalType.style.display = 'none';
             }
             
             modal.classList.add('active');

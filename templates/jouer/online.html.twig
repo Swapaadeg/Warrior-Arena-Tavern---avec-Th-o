@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Online Play{% endblock %}
+
+{% block body %}
+<div class="battle-page">
+    <h1>Online Matchmaking</h1>
+    <p>Looking for opponents currently active on the site (updated in last 5 minutes).</p>
+
+    <div class="character-list">
+        {% for candidate in candidates %}
+            <div class="character-item">
+                <h3>{{ candidate.username }}</h3>
+                <form method="post" action="{{ path('jouer_battle') }}">
+                    <input type="hidden" name="opponentId" value="{{ candidate.id }}">
+                    <button type="submit" class="btn btn-primary">Challenge</button>
+                </form>
+            </div>
+        {% else %}
+            <div>No opponents online right now.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

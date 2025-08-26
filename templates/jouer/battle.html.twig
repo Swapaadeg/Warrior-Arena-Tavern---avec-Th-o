@@ -3,370 +3,124 @@
 {% block title %}Résultat de la bataille{% endblock %}
 
 {% block body %}
-<h1>Résultat de la bataille</h1>
-<div class="row">
-    <div class="col-md-6">
-        <h2>Votre équipe</h2>
-        <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
-                                <div class="battle-page">
-                                    <div class="team-avatars">
-                    <img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
-                    <div class="match-page">
-                        <div class="players-names">
-                            <span class="player-name gold-animated">{{ app.user.username }}</span>
-                            <span class="vs-label">VS</span>
-                            {% if opponent %}
-                                <span class="player-name gold-animated">{{ opponent.username }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="team-avatars">
-                            {# Team 1: tanks #}
-                            {% set tanks1 = my_team|filter(c => c.role and c.role.name|lower == 'tank') %}
-                            {% for tank in tanks1 %}
-                                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar team1-1 offset-{{ loop.index0 }}" title="{{ tank.name }}">
-                            {% endfor %}
-                            {# Team 1: dps #}
-                            {% set dps1 = my_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
-                            {% for dps in dps1 %}
-                                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar team1-3 offset-{{ loop.index0 }}" title="{{ dps.name }}">
-                            {% endfor %}
-                            {# Team 1: heals #}
-                            {% set heals1 = my_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
-                            {% for heal in heals1 %}
-                                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar team1-5 offset-{{ loop.index0 }}" title="{{ heal.name }}">
-                            {% endfor %}
-
-                            {# Team 2: tanks #}
-                            {% set tanks2 = opponent_team|filter(c => c.role and c.role.name|lower == 'tank') %}
-                            {% for tank in tanks2 %}
-                                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar team2-1 offset-{{ loop.index0 }}" title="{{ tank.name }}">
-                            {% endfor %}
-                            {# Team 2: dps #}
-                            {% set dps2 = opponent_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
-                            {% for dps in dps2 %}
-                                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar team2-4 offset-{{ loop.index0 }}" title="{{ dps.name }}">
-                            {% endfor %}
-                            {# Team 2: heals #}
-                            {% set heals2 = opponent_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
-                            {% for heal in heals2 %}
-                                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar team2-2 offset-{{ loop.index0 }}" title="{{ heal.name }}">
-                            {% endfor %}
-                        </div>
-                        <div class="match-info">
-                            <form method="post" action="{{ path('jouer_battle') }}">
-                                {% if opponent %}
-                                    <input type="hidden" name="opponentId" value="{{ opponent.id }}">
-                                    <button type="submit" class="play-btn match-btn">Lancer la bataille</button>
-                                {% else %}
-                                    <div class="alert alert-warning">Aucun adversaire trouvé pour le matchmaking.</div>
-                                {% endif %}
-                            </form>
-                        </div>
+<img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
+<div class="match-page">
+    <div class="players-names">
+        <span class="player-name gold-animated">{{ app.user.username }}</span>
+        <span class="vs-label">VS</span>
+        {% if opponent %}
+            <span class="player-name gold-animated">{{ opponent.username }}</span>
+        {% endif %}
+    </div>
+    <div class="team-avatars">
+        {# Team 1: tanks #}
+        {% set tanks1 = my_team|filter(c => c.role and c.role.name|lower == 'tank') %}
+        {% for tank in tanks1 %}
+            <div class="avatar-container team1-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}" id="char-L{{ tank.id }}">
+                <div class="avatar-info">
+                    <div class="avatar-hp-bar">
+                        <div class="avatar-hp-fill" id="hp-bar-L{{ tank.id }}" style="width:100%"><span class="avatar-hp" id="hp-L{{ tank.id }}">{{ tank.HP }}</span></div>
                     </div>
-                                    </div>
-                                </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <h2>Adversaire : {{ opponent.username }}</h2>
-        <div class="character-list" style="display: flex; flex-wrap: wrap; gap: 1em;">
-            {% for character in opponent_team %}
-                <div class="character-item" id="char-R{{ character.id }}" style="border: 1px solid #ccc; padding: 1em; border-radius: 8px; width: 180px; text-align: center;">
-                    <h3>{{ character.name }}</h3>
-                    <div>PV: <span class="hp" id="hp-R{{ character.id }}">{{ character.HP }}</span></div>
                 </div>
-            {% endfor %}
+                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
+            </div>
+        {% endfor %}
+        {# Team 1: dps #}
+        {% set dps1 = my_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
+        {% for dps in dps1 %}
+            <div class="avatar-container team1-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}" id="char-L{{ dps.id }}">
+                <div class="avatar-info">
+                    <div class="avatar-hp-bar">
+                        <div class="avatar-hp-fill" id="hp-bar-L{{ dps.id }}" style="width:100%"><span class="avatar-hp" id="hp-L{{ dps.id }}">{{ dps.HP }}</span></div>
+                    </div>
+                </div>
+                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
+            </div>
+        {% endfor %}
+        {# Team 1: heals #}
+        {% set heals1 = my_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
+        {% for heal in heals1 %}
+            <div class="avatar-container team1-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}" id="char-L{{ heal.id }}">
+                <div class="avatar-info">
+                    <div class="avatar-hp-bar">
+                        <div class="avatar-hp-fill" id="hp-bar-L{{ heal.id }}" style="width:100%"><span class="avatar-hp" id="hp-L{{ heal.id }}">{{ heal.HP }}</span></div>
+                    </div>
+                </div>
+                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
+            </div>
+        {% endfor %}
+
+        {# Team 2: tanks #}
+        {% set tanks2 = opponent_team|filter(c => c.role and c.role.name|lower == 'tank') %}
+        {% for tank in tanks2 %}
+            <div class="avatar-container team2-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}" id="char-R{{ tank.id }}">
+                <div class="avatar-info">
+                    <div class="avatar-hp-bar">
+                        <div class="avatar-hp-fill" id="hp-bar-R{{ tank.id }}" style="width:100%"><span class="avatar-hp" id="hp-R{{ tank.id }}">{{ tank.HP }}</span></div>
+                    </div>
+                </div>
+                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
+            </div>
+        {% endfor %}
+        {# Team 2: dps #}
+        {% set dps2 = opponent_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
+        {% for dps in dps2 %}
+            <div class="avatar-container team2-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}" id="char-R{{ dps.id }}">
+                <div class="avatar-info">
+                    <div class="avatar-hp-bar">
+                        <div class="avatar-hp-fill" id="hp-bar-R{{ dps.id }}" style="width:100%"><span class="avatar-hp" id="hp-R{{ dps.id }}">{{ dps.HP }}</span></div>
+                    </div>
+                </div>
+                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
+            </div>
+        {% endfor %}
+        {# Team 2: heals #}
+        {% set heals2 = opponent_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
+        {% for heal in heals2 %}
+            <div class="avatar-container team2-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}" id="char-R{{ heal.id }}">
+                <div class="avatar-info">
+                    <div class="avatar-hp-bar">
+                        <div class="avatar-hp-fill" id="hp-bar-R{{ heal.id }}" style="width:100%"><span class="avatar-hp" id="hp-R{{ heal.id }}">{{ heal.HP }}</span></div>
+                    </div>
+                </div>
+                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
+            </div>
+        {% endfor %}
+    </div>
+    <div class="battle-controls">
+        <button id="play-battle" class="match-btn">Jouer</button>
+        <button id="pause-battle" class="match-btn">Pause</button>
+    </div>
+    
+    <div class="battle-info">
+        <div class="round-counter">
+            <span id="round-counter">Round: 0</span>
+        </div>
+        <div class="battle-log-section">
+            <h3 class="log-title">Journal du combat</h3>
+            <div id="battle-log" class="battle-log"></div>
+            <div id="battle-winner" class="battle-winner" 
+                data-winner="{{ result.winnerTeamId is defined ? result.winnerTeamId : '' }}"
+                data-opponent-name="{{ opponent.username }}"></div>
         </div>
     </div>
 </div>
-<div class="mt-4 row">
-    <div class="col-md-8 text-center">
-        <button id="play-battle" class="btn btn-danger btn-lg">Lancer l'animation</button>
-        <button id="pause-battle" class="btn btn-secondary btn-lg" style="margin-left:1em;">Pause Battle</button>
-    </div>
-    <div class="col-md-4 text-center">
-        <div id="round-counter" style="font-weight:bold; font-size:1.2em;">Round: 0</div>
-    </div>
-    <div class="col-md-4">
-        <h4>Journal du combat</h4>
-        <div id="battle-log" style="margin-top:1em; min-height:2em; max-height:400px; overflow-y:auto; border:1px solid #ccc; border-radius:8px; background:#fafafa; padding:1em;"></div>
-        <div id="battle-winner" style="margin-top:1em; font-weight:bold; font-size:1.2em;"></div>
-    </div>
-</div>
+
+<!-- Hidden data for JavaScript -->
+<script type="application/json" id="battle-setup-data">{{ setup|json_encode|raw }}</script>
+<script type="application/json" id="battle-frames-data">{{ frames|json_encode|raw }}</script>
+<script type="application/json" id="battle-unit-map-data">{{ unit_map|json_encode|raw }}</script>
+<script type="application/json" id="battle-unit-owners-data">{{ unit_owners|json_encode|raw }}</script>
+
 <style>
     .glow-left { box-shadow: 0 0 18px 6px rgba(0,150,255,0.35); background: #e8f6ff; }
     .glow-right { box-shadow: 0 0 18px 6px rgba(255,80,80,0.25); background: #fff0f0; }
     .glow-action { box-shadow: 0 0 12px 4px rgba(0,0,0,0.12); }
-    /* When a unit acts, scale it up slightly */
-    .acting { transform: scale(1.08); z-index: 5; transition: transform 220ms ease; }
     /* When a unit is targeted, scale up a bit less */
     .targeted { transform: scale(1.04); z-index: 4; transition: transform 220ms ease; }
     /* Heal visual - both healer and healed turn green briefly */
     .heal { box-shadow: 0 0 18px 6px rgba(60,180,80,0.25); background: #eefdf0; }
     .dead { opacity: 0.5; filter: grayscale(1); }
 </style>
-<script>
-// Data passed from the controller
-const setup = {{ setup|json_encode|raw }};
-const frames = {{ frames|json_encode|raw }};
-const unitMap = {{ unit_map|json_encode|raw }};
-const unitOwners = {{ unit_owners|json_encode|raw }};
-let playTimeouts = [];
-let isPaused = false;
-let currentFrameIdx = 0;
-let currentActionIdx = 0;
-let currentFrame = null;
-let currentActions = [];
-let currentEvents = [];
-let processNextActionRef = null;
 
-// Build a map of unit max HP for clamping heals
-const unitMaxHp = {};
-if (setup) {
-    (setup.left || []).forEach(u => unitMaxHp[u.id] = u.maxHp);
-    (setup.right || []).forEach(u => unitMaxHp[u.id] = u.maxHp);
-}
-
-function clearAllTimeouts() {
-    playTimeouts.forEach(id => clearTimeout(id));
-    playTimeouts = [];
-}
-
-function resetVisuals() {
-    document.querySelectorAll('.character-item').forEach(el => {
-        el.classList.remove('glow-left','glow-right','glow-action','acting','targeted','heal');
-    });
-}
-
-function resetTemporaryVisuals() {
-    // Like resetVisuals but keep dead class
-    document.querySelectorAll('.character-item').forEach(el => {
-        el.classList.remove('glow-left','glow-right','glow-action','acting','targeted','heal');
-    });
-}
-
-function syncHpSnapshot(hpByUnit) {
-    Object.entries(hpByUnit || {}).forEach(([uid, hp]) => {
-        const el = document.getElementById('hp-' + uid);
-        if (el) el.textContent = hp;
-        const box = document.getElementById('char-' + uid);
-        if (box) {
-            if (hp <= 0) box.classList.add('dead');
-            else box.classList.remove('dead');
-        }
-    });
-}
-
-function playFrame(idx) {
-    if (!frames || idx >= frames.length) {
-        // finished
-        // Show winner from server result
-        let winner = {{ result.winnerTeamId is defined ? result.winnerTeamId|json_encode|raw : 'null' }};
-        let winnerText = '';
-        if (winner === 'left') {
-            winnerText = 'Victoire : Votre équipe !';
-        } else if (winner === 'right') {
-            winnerText = 'Victoire : ' + {{ opponent.username|json_encode|raw }};
-        } else {
-            winnerText = 'Match nul !';
-        }
-        document.getElementById('battle-winner').textContent = winnerText;
-        const p = document.createElement('div');
-        p.textContent = 'Fin du combat.';
-        document.getElementById('battle-log').appendChild(p);
-        return;
-    }
-
-    resetTemporaryVisuals();
-    currentFrameIdx = idx;
-    resetVisuals();
-    const frame = frames[idx];
-    currentFrame = frame;
-
-    // Update round counter if present
-    if (typeof frame.round !== 'undefined') {
-        const rc = document.getElementById('round-counter');
-        if (rc) rc.textContent = 'Round: ' + frame.round;
-    }
-
-    // If frame contains roundEvents (global AoE from round), render them first
-    if (frame.roundEvents && frame.roundEvents.length) {
-        const logDiv = document.getElementById('battle-log');
-        frame.roundEvents.forEach(ev => { const p = document.createElement('div'); p.textContent = ev; logDiv.appendChild(p); });
-        logDiv.scrollTop = logDiv.scrollHeight;
-    }
-
-    // clear any previous team-wide glow (we'll set it per-action)
-    Object.keys(unitMap).forEach(uid => {
-        const el = document.getElementById('char-' + uid);
-        if (el) { el.classList.remove('glow-left','glow-right'); }
-    });
-
-    // local hp map to incrementally update UI
-    const localHp = {};
-    Object.keys(unitMap).forEach(uid => {
-        const el = document.getElementById('hp-' + uid);
-        localHp[uid] = el ? parseInt(el.textContent || '0', 10) : (frame.hpByUnit && frame.hpByUnit[uid] ? frame.hpByUnit[uid] : 0);
-    });
-
-    currentActions = frame.actions || [];
-    currentEvents = frame.events || [];
-    currentActionIdx = 0;
-
-    function processNextAction() {
-        if (isPaused) return; // paused, do nothing
-
-        // If there are no actions, just sync snapshot and advance after 1s
-        if (!currentActions || currentActions.length === 0) {
-            if (currentEvents.length) {
-                const logDiv = document.getElementById('battle-log');
-                currentEvents.forEach(ev => { const p = document.createElement('div'); p.textContent = ev; logDiv.appendChild(p); });
-                logDiv.scrollTop = logDiv.scrollHeight;
-            }
-            syncHpSnapshot(frame.hpByUnit);
-            const t = setTimeout(() => playFrame(currentFrameIdx + 1), 1000);
-            playTimeouts.push(t);
-            return;
-        }
-
-        if (currentActionIdx >= currentActions.length) {
-            // end of actions for this frame: sync snapshot then go to next frame after 1s
-            setTimeout(() => {
-                syncHpSnapshot(frame.hpByUnit);
-                if (!isPaused) {
-                    const t = setTimeout(() => playFrame(currentFrameIdx + 1), 1000);
-                    playTimeouts.push(t);
-                }
-            }, 300);
-            return;
-        }
-
-        const action = currentActions[currentActionIdx];
-
-        // perform this action immediately
-        const actorEl = document.getElementById('char-' + action.actorId);
-        const targetEl = action.targetId ? document.getElementById('char-' + action.targetId) : null;
-        if (actorEl) {
-            actorEl.classList.add('acting');
-            // highlight actor's team while acting
-            const teamPrefix = action.actorId.startsWith('L') ? 'L' : 'R';
-            Object.keys(unitMap).forEach(uid => {
-                if (uid.startsWith(teamPrefix)) {
-                    const el = document.getElementById('char-' + uid);
-                    if (el) el.classList.add(teamPrefix === 'L' ? 'glow-left' : 'glow-right');
-                }
-            });
-        }
-        if (targetEl) targetEl.classList.add('targeted');
-        if (action.kind === 'HEAL') {
-            if (actorEl) actorEl.classList.add('heal');
-            if (targetEl) targetEl.classList.add('heal');
-        }
-
-        // update HP display incrementally
-        if (action.kind === 'ATTACK') {
-            const tid = action.targetId;
-            if (typeof localHp[tid] !== 'undefined') {
-                localHp[tid] = Math.max(0, localHp[tid] - action.amount);
-                const hpEl = document.getElementById('hp-' + tid);
-                if (hpEl) hpEl.textContent = localHp[tid];
-                const box = document.getElementById('char-' + tid);
-                if (box && localHp[tid] <= 0) box.classList.add('dead');
-            }
-        } else if (action.kind === 'HEAL') {
-            const tid = action.targetId;
-            if (typeof localHp[tid] !== 'undefined') {
-                const maxHp = unitMaxHp[tid] || 9999;
-                localHp[tid] = Math.min(maxHp, localHp[tid] + action.amount);
-                const hpEl = document.getElementById('hp-' + tid);
-                if (hpEl) hpEl.textContent = localHp[tid];
-                const box = document.getElementById('char-' + tid);
-                if (box && localHp[tid] > 0) box.classList.remove('dead');
-            }
-        }
-
-        // append corresponding event if available
-        const logDiv = document.getElementById('battle-log');
-        if (currentEvents[currentActionIdx]) {
-            const p = document.createElement('div');
-            p.textContent = currentEvents[currentActionIdx];
-            logDiv.appendChild(p);
-            logDiv.scrollTop = logDiv.scrollHeight;
-        }
-
-        // schedule cleanup for this action
-        const cleanup = setTimeout(() => {
-            if (actorEl) actorEl.classList.remove('acting');
-            if (targetEl) targetEl.classList.remove('targeted');
-            if (actorEl) actorEl.classList.remove('heal');
-            if (targetEl) targetEl.classList.remove('heal');
-            // remove the team-wide highlight after action finishes
-            const teamPrefix = action.actorId.startsWith('L') ? 'L' : 'R';
-            Object.keys(unitMap).forEach(uid => {
-                if (uid.startsWith(teamPrefix)) {
-                    const el = document.getElementById('char-' + uid);
-                    if (el) el.classList.remove(teamPrefix === 'L' ? 'glow-left' : 'glow-right');
-                }
-            });
-        }, 700);
-        playTimeouts.push(cleanup);
-
-        // schedule next action after 1s (if not paused)
-        const nextTimer = setTimeout(() => {
-            currentActionIdx++;
-            processNextAction();
-        }, 1000);
-        playTimeouts.push(nextTimer);
-    }
-
-    // Start processing actions for this frame
-    processNextActionRef = processNextAction;
-    processNextAction();
-}
-
-document.getElementById('play-battle').addEventListener('click', function() {
-    // Stop any previous run
-    clearAllTimeouts();
-    resetVisuals();
-    document.getElementById('battle-log').innerHTML = '';
-    document.getElementById('battle-winner').textContent = '';
-    isPaused = false;
-    processNextActionRef = null;
-
-    if (!frames || frames.length === 0) {
-        const logDiv = document.getElementById('battle-log');
-        const p = document.createElement('div');
-        p.textContent = 'No frames available.';
-        logDiv.appendChild(p);
-        return;
-    }
-
-    playFrame(0);
-});
-
-document.getElementById('pause-battle').addEventListener('click', function() {
-    isPaused = !isPaused;
-    this.textContent = isPaused ? 'Resume Battle' : 'Pause Battle';
-    if (!isPaused) {
-        // resume: continue processing current frame/action
-        if (currentFrameIdx < frames.length) {
-            // clear any lingering timeouts and continue
-            clearAllTimeouts();
-            // resume action processing at currentActionIdx
-            // small delay to allow visuals to settle
-            setTimeout(() => {
-                // continue from the stored processNextActionRef which preserves indices
-                if (processNextActionRef) processNextActionRef();
-            }, 120);
-        }
-    } else {
-        // paused: stop scheduling future timers
-        clearAllTimeouts();
-    }
-});
-</script>
-
-<div style="margin-top:1em; font-size:0.9em; color:#666;">Debug setup JSON (use this to implement your engine):
-    <pre style="white-space:pre-wrap; max-height:200px; overflow:auto; background:#f6f6f6; padding:0.5em; border-radius:6px;">{{ setup|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}</pre>
-</div>
 {% endblock %}

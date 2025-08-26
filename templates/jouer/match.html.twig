@@ -16,33 +16,45 @@
         {# Team 1: tanks #}
         {% set tanks1 = my_team|filter(c => c.role and c.role.name|lower == 'tank') %}
         {% for tank in tanks1 %}
-            <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar team1-1 offset-{{ loop.index0 }}" title="{{ tank.name }}">
+            <div class="avatar-container team1-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
+            </div>
         {% endfor %}
         {# Team 1: dps #}
         {% set dps1 = my_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
         {% for dps in dps1 %}
-            <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar team1-3 offset-{{ loop.index0 }}" title="{{ dps.name }}">
+            <div class="avatar-container team1-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
+            </div>
         {% endfor %}
         {# Team 1: heals #}
         {% set heals1 = my_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
         {% for heal in heals1 %}
-            <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar team1-5 offset-{{ loop.index0 }}" title="{{ heal.name }}">
+            <div class="avatar-container team1-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
+            </div>
         {% endfor %}
 
         {# Team 2: tanks #}
         {% set tanks2 = opponent_team|filter(c => c.role and c.role.name|lower == 'tank') %}
         {% for tank in tanks2 %}
-            <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar team2-1 offset-{{ loop.index0 }}" title="{{ tank.name }}">
+            <div class="avatar-container team2-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
+            </div>
         {% endfor %}
         {# Team 2: dps #}
         {% set dps2 = opponent_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
         {% for dps in dps2 %}
-            <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar team2-4 offset-{{ loop.index0 }}" title="{{ dps.name }}">
+            <div class="avatar-container team2-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
+            </div>
         {% endfor %}
         {# Team 2: heals #}
         {% set heals2 = opponent_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
         {% for heal in heals2 %}
-            <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar team2-2 offset-{{ loop.index0 }}" title="{{ heal.name }}">
+            <div class="avatar-container team2-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
+            </div>
         {% endfor %}
     </div>
     <div class="match-info">

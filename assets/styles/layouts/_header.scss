@@ -11,20 +11,14 @@
     min-height: 600px;
     @include flex(row, center, center);
     overflow: hidden;
-    background-image: url(../../img/slider3.jpg);
-    background-size: cover;
-    background-position: bottom;
-    background-repeat: no-repeat;
+    background: url(../../img/slider3.jpg) bottom/cover no-repeat;
     margin-bottom: 0;
     
     // Dark overlay
     &::after {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        inset: 0;
         background: rgba($primary-dark, 0.7);
         z-index: -1;
     }
@@ -46,38 +40,29 @@
     line-height: 1.2;
     position: relative;
     
-    // Image décorative avant le titre
+    // Mixin pour les images décoratives
+    @mixin decorative-image($image, $position, $offset-x, $offset-y) {
+        content: '';
+        position: absolute;
+        top: $offset-y;
+        #{$position}: $offset-x;
+        transform: translateY(-50%);
+        width: 200px;
+        height: 200px;
+        background: url(../../img/#{$image}) center/contain no-repeat;
+        z-index: 1;
+    }
+    
+    // Images décoratives
     &::before {
-        content: '';
-        position: absolute;
-        top: 11%;
-        left: -190px;
-        transform: translateY(-50%);
-        width: 200px;
-        height: 200px;
-        background-image: url(../../img/z1.png);
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        z-index: 1;
+        @include decorative-image('z1.png', 'left', -190px, 11%);
     }
     
-    // Image décorative après le titre
     &::after {
-        content: '';
-        position: absolute;
-        top: 78%;
-        right: -180px;
-        transform: translateY(-50%);
-        width: 200px;
-        height: 200px;
-        background-image: url(../../img/z2.png);
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        z-index: 1;
+        @include decorative-image('z2.png', 'right', -180px, 78%);
     }
     
+    // Base pour tous les spans avec gradient
     span {
         display: block;
         font-weight: bold;
@@ -85,12 +70,14 @@
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        color: transparent;
         letter-spacing: 0.1em;
     }
     
-    .warrior {
+    .warrior, .taverne {
         font-size: clamp(2rem, 8vw, 6rem);
+    }
+    
+    .warrior {
         margin-bottom: -0.2em;
     }
     
@@ -98,6 +85,8 @@
         font-size: clamp(0.8rem, 4vw, 2rem);
         margin-left: clamp(10rem, 20vw, 20rem);
         font-family: $font-text;
+        
+        // Reset du gradient pour .arena uniquement
         background: none;
         background-clip: initial;
         -webkit-background-clip: initial;
@@ -106,7 +95,6 @@
     }
     
     .taverne {
-        font-size: clamp(2rem, 8vw, 6rem);
         margin-left: clamp(1em, 3vw, 2em);
     }
 }

@@ -1,9 +1,15 @@
 @use "../abstracts/variables" as *;
 @use "../abstracts/mixins" as *;
+@use "sass:color";
+@use "sass:math";
 
 // ==========================================================================
 // BUTTONS STYLES - WARRIOR ARENA TAVERN
 // ==========================================================================
+
+// ===============================
+// HERO CTA BUTTON
+// ===============================
 
 .cta-button {
     margin-top: 6rem;
@@ -45,5 +51,264 @@
             1px 1px 3px rgba($primary-dark, 0.9),
             0 0 12px rgba($accent-gold, 0.8),
             0 0 25px rgba($accent-gold, 0.6);
+    }
+}
+
+// ===============================
+// BATTLE BUTTONS
+// ===============================
+
+.battle-button {
+    background: linear-gradient(135deg, var(--accent-gold), #d4af37);
+    color: var(--text-light);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(var(--accent-gold-rgb), 0.3);
+    
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(var(--accent-gold-rgb), 0.4);
+        background: linear-gradient(135deg, #d4af37, var(--accent-gold));
+    }
+    
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+// ===============================
+// ACTION BUTTONS (START BATTLE, ETC.)
+// ===============================
+
+.start-battle-button {
+    background: linear-gradient(135deg, $accent-gold, color.adjust($accent-gold, $lightness: -10%));
+    color: $primary-dark;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba($accent-gold, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    
+    &:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba($accent-gold, 0.4);
+        background: linear-gradient(135deg, color.adjust($accent-gold, $lightness: 5%), $accent-gold);
+    }
+    
+    &:disabled {
+        background: $primary-brown;
+        color: rgba($primary-beige, 0.7);
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    
+    &:active:not(:disabled) {
+        transform: translateY(-1px);
+    }
+}
+
+// ===============================
+// FILTER BUTTONS
+// ===============================
+
+.filter-reset {
+    padding: 0.6rem 1.2rem;
+    border: 2px solid rgba(var(--accent-gold-rgb), 0.3);
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(var(--bg-light-rgb, 255, 255, 255), 0.1), rgba(var(--bg-light-rgb, 255, 255, 255), 0.05));
+    color: var(--text-light);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    backdrop-filter: blur(5px);
+
+    &:hover {
+        background: linear-gradient(135deg, rgba(var(--accent-gold-rgb), 0.2), rgba(var(--accent-gold-rgb), 0.1));
+        border-color: var(--accent-gold);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    i {
+        font-size: 0.8rem;
+    }
+}
+
+// ===============================
+// PROFILE BUTTONS
+// ===============================
+
+.profile-edit-button {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, $accent-gold, color.adjust($accent-gold, $lightness: -10%));
+    color: var(--bg-dark);
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 4px 15px rgba(var(--accent-gold-rgb), 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.2);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+        );
+        transition: left 0.5s ease;
+    }
+    
+    &:hover {
+        color: var(--bg-dark);
+        text-decoration: none;
+        transform: translateY(-3px);
+        box-shadow: 
+            0 8px 25px rgba(var(--accent-gold-rgb), 0.4),
+            0 4px 12px rgba(0, 0, 0, 0.3);
+        
+        &::before {
+            left: 100%;
+        }
+    }
+    
+    &:active {
+        transform: translateY(-1px);
+    }
+}
+
+// ===============================
+// SELECTION INDICATORS
+// ===============================
+
+.selection-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: rgba($accent-gold, 0.8);
+    border: 2px solid $primary-beige;
+    border-radius: 50%;
+    @include flex(row, center, center);
+    opacity: 0.3;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    
+    &::before {
+        content: "+";
+        color: $primary-dark;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    &:hover {
+        opacity: 1;
+        transform: scale(1.1);
+        background: $accent-gold;
+    }
+}
+
+// État sélectionné
+.character-card.selected .selection-indicator {
+    opacity: 1;
+    transform: scale(1);
+    background: $accent-gold;
+    
+    &::before {
+        content: "✓";
+    }
+}
+
+// ===============================
+// CLOSE BUTTONS
+// ===============================
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: $primary-brown;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        color: $accent-gold;
+        transform: scale(1.2);
+    }
+}
+
+// ===============================
+// UTILITY BUTTON CLASSES
+// ===============================
+
+// Mixin pour boutons avec effet de lift
+@mixin button-lift-effect($lift: -2px, $shadow-color: rgba(0, 0, 0, 0.2)) {
+    transition: all 0.3s ease;
+    
+    &:hover {
+        transform: translateY($lift);
+        box-shadow: 0 #{abs($lift) * 2} #{abs($lift) * 8} $shadow-color;
+    }
+    
+    &:active {
+        transform: translateY(#{math.div($lift, 2)});
+    }
+}
+
+// Classes utilitaires pour les boutons
+.btn-lift {
+    @include button-lift-effect();
+}
+
+.btn-lift-strong {
+    @include button-lift-effect(-4px, rgba(0, 0, 0, 0.3));
+}
+
+.btn-glow {
+    transition: all 0.3s ease;
+    
+    &:hover {
+        box-shadow: 0 0 20px rgba(var(--accent-gold-rgb), 0.4);
+        text-shadow: 0 0 10px rgba(var(--accent-gold-rgb), 0.6);
     }
 }

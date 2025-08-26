@@ -6,6 +6,18 @@
 // FOOTER - WARRIOR ARENA TAVERN
 // ==========================================================================
 
+// Mixin pour les liens stylisés du footer
+@mixin footer-link-style($base-color: $primary-beige, $hover-color: $accent-gold) {
+    color: $base-color;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        color: $hover-color;
+        text-shadow: 0 0 8px rgba($hover-color, 0.6);
+    }
+}
+
 .site-footer {
     img {
         width: 100%;
@@ -53,15 +65,8 @@
                 
                 li {
                     a {
-                        color: $primary-beige;
-                        text-decoration: none;
+                        @include footer-link-style($primary-beige, $accent-gold);
                         font-size: 1rem;
-                        transition: all 0.3s ease;
-                        
-                        &:hover {
-                            color: $accent-gold;
-                            text-shadow: 0 0 8px rgba($accent-gold, 0.6);
-                        }
                     }
                 }
             }
@@ -81,16 +86,9 @@
                     }
 
                     a {
-                        color: $accent-gold;
+                        @include footer-link-style($accent-gold, color.adjust($accent-gold, $lightness: 15%));
                         font-family: $font-h2;
                         font-size: 1.1rem;
-                        text-decoration: none;
-                        transition: all 0.3s ease;
-
-                        &:hover {
-                            color: color.adjust($accent-gold, $lightness: 15%);
-                            text-shadow: 0 0 8px rgba($accent-gold, 0.6);
-                        }
                     }
                 }
             }
@@ -103,7 +101,7 @@
                 height: 80px;
                 width: auto;
                 filter: brightness(1.2);
-                transition: transform 0.3s ease;
+                transition: all 0.3s ease;
                 
                 &:hover {
                     transform: scale(1.1);

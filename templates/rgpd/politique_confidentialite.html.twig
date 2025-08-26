@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Politique de Confidentialité - Warrior Arena Tavern{% endblock %}
+
+{% block body %}
+<div class="rgpd-page">
+    <div class="container">
+        
+        <!-- En-tête -->
+        <header class="rgpd-header">
+            <div class="icon-title">
+                <i class="fas fa-shield-alt main-icon"></i>
+                <h1>Politique de Confidentialité</h1>
+            </div>
+            <p class="rgpd-description">Découvrez comment nous collectons, utilisons et protégeons vos données personnelles.</p>
+        </header>
+
+        <!-- Contenu principal -->
+        <div class="rgpd-wrapper">
+            
+            <!-- Sections principales -->
+            <div class="rgpd-sections">
+                <div class="rgpd-section">
+                    <h2 class="section-title">
+                        <span class="section-number">1</span>
+                        <span>Informations à venir</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Le contenu de la politique de confidentialité sera ajouté prochainement.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="rgpd-sidebar">
+                
+                <!-- Informations de contact -->
+                <div class="sidebar-card">
+                    <h3><i class="fas fa-envelope"></i> Contact</h3>
+                    <p>Une question concernant vos données personnelles ?</p>
+                    <a href="{{ path('contact') }}" class="contact-btn">Nous contacter</a>
+                </div>
+
+                <!-- Vos droits -->
+                <div class="sidebar-card">
+                    <h3><i class="fas fa-user-shield"></i> Vos droits</h3>
+                    <ul class="rights-list">
+                        <li>• Droit d'accès</li>
+                        <li>• Droit de rectification</li>
+                        <li>• Droit à l'effacement</li>
+                        <li>• Droit de portabilité</li>
+                        <li>• Droit d'opposition</li>
+                    </ul>
+                </div>
+
+                <!-- Dernière mise à jour -->
+                <div class="sidebar-card">
+                    <h3><i class="fas fa-clock"></i> Mise à jour</h3>
+                    <p class="update-date">26 août 2025</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation de retour -->
+        <div class="back-navigation">
+            <a href="{{ path('home') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Retour à l'accueil</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

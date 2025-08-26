@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Conditions Générales d'Utilisation - Warrior Arena Tavern{% endblock %}
+
+{% block body %}
+<div class="rgpd-page">
+    <div class="container">
+        
+        <!-- En-tête -->
+        <header class="rgpd-header">
+            <div class="icon-title">
+                <i class="fas fa-file-contract main-icon"></i>
+                <h1>Conditions Générales d'Utilisation</h1>
+            </div>
+            <p class="rgpd-description">Consultez les règles d'utilisation de notre plateforme de jeu.</p>
+        </header>
+
+        <!-- Contenu principal -->
+        <div class="rgpd-wrapper">
+            
+            <!-- Sections principales -->
+            <div class="rgpd-sections">
+                <div class="rgpd-section">
+                    <h3>1. Objet</h3>
+                    <p>Les présentes Conditions Générales d'Utilisation ont pour objet de définir les modalités d'accès et d'utilisation du site <strong>Warrior Arena Tavern</strong>.</p>
+
+                    <h3>2. Acceptation</h3>
+                    <p>En accédant au site, l'utilisateur accepte, sans réserve, les présentes CGU dans leur intégralité.</p>
+
+                    <h3>3. Accès au site</h3>
+                    <p>Le site est accessible gratuitement à tout utilisateur disposant d'un accès à internet. Certains services peuvent nécessiter la création d'un compte utilisateur.</p>
+
+                    <h3>4. Compte utilisateur</h3>
+                    <p>L'utilisateur s'engage à fournir des informations exactes lors de son inscription. Il est responsable de la confidentialité de ses identifiants et de toute activité liée à son compte.</p>
+
+                    <h3>5. Comportement de l'utilisateur</h3>
+                    <p>Tout comportement illégal, injurieux, ou portant atteinte à l'intégrité du site ou d'un autre utilisateur entraînera la suspension ou la suppression du compte.</p>
+
+                    <h3>6. Propriété intellectuelle</h3>
+                    <p>Les contenus du site (textes, images, design, etc.) sont protégés par le droit d'auteur. Toute reproduction sans autorisation est strictement interdite.</p>
+
+                    <h3>7. Responsabilité</h3>
+                    <p>Le site s'efforce d'assurer l'exactitude des informations, mais ne peut garantir l'absence d'erreurs. Il décline toute responsabilité quant à l'utilisation du site ou des informations diffusées.</p>
+
+                    <h3>8. Données personnelles</h3>
+                    <p>Les données collectées sont traitées conformément à notre <a href="{{ path('app_politique_confidentialite') }}">Politique de confidentialité</a>.</p>
+
+                    <h3>9. Modification des CGU</h3>
+                    <p>Le site se réserve le droit de modifier les présentes CGU à tout moment. L'utilisateur sera informé de tout changement significatif.</p>
+
+                    <h3>10. Loi applicable</h3>
+                    <p>Les présentes CGU sont régies par la loi française. En cas de litige, les tribunaux français seront seuls compétents.</p>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="rgpd-sidebar">
+                
+                <!-- Informations de contact -->
+                <div class="sidebar-card">
+                    <h3><i class="fas fa-envelope"></i> Contact</h3>
+                    <p>Une question sur nos conditions d'utilisation ?</p>
+                    <a href="{{ path('contact') }}" class="contact-btn">Nous contacter</a>
+                </div>
+
+                <!-- Informations importantes -->
+                <div class="sidebar-card">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Important</h3>
+                    <p>En utilisant notre service, vous acceptez ces conditions d'utilisation.</p>
+                </div>
+
+                <!-- Dernière mise à jour -->
+                <div class="sidebar-card">
+                    <h3><i class="fas fa-clock"></i> Mise à jour</h3>
+                    <p class="update-date">26 août 2025</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation de retour -->
+        <div class="back-navigation">
+            <a href="{{ path('home') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Retour à l'accueil</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

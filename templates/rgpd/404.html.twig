@@ -1,0 +1,400 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page non trouvée - Warrior Arena Tavern{% endblock %}
+
+{% block body %}
+<div class="error-page">
+    <div class="container">
+        <div class="error-content">
+            
+            <!-- Icône et titre d'erreur -->
+            <div class="error-header">
+                <i class="fas fa-exclamation-triangle error-icon"></i>
+                <h1>Oups ! Page introuvable</h1>
+                <div class="error-code">404</div>
+            </div>
+
+            <!-- Message d'erreur -->
+            <div class="error-message">
+                <p>Il semblerait que la page que vous cherchez n'existe pas ou ait été déplacée.</p>
+                <p>Peut-être avez-vous fait une erreur de frappe dans l'URL ?</p>
+            </div>
+
+            <!-- Suggestions de pages -->
+            <div class="suggested-pages">
+                <h2>Où souhaitez-vous aller ?</h2>
+                <div class="page-links">
+                    <a href="{{ path('home') }}" class="page-link">
+                        <i class="fas fa-home"></i>
+                        <div>
+                            <strong>Accueil</strong>
+                            <small>Retournez à la page principale</small>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ path('jouer') }}" class="page-link">
+                        <i class="fas fa-gamepad"></i>
+                        <div>
+                            <strong>Jouer</strong>
+                            <small>Accédez à l'arène de combat</small>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ path('personnages') }}" class="page-link">
+                        <i class="fas fa-user-ninja"></i>
+                        <div>
+                            <strong>Mes Personnages</strong>
+                            <small>Gérez vos guerriers</small>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ path('profile') }}" class="page-link">
+                        <i class="fas fa-user-circle"></i>
+                        <div>
+                            <strong>Mon Profil</strong>
+                            <small>Consultez votre profil</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Informations utiles -->
+            <div class="error-help">
+                <div class="help-section">
+                    <h3><i class="fas fa-lightbulb"></i> Suggestions</h3>
+                    <ul>
+                        <li>Vérifiez l'orthographe de l'URL</li>
+                        <li>Utilisez le menu de navigation</li>
+                        <li>Retournez à la page d'accueil</li>
+                        <li>Contactez-nous si le problème persiste</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3><i class="fas fa-question-circle"></i> Besoin d'aide ?</h3>
+                    <p>Si vous pensez qu'il s'agit d'une erreur de notre part, n'hésitez pas à nous contacter.</p>
+                    <a href="{{ path('contact') }}" class="contact-btn">
+                        <i class="fas fa-envelope"></i>
+                        Nous contacter
+                    </a>
+                </div>
+            </div>
+
+            <!-- Bouton retour -->
+            <div class="back-navigation">
+                <button onclick="history.back()" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Page précédente</span>
+                </button>
+                
+                <a href="{{ path('home') }}" class="home-btn">
+                    <i class="fas fa-home"></i>
+                    <span>Retour à l'accueil</span>
+                </a>
+            </div>
+
+            <!-- Image décorative -->
+            <div class="error-decoration">
+                <div class="floating-swords">
+                    <i class="fas fa-sword"></i>
+                    <i class="fas fa-shield"></i>
+                    <i class="fas fa-helmet-battle"></i>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Styles spécifiques à la page 404 -->
+<style>
+.error-page {
+    background-image: url('{{ asset("img/img92.jpg") }}');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh;
+    padding: 2rem 0;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.error-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 35, 47, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.error-content {
+    background: rgba(245, 230, 211, 0.95);
+    border-radius: 20px;
+    padding: 3rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(26, 35, 47, 0.4);
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(201, 169, 97, 0.3);
+    position: relative;
+    z-index: 2;
+}
+
+.error-header {
+    margin-bottom: 2rem;
+}
+
+.error-icon {
+    font-size: 4rem;
+    color: #e74c3c;
+    margin-bottom: 1rem;
+    animation: shake 2s infinite;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.error-header h1 {
+    color: #1A232F;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 2.5rem;
+    margin: 0 0 1rem 0;
+}
+
+.error-code {
+    font-size: 6rem;
+    font-weight: bold;
+    color: rgba(201, 169, 97, 0.3);
+    line-height: 1;
+    font-family: 'Cinzel Decorative', serif;
+}
+
+.error-message {
+    margin-bottom: 3rem;
+}
+
+.error-message p {
+    color: #1A232F;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+
+.suggested-pages {
+    margin-bottom: 3rem;
+}
+
+.suggested-pages h2 {
+    color: #C9A961;
+    font-family: 'Cinzel Decorative', serif;
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+}
+
+.page-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.page-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(26, 35, 47, 0.1);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #1A232F;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(201, 169, 97, 0.2);
+}
+
+.page-link:hover {
+    background: rgba(201, 169, 97, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(201, 169, 97, 0.3);
+    border-color: #C9A961;
+}
+
+.page-link i {
+    font-size: 2rem;
+    color: #C9A961;
+}
+
+.page-link strong {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+}
+
+.page-link small {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.error-help {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+    text-align: left;
+}
+
+.help-section {
+    background: rgba(26, 35, 47, 0.05);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(201, 169, 97, 0.2);
+}
+
+.help-section h3 {
+    color: #C9A961;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.help-section h3 i {
+    margin-right: 0.5rem;
+}
+
+.help-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.help-section li {
+    padding: 0.3rem 0;
+    color: #1A232F;
+}
+
+.help-section li:before {
+    content: "→";
+    color: #C9A961;
+    margin-right: 0.5rem;
+}
+
+.contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #C9A961, #B8934B);
+    color: #1A232F;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.contact-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(201, 169, 97, 0.4);
+}
+
+.back-navigation {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.back-btn, .home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(26, 35, 47, 0.8);
+    color: #F5E6D3;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: none;
+    cursor: pointer;
+}
+
+.back-btn:hover, .home-btn:hover {
+    background: rgba(201, 169, 97, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(26, 35, 47, 0.3);
+}
+
+.error-decoration {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    opacity: 0.1;
+}
+
+.floating-swords {
+    display: flex;
+    gap: 1rem;
+}
+
+.floating-swords i {
+    font-size: 3rem;
+    color: #C9A961;
+    animation: float 3s ease-in-out infinite;
+}
+
+.floating-swords i:nth-child(2) {
+    animation-delay: 1s;
+}
+
+.floating-swords i:nth-child(3) {
+    animation-delay: 2s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .error-content {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+    }
+    
+    .error-header h1 {
+        font-size: 2rem;
+    }
+    
+    .error-code {
+        font-size: 4rem;
+    }
+    
+    .page-links {
+        grid-template-columns: 1fr;
+    }
+    
+    .error-help {
+        grid-template-columns: 1fr;
+    }
+    
+    .back-navigation {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .back-btn, .home-btn {
+        width: 100%;
+        justify-content: center;
+        max-width: 300px;
+    }
+}
+</style>
+{% endblock %}

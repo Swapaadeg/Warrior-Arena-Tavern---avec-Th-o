@@ -26,9 +26,9 @@ class RgpdController extends AbstractController
         return $this->render('rgpd/mentions_legales.html.twig');
     }
 
-    #[Route('/404', name: 'app_404')]
+    #[Route('/page-404', name: 'app_404')]
     public function page404(): Response
     {
-        return $this->render('rgpd/404.html.twig', [], new Response('', 404));
+        return $this->render('rgpd/404.html.twig');
     }
 }

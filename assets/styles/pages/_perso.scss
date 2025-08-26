@@ -21,14 +21,6 @@
         text-shadow: 2px 2px 4px rgba($primary-dark, 0.7);
     }
 }
-.battle-page{
-    .character-list{
-        flex-direction: row;
-        .character-item{
-            flex-wrap: wrap;
-        }
-    }
-}
 
 
 .character-list {
@@ -165,30 +157,4 @@
     background: rgba($primary-beige, 0.5);
     border-radius: 15px;
     border: 2px dashed $accent-gold;
-}
-
-// Responsive
-@media (max-width: 768px) {
-    .character-item {
-        flex-direction: column;
-        text-align: center;
-        
-        .character-info {
-            .character-stats {
-                justify-content: center;
-            }
-            
-            .character-tags {
-                justify-content: center;
-            }
-        }
-    }
-    
-    .characters-list-section {
-        padding: 1rem;
-        
-        h2 {
-            font-size: 2rem;
-        }
-    }
 }

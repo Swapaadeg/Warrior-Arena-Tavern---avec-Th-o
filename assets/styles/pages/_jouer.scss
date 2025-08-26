@@ -514,17 +514,7 @@
     flex-wrap: wrap;
     gap: 1rem;
     justify-content: center;
-}
 
-.character-item {
-    border: 1px solid rgba(var(--accent-gold-rgb), 0.3);
-    padding: 1rem;
-    border-radius: 8px;
-    width: 180px;
-    text-align: center;
-    background: rgba(var(--bg-dark-rgb), 0.3);
-    transition: all 0.3s ease;
-    
     &:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(var(--accent-gold-rgb), 0.2);
@@ -582,21 +572,6 @@
     margin-top: 2rem;
 }
 
-// Responsive design pour la page de match
-@media (max-width: 768px) {
-    .match-container {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
-    .character-list {
-        justify-content: center;
-    }
-    
-    .character-item {
-        width: 160px;
-    }
-}
 
 // =============================================================================
 // JOUER PAGE STYLES - Filtres et classements
@@ -985,16 +960,6 @@
     flex-wrap: wrap;
     gap: 1rem;
     justify-content: center;
-}
-
-.character-item {
-    border: 1px solid rgba(var(--accent-gold-rgb), 0.3);
-    padding: 1rem;
-    border-radius: 8px;
-    width: 180px;
-    text-align: center;
-    background: rgba(var(--bg-dark-rgb), 0.3);
-    transition: all 0.3s ease;
     
     &:hover {
         transform: translateY(-2px);
@@ -1053,18 +1018,3 @@
     margin-top: 2rem;
 }
 
-// Responsive design pour la page de match
-@media (max-width: 768px) {
-    .match-container {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
-    .character-list {
-        justify-content: center;
-    }
-    
-    .character-item {
-        width: 160px;
-    }
-}

@@ -25,7 +25,7 @@
     text-align: center;
 }
 
-.nav-links {
+.rgpd-page .nav-links {
     display: inline-flex;
     background: rgba($primary-dark, 0.8);
     border-radius: 25px;
@@ -332,7 +332,7 @@
         gap: 2rem;
     }
 
-    .nav-links {
+    .rgpd-page .nav-links {
         flex-direction: column;
         align-items: stretch;
     }

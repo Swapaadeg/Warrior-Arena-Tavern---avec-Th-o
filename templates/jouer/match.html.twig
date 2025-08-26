@@ -3,39 +3,69 @@
 {% block title %}Matchmaking{% endblock %}
 
 {% block body %}
+<img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
 <div class="match-page">
-    <h1 class="match-title">Matchmaking</h1>
-    <div class="match-container">
-        <div class="team-section">
-            <h2 class="team-title">Votre équipe</h2>
-            <div class="character-list">
-                {% for character in my_team %}
-                    <div class="character-item">
-                        <h3 class="character-name">{{ character.name }}</h3>
-                        <div class="character-stat">PV: {{ character.HP }}</div>
-                    </div>
-                {% endfor %}
+    <div class="players-names">
+        <span class="player-name gold-animated">{{ app.user.username }}</span>
+        <span class="vs-label">VS</span>
+        {% if opponent %}
+            <span class="player-name gold-animated">{{ opponent.username }}</span>
+        {% endif %}
+    </div>
+    <div class="team-avatars">
+        {# Team 1: tanks #}
+        {% set tanks1 = my_team|filter(c => c.role and c.role.name|lower == 'tank') %}
+        {% for tank in tanks1 %}
+            <div class="avatar-container team1-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
             </div>
-        </div>
-        <div class="team-section">
+        {% endfor %}
+        {# Team 1: dps #}
+        {% set dps1 = my_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
+        {% for dps in dps1 %}
+            <div class="avatar-container team1-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
+            </div>
+        {% endfor %}
+        {# Team 1: heals #}
+        {% set heals1 = my_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
+        {% for heal in heals1 %}
+            <div class="avatar-container team1-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
+            </div>
+        {% endfor %}
+
+        {# Team 2: tanks #}
+        {% set tanks2 = opponent_team|filter(c => c.role and c.role.name|lower == 'tank') %}
+        {% for tank in tanks2 %}
+            <div class="avatar-container team2-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
+            </div>
+        {% endfor %}
+        {# Team 2: dps #}
+        {% set dps2 = opponent_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
+        {% for dps in dps2 %}
+            <div class="avatar-container team2-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
+            </div>
+        {% endfor %}
+        {# Team 2: heals #}
+        {% set heals2 = opponent_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
+        {% for heal in heals2 %}
+            <div class="avatar-container team2-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
+            </div>
+        {% endfor %}
+    </div>
+    <div class="match-info">
+        <form method="post" action="{{ path('jouer_battle') }}">
             {% if opponent %}
-                <h2 class="team-title">Adversaire : {{ opponent.username }}</h2>
-                <div class="character-list">
-                    {% for character in opponent_team %}
-                        <div class="character-item">
-                            <h3 class="character-name">{{ character.name }}</h3>
-                            <div class="character-stat">PV: {{ character.HP }}</div>
-                        </div>
-                    {% endfor %}
-                </div>
-                <form method="post" action="{{ path('jouer_battle') }}" class="battle-form">
-                    <input type="hidden" name="opponentId" value="{{ opponent.id }}">
-                    <button type="submit" class="battle-button">Lancer la bataille</button>
-                </form>
+                <input type="hidden" name="opponentId" value="{{ opponent.id }}">
+                <button type="submit" class="play-btn match-btn">Lancer la bataille</button>
             {% else %}
-                <div class="no-opponent">Aucun adversaire trouvé pour le matchmaking.</div>
+                <div class="alert alert-warning">Aucun adversaire trouvé pour le matchmaking.</div>
             {% endif %}
-        </div>
+        </form>
     </div>
 </div>
 {% endblock %}

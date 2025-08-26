@@ -3,7 +3,7 @@
 @use "sass:color";
 
 // ==========================================================================
-// PAGE JOUER - WARRIOR ARENA TAVERNE
+// PAGE JOUER - WARRIOR ARENA TAVERN
 // ==========================================================================
 
 .play-page {
@@ -85,6 +85,11 @@
         max-width: 1200px;
         margin: 0 auto;
     }
+}
+
+// Masquer les checkboxes (sélection visuelle via JavaScript)
+.character-checkbox {
+    display: none;
 }
 
 // Carte de personnage
@@ -228,6 +233,21 @@
                 width: auto;
                 height: auto;
             }
+            
+            &.tank {
+                color: #4a90e2;
+                text-shadow: 0 2px 4px rgba(74, 144, 226, 0.3);
+            }
+
+            &.healer {
+                color: #50c878;
+                text-shadow: 0 2px 4px rgba(80, 200, 120, 0.3);
+            }
+
+            &.dps {
+                color: #e74c3c;
+                text-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+            }
         }
         
         .role-name {
@@ -261,6 +281,35 @@
         }
     }
 }
+    
+    // Style pour les labels de tags
+    .tag-label {
+        display: inline-block;
+        background: rgba($accent-gold, 0.15);
+        color: $accent-gold;
+        font-weight: 600;
+        border-radius: 12px;
+        padding: 0.2rem 0.8rem;
+        font-size: 0.95rem;
+        margin: 0.1rem 0.3rem;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba($primary-dark, 0.08);
+        border: 1px solid $accent-gold;
+    }
+    
+    // Style pour les badges
+    .badge {
+        display: inline-block;
+        background: $primary-dark;
+        color: $accent-gold;
+        font-weight: bold;
+        border-radius: 50px;
+        padding: 0.2rem 0.7rem;
+        font-size: 0.85rem;
+        margin: 0.1rem 0.2rem;
+        box-shadow: 0 1px 4px rgba($primary-dark, 0.12);
+        border: 2px solid $accent-gold;
+    }
 
 // Bouton de jeu
 .play-section {
@@ -468,53 +517,5 @@
     
     &.dps {
         filter: hue-rotate(0deg); // Rouge pour DPS
-    }
-}
-
-// Responsive
-@media (max-width: 768px) {
-    .play-page {
-        padding: 1rem;
-        
-        .play-title {
-            font-size: 2rem;
-        }
-    }
-    
-    .battle-board {
-        height: 200px;
-        margin-bottom: 2rem;
-    }
-    
-    .character-grid {
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 1rem;
-    }
-    
-    .character-card {
-        padding: 1rem;
-        
-        .character-avatar {
-            width: 60px;
-            height: 60px;
-        }
-        
-        .character-name {
-            font-size: 1.1rem;
-        }
-    }
-    
-    .modal-content {
-        padding: 1.5rem;
-        
-        .modal-header .modal-avatar {
-            width: 100px;
-            height: 100px;
-        }
-        
-        .modal-stats {
-            grid-template-columns: 1fr;
-            gap: 0.8rem;
-        }
     }
 }

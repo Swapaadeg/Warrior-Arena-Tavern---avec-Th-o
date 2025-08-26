@@ -1,0 +1,450 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+@use "sass:color";
+// ==========================================================================
+// MATCH STYLES - WARRIOR ARENA TAVERNE
+// ==========================================================================
+
+
+// Styles pour la page match
+.match-page {
+  position: relative;
+  min-height: 100vh;
+  background: url('../../img/mapgemini.png') center center/cover no-repeat;
+  padding: 2rem;
+
+  .team-avatars {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  // Avatar containers positioning
+  .avatar-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 90px;
+    z-index: 3;
+  }
+
+  // TEAM 1 - Positioning par rôle
+
+  .avatar-container.team1-tank { left: 40%; top: 35%; }
+  .avatar-container.team1-tank.offset-1 { top: calc(35% + 15%); }
+  .avatar-container.team1-tank.offset-2 { top: calc(35% + 30%); }
+  .avatar-container.team1-tank.offset-3 { top: calc(35% + 45%); }
+
+  .avatar-container.team1-dps { left: 30%; top: 35%; }
+  .avatar-container.team1-dps.offset-1 { top: calc(35% + 15%); }
+  .avatar-container.team1-dps.offset-2 { top: calc(35% + 30%); }
+  .avatar-container.team1-dps.offset-3 { top: calc(35% + 45%); }
+
+  .avatar-container.team1-heal { left: 20%; top: 35%; }
+  .avatar-container.team1-heal.offset-1 { top: calc(35% + 15%); }
+  .avatar-container.team1-heal.offset-2 { top: calc(35% + 30%); }
+  .avatar-container.team1-heal.offset-3 { top: calc(35% + 45%); }
+
+  // TEAM 2 - Positioning par rôle
+
+  .avatar-container.team2-tank { right: 40%; top: 35%; }
+  .avatar-container.team2-tank.offset-1 { top: calc(35% + 15%); }
+  .avatar-container.team2-tank.offset-2 { top: calc(35% + 30%); }
+  .avatar-container.team2-tank.offset-3 { top: calc(35% + 45%); }
+
+  .avatar-container.team2-dps { right: 30%; top: 35%; }
+  .avatar-container.team2-dps.offset-1 { top: calc(35% + 15%); }
+  .avatar-container.team2-dps.offset-2 { top: calc(35% + 30%); }
+  .avatar-container.team2-dps.offset-3 { top: calc(35% + 45%); }
+
+  .avatar-container.team2-heal { right: 20%; top: 35%; }
+  .avatar-container.team2-heal.offset-1 { top: calc(35% + 15%); }
+  .avatar-container.team2-heal.offset-2 { top: calc(35% + 30%); }
+  .avatar-container.team2-heal.offset-3 { top: calc(35% + 45%); }
+
+  // Avatar image styling (centered within container)
+  .avatar {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid $accent-gold;
+    box-shadow: 0 4px 15px rgba($primary-dark, 0.2);
+    background: $primary-beige;
+    transition: transform 0.3s;
+    z-index: 2;
+  }
+
+  // Avatar HP bar and info styling for battle page
+  .avatar-info {
+    width: 100%;
+    margin-bottom: 5px;
+    text-align: center;
+  }
+
+  .avatar-hp-bar {
+    width: 100%;
+    height: 18px;
+    background: #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 2px;
+  }
+
+  .avatar-hp-fill {
+    background: linear-gradient(90deg, #3ecf4c 60%, #2e8b57 100%);
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    // HP critique - en dessous de 30%
+    &.low-hp {
+      background: linear-gradient(90deg, #ff4444 60%, #cc0000 100%);
+    }
+  }
+
+  .avatar-hp {
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    position: absolute;
+    z-index: 1;
+  }
+
+  // Animations spécifiques par rôle quand un personnage agit
+  
+  // Animation défensive bleue pour les tanks
+  .avatar-container.acting-tank {
+    animation: tank-defense 0.8s ease-in-out;
+    box-shadow: 0 0 25px 8px rgba(30, 144, 255, 0.6);
+    background: radial-gradient(circle, rgba(173, 216, 230, 0.3), rgba(30, 144, 255, 0.2));
+  }
+
+  @keyframes tank-defense {
+    0%, 100% { 
+      transform: scale(1.08); 
+      box-shadow: 0 0 25px 8px rgba(30, 144, 255, 0.6);
+    }
+    25% { 
+      transform: scale(1.12); 
+      box-shadow: 0 0 35px 12px rgba(65, 105, 225, 0.8);
+    }
+    50% { 
+      transform: scale(1.08); 
+      box-shadow: 0 0 30px 10px rgba(100, 149, 237, 0.7);
+    }
+    75% { 
+      transform: scale(1.12); 
+      box-shadow: 0 0 35px 12px rgba(65, 105, 225, 0.8);
+    }
+  }
+
+  // Animation de dégâts rouge pour les DPS
+  .avatar-container.acting-dps {
+    animation: dps-damage 0.8s ease-in-out;
+    box-shadow: 0 0 25px 8px rgba(255, 69, 0, 0.7);
+    background: radial-gradient(circle, rgba(255, 99, 71, 0.3), rgba(255, 0, 0, 0.2));
+  }
+
+  @keyframes dps-damage {
+    0%, 100% { 
+      transform: scale(1.08); 
+      box-shadow: 0 0 25px 8px rgba(255, 69, 0, 0.7);
+    }
+    15% { 
+      transform: scale(1.15) rotate(-2deg); 
+      box-shadow: 0 0 40px 15px rgba(255, 0, 0, 0.9);
+    }
+    30% { 
+      transform: scale(1.1) rotate(2deg); 
+      box-shadow: 0 0 35px 12px rgba(220, 20, 60, 0.8);
+    }
+    45% { 
+      transform: scale(1.15) rotate(-1deg); 
+      box-shadow: 0 0 40px 15px rgba(255, 0, 0, 0.9);
+    }
+    60% { 
+      transform: scale(1.08) rotate(1deg); 
+      box-shadow: 0 0 30px 10px rgba(255, 69, 0, 0.7);
+    }
+    80% { 
+      transform: scale(1.12); 
+      box-shadow: 0 0 35px 12px rgba(220, 20, 60, 0.8);
+    }
+  }
+
+  // Animation paillettes vertes pour les heals
+  .avatar-container.acting-heal {
+    animation: heal-sparkles 0.8s ease-in-out;
+    box-shadow: 0 0 25px 8px rgba(50, 205, 50, 0.6);
+    background: radial-gradient(circle, rgba(144, 238, 144, 0.4), rgba(50, 205, 50, 0.2));
+    position: relative;
+  }
+
+  .avatar-container.acting-heal::before {
+    content: '';
+    position: absolute;
+    top: -10px; left: -10px; right: -10px; bottom: -10px;
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(50, 205, 50, 0.8) 2px, transparent 2px),
+      radial-gradient(circle at 80% 20%, rgba(144, 238, 144, 0.9) 1px, transparent 1px),
+      radial-gradient(circle at 40% 70%, rgba(34, 139, 34, 0.7) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 70% 70%, rgba(50, 205, 50, 0.8) 1px, transparent 1px),
+      radial-gradient(circle at 90% 50%, rgba(144, 238, 144, 0.9) 2px, transparent 2px);
+    border-radius: 50%;
+    animation: sparkle-rotation 0.8s ease-in-out;
+    pointer-events: none;
+  }
+
+  @keyframes heal-sparkles {
+    0%, 100% { 
+      transform: scale(1.08); 
+      box-shadow: 0 0 25px 8px rgba(50, 205, 50, 0.6);
+    }
+    25% { 
+      transform: scale(1.12); 
+      box-shadow: 0 0 35px 12px rgba(34, 139, 34, 0.8);
+    }
+    50% { 
+      transform: scale(1.1); 
+      box-shadow: 0 0 40px 15px rgba(144, 238, 144, 0.9);
+    }
+    75% { 
+      transform: scale(1.12); 
+      box-shadow: 0 0 35px 12px rgba(50, 205, 50, 0.7);
+    }
+  }
+
+  @keyframes sparkle-rotation {
+    0% { 
+      transform: rotate(0deg) scale(0.8); 
+      opacity: 0; 
+    }
+    25% { 
+      transform: rotate(90deg) scale(1.2); 
+      opacity: 1; 
+    }
+    50% { 
+      transform: rotate(180deg) scale(1); 
+      opacity: 0.8; 
+    }
+    75% { 
+      transform: rotate(270deg) scale(1.2); 
+      opacity: 1; 
+    }
+    100% { 
+      transform: rotate(360deg) scale(0.8); 
+      opacity: 0; 
+    }
+  }
+}
+
+
+.players-names {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.player-name {
+  font-family: $font-title;
+  font-size: 2.2rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  position: relative;
+  background: linear-gradient(90deg, #fffbe6 0%, $accent-gold 40%, #ffd700 60%, #fffbe6 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow:
+    0 0 18px #ffd700,
+    0 0 32px #fffbe6,
+    0 0 8px #fffbe6,
+    0 0 2px #ffd700;
+  filter: drop-shadow(0 0 8px #ffd700);
+  animation: neon-glow 2.5s infinite alternate, gold-glow 2.5s infinite alternate;
+}
+
+@keyframes neon-glow {
+  0% {
+    text-shadow:
+      0 0 18px #ffd700,
+      0 0 32px #fffbe6,
+      0 0 8px #fffbe6,
+      0 0 2px #ffd700;
+    filter: drop-shadow(0 0 8px #ffd700);
+  }
+  100% {
+    text-shadow:
+      0 0 32px #ffd700,
+      0 0 64px #fffbe6,
+      0 0 16px #fffbe6,
+      0 0 4px #ffd700;
+    filter: drop-shadow(0 0 16px #ffd700);
+  }
+}
+
+@keyframes gold-glow {
+  0% { text-shadow: 0 0 12px rgba($accent-gold, 0.7), 0 0 32px rgba($accent-gold, 0.3); }
+  100% { text-shadow: 0 0 32px rgba($accent-gold, 1), 0 0 64px rgba($accent-gold, 0.6); }
+}
+
+.vs-label {
+  font-size: 2rem;
+  color: $accent-gold;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba($accent-gold, 0.5);
+  margin: 0 1.5rem;
+}
+
+.match-btn {
+  display: block;
+  margin: 2rem auto 0 auto;
+  background: $accent-gold;
+    color: $primary-dark;
+    font-family: $font-title;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 16px;
+    padding: 0.7rem 2.2rem;
+    box-shadow: 0 4px 18px rgba($accent-gold, 0.25);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 2rem;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.match-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: none;
+  transition: left 0.5s;
+}
+
+.match-btn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 8px 32px rgba($accent-gold, 0.35);
+}
+
+.match-btn:hover::after {
+  left: 100%;
+}
+
+// Battle info section
+.battle-info {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 400px;
+  z-index: 10;
+  
+  .round-counter {
+    text-align: center;
+    margin-bottom: 1rem;
+    
+    span {
+      background: rgba($primary-dark, 0.9);
+      color: $accent-gold;
+      font-family: $font-title;
+      font-size: 1.4rem;
+      font-weight: bold;
+      padding: 0.5rem 1.5rem;
+      border-radius: 25px;
+      border: 2px solid $accent-gold;
+      box-shadow: 0 4px 15px rgba($accent-gold, 0.3);
+    }
+  }
+  
+  .battle-log-section {
+    background: rgba($primary-beige, 0.95);
+    border: 3px solid $accent-gold;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 25px rgba($primary-dark, 0.4);
+    backdrop-filter: blur(10px);
+    
+    .log-title {
+      font-family: $font-title;
+      color: $primary-dark;
+      font-size: 1.6rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 4px rgba($accent-gold, 0.3);
+    }
+    
+    .battle-log {
+      min-height: 150px;
+      max-height: 300px;
+      overflow-y: auto;
+      background: rgba($primary-dark, 0.1);
+      border: 2px solid $primary-brown;
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: $font-text;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      
+      div {
+        margin-bottom: 0.3rem;
+        color: $primary-dark;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+      
+      // Style de la scrollbar
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: rgba($primary-brown, 0.2);
+        border-radius: 4px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: $accent-gold;
+        border-radius: 4px;
+        
+        &:hover {
+          background: color.adjust($accent-gold, $lightness: -10%);
+        }
+      }
+    }
+    
+    .battle-winner {
+      margin-top: 1rem;
+      text-align: center;
+      font-family: $font-title;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: $accent-gold;
+      text-shadow: 0 2px 4px rgba($primary-dark, 0.5);
+      
+      &:empty {
+        display: none;
+      }
+    }
+  }
+}

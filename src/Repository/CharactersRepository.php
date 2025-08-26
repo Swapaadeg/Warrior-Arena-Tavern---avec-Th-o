@@ -11,6 +11,24 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CharactersRepository extends ServiceEntityRepository
 {
+    /**
+     * Retourne tous les personnages triés par rôle : tanks, healers, dps
+     */
+    public function findAllOrderedByRole(): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->leftJoin('c.role', 'r')
+            ->addSelect('r')
+            ->orderBy(
+                "CASE
+                    WHEN LOWER(r.name) = 'tank' THEN 1
+                    WHEN LOWER(r.name) IN ('healer', 'heal') THEN 2
+                    ELSE 3
+                END"
+            , 'ASC')
+            ->addOrderBy('c.name', 'ASC');
+        return $qb->getQuery()->getResult();
+    }
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Characters::class);

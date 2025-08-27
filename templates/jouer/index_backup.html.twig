@@ -10,66 +10,25 @@
     
     <!-- Plateau de jeu -->
     <div class="battle-board">
-        <img src="{{ asset('bagarre.png') }}" alt="Plateau de combat">
+        <img src="{{ asset('mapgemini.png') }}" alt="Plateau de combat">
         <div class="board-overlay">Arène de Combat</div>
     </div>
     
     <!-- Sélection des personnages -->
     <div class="characters-selection">
-        <div class="section-header">
-            <h2 class="section-title">Choisissez vos champions</h2>
+        <h2 class="section-title">Choisissez vos champions</h2>
             <span class="subtitle">Sélectionner 5 champions, ctrl+click pour sélectionner</span>
-        </div>
-        
-        <!-- Filtres -->
-        <div class="character-filters">
-            <div class="filter-group">
-                <label for="role-filter" class="filter-label">
-                    <i class="fas fa-user-shield"></i> Filtrer par rôle :
-                </label>
-                <select id="role-filter" class="filter-select">
-                    <option value="">Tous les rôles</option>
-                    {% for role in roles %}
-                        <option value="{{ role.id }}" {% if current_role == role.id %}selected{% endif %}>
-                            {{ role.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div class="filter-group">
-                <label for="type-filter" class="filter-label">
-                    <i class="fas fa-tags"></i> Filtrer par type :
-                </label>
-                <select id="type-filter" class="filter-select">
-                    <option value="">Tous les types</option>
-                    {% for type in types %}
-                        <option value="{{ type.id }}" {% if current_type == type.id %}selected{% endif %}>
-                            {{ type.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <button type="button" class="filter-reset" id="reset-filters">
-                <i class="fas fa-times"></i> Réinitialiser
-            </button>
-        </div>
 
         <form id="team-form" method="post">
             <div class="character-grid">
-                {% if characters|length == 0 %}
-                    <div class="no-characters-message">
-                        <i class="fas fa-search"></i>
-                        <p>Aucun personnage trouvé avec ces filtres.</p>
-                        <p>Essayez de modifier vos critères de recherche.</p>
-                    </div>
-                {% else %}
-                    {% for character in characters %}
-                    <div class="character-card" 
+                {% for character in characters %}
+                    <div class="character-card character-target" 
                          data-character-id="{{ character.id }}" 
                          data-index="{{ loop.index0 }}"
-                         {% if character.role %}data-role="{{ character.role.name|lower }}"{% endif %}>
+                         data-character-name="{{ character.name }}"
+                         data-power="{{ character.power }}"
+                         data-defense="{{ character.defense }}"
+                         data-hp="{{ character.HP }}">
                         <div class="selection-indicator"></div>
                         
                         {% if character.imageName %}
@@ -114,7 +73,50 @@
                         <input type="checkbox" name="team[]" value="{{ character.id }}" class="character-checkbox" style="display:none;">
                     </div>
                 {% endfor %}
-                {% endif %}
+            </div>
+            
+            {# Section des armes drag & drop #}
+            <div class="weapons-section mt-4">
+                <h3 class="section-title">⚔️ Armes disponibles</h3>
+                <p class="subtitle">Glissez-déposez une arme sur un de vos personnages sélectionnés pour l'équiper</p>
+                
+                {# DEBUG #}
+                <div class="alert alert-info mb-3">
+                    DEBUG: {{ randomWeapons|length }} arme(s) trouvée(s)
+                </div>
+                
+                <div class="weapons-container d-flex justify-content-around mb-4">
+                    {% for weapon in randomWeapons %}
+                        <div class="weapon-card draggable" 
+                             draggable="true"
+                             data-weapon-id="{{ weapon.id }}"
+                             data-weapon-name="{{ weapon.name }}"
+                             data-weapon-power="{{ weapon.power }}"
+                             data-weapon-defense="{{ weapon.defense }}">
+                            <div class="card" style="width: 200px;">
+                                {% if weapon.imageName %}
+                                    <img src="{{ asset('uploads/weapons/' ~ weapon.imageName) }}" 
+                                         class="card-img-top" alt="{{ weapon.name }}" style="height: 120px; object-fit: cover;">
+                                {% else %}
+                                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 120px;">
+                                        <i class="fas fa-sword fa-2x text-white"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="card-body p-2">
+                                    <h6 class="card-title">{{ weapon.name }}</h6>
+                                    <small class="text-muted">{{ weapon.description|slice(0, 50) }}{% if weapon.description|length > 50 %}...{% endif %}</small>
+                                    <div class="stats mt-2">
+                                        <div><i class="fas fa-fist-raised text-danger"></i> {{ weapon.power }}</div>
+                                        <div><i class="fas fa-shield-alt text-primary"></i> {{ weapon.defense }}</div>
+                                        {% if weapon.types %}
+                                            <div><i class="fas fa-tag text-success"></i> {{ weapon.types.name }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
             
             <div class="play-section">
@@ -135,6 +137,9 @@
             <img src="" alt="" class="modal-avatar" id="modal-avatar">
             <h3 class="modal-name" id="modal-name"></h3>
             <div class="modal-role" id="modal-role"></div>
+            <div class="character-tags">
+                <div class="tag-group" id="modal-type"></div>
+            </div>
         </div>
         <div class="modal-stats" id="modal-stats">
             <div class="stat">
@@ -167,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalClose = document.getElementById('modal-close');
     
     // Données des personnages pour la modale
-    let charactersData = {
+    const charactersData = {
         {% for character in characters %}
         {{ character.id }}: {
             name: "{{ character.name }}",
@@ -176,21 +181,20 @@ document.addEventListener('DOMContentLoaded', function() {
             defense: {{ character.defense }},
             description: "{{ character.description|escape('js') }}",
             imageName: "{{ character.imageName }}",
-            role: {% if character.role %}"{{ character.role.name }}"{% else %}null{% endif %}
+            role: {% if character.role %}"{{ character.role.name }}"{% else %}null{% endif %},
+            type: {% if character.type %}"{{ character.type.name }}"{% else %}null{% endif %}
         }{% if not loop.last %},{% endif %}
         {% endfor %}
     };
 
     function updateTeamCounter() {
-        const currentCheckboxes = document.querySelectorAll('.character-checkbox');
-        const currentCards = document.querySelectorAll('.character-card');
-        const selectedCount = Array.from(currentCheckboxes).filter(cb => cb.checked).length;
+        const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
         teamCountEl.textContent = selectedCount;
         playBtn.disabled = selectedCount !== 5;
         
         // Mettre à jour l'apparence des cartes
-        currentCards.forEach((card, idx) => {
-            if (currentCheckboxes[idx] && currentCheckboxes[idx].checked) {
+        characterCards.forEach((card, idx) => {
+            if (checkboxes[idx].checked) {
                 card.classList.add('selected');
             } else {
                 card.classList.remove('selected');
@@ -198,50 +202,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Gestion de la sélection et de la modale avec délégation d'événements
-    const characterGrid = document.getElementById('character-grid');
-    
-    characterGrid.addEventListener('click', function(e) {
-        const card = e.target.closest('.character-card');
-        if (!card) return;
-        
-        // Empêcher le déclenchement multiple si on clique sur la checkbox
-        if (e.target.tagName.toLowerCase() === 'input') return;
-        
-        // Trouver l'index de cette carte
-        const allCards = Array.from(document.querySelectorAll('.character-card'));
-        const cardIndex = allCards.indexOf(card);
-        const allCheckboxes = document.querySelectorAll('.character-checkbox');
-        
-        console.log('Clic sur carte index:', cardIndex, 'Total cartes:', allCards.length);
-        
-        // Si on maintient Ctrl/Cmd ou on clique sur l'indicateur de sélection, on sélectionne
-        if (e.ctrlKey || e.metaKey || e.target.classList.contains('selection-indicator')) {
-            e.preventDefault();
-            console.log('Mode sélection activé');
+    // Gestion de la sélection et de la modale
+    characterCards.forEach((card, idx) => {
+        card.addEventListener('click', function(e) {
+            // Empêcher le déclenchement multiple si on clique sur la checkbox
+            if (e.target.tagName.toLowerCase() === 'input') return;
             
-            if (allCheckboxes[cardIndex]) {
+            // Si on maintient Ctrl/Cmd ou on clique sur l'indicateur de sélection, on sélectionne
+            if (e.ctrlKey || e.metaKey || e.target.classList.contains('selection-indicator')) {
                 // Limiter à 5 sélections maximum
-                const currentlySelected = Array.from(allCheckboxes).filter(cb => cb.checked).length;
-                if (!allCheckboxes[cardIndex].checked && currentlySelected >= 5) {
-                    alert('Vous ne pouvez sélectionner que 5 personnages maximum !');
+                const currentlySelected = Array.from(checkboxes).filter(cb => cb.checked).length;
+                if (!checkboxes[idx].checked && currentlySelected >= 5) {
                     return;
                 }
                 
-                allCheckboxes[cardIndex].checked = !allCheckboxes[cardIndex].checked;
-                console.log('Checkbox changée:', allCheckboxes[cardIndex].checked);
+                checkboxes[idx].checked = !checkboxes[idx].checked;
                 updateTeamCounter();
                 return;
-            } else {
-                console.log('Pas de checkbox trouvée à l\'index', cardIndex);
             }
-        }
-        
-        // Sinon, on ouvre la modale
-        const characterId = card.dataset.characterId;
-        const character = charactersData[characterId];
-        
-        if (character) {
+            
+            // Sinon, on ouvre la modale
+            const characterId = card.dataset.characterId;
+            const character = charactersData[characterId];
+            
             // Remplir la modale avec les données
             document.getElementById('modal-name').textContent = character.name;
             document.getElementById('modal-hp').textContent = character.hp;
@@ -267,9 +250,17 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 modalRole.style.display = 'none';
             }
+            // Type
+            const modalType = document.getElementById('modal-type');
+            if (character.type) {
+                modalType.innerHTML = '<span class="tag-label">Type :</span> <span class="badge bg-info">' + character.type + '</span>';
+                modalType.style.display = 'flex';
+            } else {
+                modalType.style.display = 'none';
+            }
             
             modal.classList.add('active');
-        }
+        });
     });
     
     // Fermeture de la modale
@@ -291,180 +282,223 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     updateTeamCounter();
-    
-    // Gestion des filtres Ajax
-    const roleFilter = document.getElementById('role-filter');
-    const typeFilter = document.getElementById('type-filter');
-    const resetButton = document.getElementById('reset-filters');
-    const characterGrid = document.querySelector('.character-grid');
-    
-    // Fonction pour appliquer les filtres en Ajax
-    async function applyFilters() {
-        const roleValue = roleFilter.value;
-        const typeValue = typeFilter.value;
-        
-        // Construire les paramètres de requête
-        const params = new URLSearchParams();
-        if (roleValue) params.set('role', roleValue);
-        if (typeValue) params.set('type', typeValue);
-        
-        try {
-            // Ajouter un indicateur de chargement
-            characterGrid.style.opacity = '0.5';
-            characterGrid.style.pointerEvents = 'none';
-            
-            console.log('Filtrage avec:', { role: roleValue, type: typeValue });
-            
-            // Faire la requête Ajax
-            const response = await fetch(`{{ path('jouer') }}?${params.toString()}`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            
-            console.log('Statut de la réponse:', response.status);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Erreur HTTP:', response.status, errorText);
-                throw new Error(`Erreur HTTP ${response.status}`);
-            }
-            
-            const responseText = await response.text();
-            console.log('Réponse brute:', responseText.substring(0, 200) + '...');
-            
-            let characters;
-            try {
-                characters = JSON.parse(responseText);
-            } catch (parseError) {
-                console.error('Erreur de parsing JSON:', parseError);
-                console.error('Réponse complète:', responseText);
-                throw new Error('Réponse invalide du serveur');
-            }
-            
-            console.log('Personnages reçus:', characters.length);
-            
-            // Reconstruire la grille
-            rebuildCharacterGrid(characters);
-            
-            // Mettre à jour l'URL sans rechargement
-            const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
-            window.history.pushState(null, '', newUrl);
-            
-        } catch (error) {
-            console.error('Erreur complète:', error);
-            alert('Erreur lors du filtrage: ' + error.message);
-        } finally {
-            // Retirer l'indicateur de chargement
-            characterGrid.style.opacity = '1';
-            characterGrid.style.pointerEvents = 'auto';
-        }
-    }
-    
-    // Fonction pour reconstruire la grille de personnages
-    function rebuildCharacterGrid(characters) {
-        if (characters.length === 0) {
-            characterGrid.innerHTML = `
-                <div class="no-characters-message">
-                    <i class="fas fa-search"></i>
-                    <p>Aucun personnage trouvé avec ces filtres.</p>
-                    <p>Essayez de modifier vos critères de recherche.</p>
-                </div>
-            `;
-            return;
-        }
-        
-        let html = '';
-        characters.forEach((character, index) => {
-            const roleClass = character.role ? character.role.name.toLowerCase() : '';
-            const roleIcon = getRoleIcon(roleClass);
-            
-            html += `
-                <div class="character-card" 
-                     data-character-id="${character.id}" 
-                     data-index="${index}"
-                     ${character.role ? `data-role="${character.role.name.toLowerCase()}"` : ''}>
-                    <div class="selection-indicator"></div>
-                    
-                    ${character.imageName ? 
-                        `<img src="{{ asset('uploads/images/') }}${character.imageName}" 
-                             alt="${character.name}" 
-                             class="character-avatar">` :
-                        `<div class="character-avatar placeholder">?</div>`
-                    }
-                    
-                    <h3 class="character-name">${character.name}</h3>
-                    
-                    <div class="character-role">
-                        ${character.role ? `
-                            <i class="fa-solid ${roleIcon.icon} role-icon ${roleIcon.class}"></i>
-                            <span class="role-name">${character.role.name}</span>
-                        ` : ''}
-                    </div>
-                    
-                    <div class="character-quick-stats">
-                        <div class="stat">
-                            <span class="stat-label">PV</span>
-                            <span class="stat-value">${character.hp}</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-label">ATK</span>
-                            <span class="stat-value">${character.power}</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-label">DEF</span>
-                            <span class="stat-value">${character.defense}</span>
-                        </div>
-                    </div>
-                    
-                    <input type="checkbox" name="team[]" value="${character.id}" class="character-checkbox" style="display:none;">
-                </div>
-            `;
-        });
-        
-        characterGrid.innerHTML = html;
-        
-        // Réinitialiser les données des personnages pour la modale
-        updateCharactersData(characters);
-    }
-    
-    // Fonction pour obtenir l'icône selon le rôle
-    function getRoleIcon(roleClass) {
-        if (roleClass === 'tank') {
-            return { icon: 'fa-shield-halved', class: 'tank' };
-        } else if (roleClass === 'healer' || roleClass === 'heal') {
-            return { icon: 'fa-heart', class: 'healer' };
-        } else {
-            return { icon: 'fa-burst', class: 'dps' };
-        }
-    }
-    
-    // Fonction pour mettre à jour les données des personnages
-    function updateCharactersData(characters) {
-        charactersData = {};
-        characters.forEach(character => {
-            charactersData[character.id] = {
-                name: character.name,
-                hp: character.hp,
-                power: character.power,
-                defense: character.defense,
-                description: character.description,
-                imageName: character.imageName,
-                role: character.role ? character.role.name : null
-            };
-        });
-    }
-    
-    // Événements pour les filtres
-    roleFilter.addEventListener('change', applyFilters);
-    typeFilter.addEventListener('change', applyFilters);
-    
-    resetButton.addEventListener('click', function() {
-        roleFilter.value = '';
-        typeFilter.value = '';
-        applyFilters();
-    });
 });
 </script>
 
+{# Script pour le drag & drop des armes #}
+<script>
+// Système de drag & drop pour les armes dans les batailles
+class BattleWeaponSystem {
+    constructor() {
+        this.equippedWeapons = new Map();
+        this.init();
+    }
+
+    init() {
+        this.setupDragAndDrop();
+        this.setupCharacterHover();
+    }
+
+    setupDragAndDrop() {
+        document.querySelectorAll('.weapon-card').forEach(weapon => {
+            weapon.addEventListener('dragstart', this.handleDragStart.bind(this));
+            weapon.addEventListener('dragend', this.handleDragEnd.bind(this));
+        });
+
+        document.querySelectorAll('.character-target').forEach(character => {
+            character.addEventListener('dragover', this.handleDragOver.bind(this));
+            character.addEventListener('dragenter', this.handleDragEnter.bind(this));
+            character.addEventListener('dragleave', this.handleDragLeave.bind(this));
+            character.addEventListener('drop', this.handleDrop.bind(this));
+        });
+    }
+
+    setupCharacterHover() {
+        document.querySelectorAll('.character-target').forEach(character => {
+            character.addEventListener('mouseenter', this.showCharacterStats.bind(this));
+            character.addEventListener('mouseleave', this.hideCharacterStats.bind(this));
+        });
+    }
+
+    handleDragStart(e) {
+        const weapon = e.target.closest('.weapon-card');
+        weapon.classList.add('dragging');
+        
+        e.dataTransfer.setData('weapon-id', weapon.dataset.weaponId);
+        e.dataTransfer.setData('weapon-name', weapon.dataset.weaponName);
+        e.dataTransfer.setData('weapon-power', weapon.dataset.weaponPower);
+        e.dataTransfer.setData('weapon-defense', weapon.dataset.weaponDefense);
+        e.dataTransfer.effectAllowed = 'move';
+    }
+
+    handleDragEnd(e) {
+        e.target.closest('.weapon-card').classList.remove('dragging');
+    }
+
+    handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    }
+
+    handleDragEnter(e) {
+        e.preventDefault();
+        const character = e.target.closest('.character-target');
+        if (character) {
+            character.classList.add('drag-over');
+        }
+    }
+
+    handleDragLeave(e) {
+        const character = e.target.closest('.character-target');
+        if (character && !character.contains(e.relatedTarget)) {
+            character.classList.remove('drag-over');
+        }
+    }
+
+    handleDrop(e) {
+        e.preventDefault();
+        const character = e.target.closest('.character-target');
+        character.classList.remove('drag-over');
+
+        if (!character.classList.contains('selected')) {
+            this.showNotification('Sélectionnez d\'abord ce personnage !', 'warning');
+            return;
+        }
+
+        const weaponData = {
+            id: e.dataTransfer.getData('weapon-id'),
+            name: e.dataTransfer.getData('weapon-name'),
+            power: parseInt(e.dataTransfer.getData('weapon-power')),
+            defense: parseInt(e.dataTransfer.getData('weapon-defense'))
+        };
+
+        const characterData = {
+            id: character.dataset.characterId,
+            name: character.dataset.characterName,
+            power: parseInt(character.dataset.power),
+            defense: parseInt(character.dataset.defense),
+            hp: parseInt(character.dataset.hp)
+        };
+
+        this.equipWeapon(characterData, weaponData, character);
+    }
+
+    equipWeapon(character, weapon, characterElement) {
+        this.equippedWeapons.set(character.id, weapon);
+        characterElement.classList.add('equipped');
+        
+        this.addWeaponIndicator(characterElement, weapon);
+
+        const newStats = {
+            power: character.power + weapon.power,
+            defense: character.defense + weapon.defense,
+            hp: character.hp
+        };
+
+        characterElement.dataset.modifiedPower = newStats.power;
+        characterElement.dataset.modifiedDefense = newStats.defense;
+        characterElement.dataset.equippedWeapon = weapon.name;
+
+        this.showNotification(`${weapon.name} équipé sur ${character.name}!`);
+        this.hideUsedWeapon(weapon.id);
+    }
+
+    addWeaponIndicator(characterElement, weapon) {
+        const oldIndicator = characterElement.querySelector('.weapon-equipped-indicator');
+        if (oldIndicator) oldIndicator.remove();
+
+        const indicator = document.createElement('div');
+        indicator.className = 'weapon-equipped-indicator';
+        indicator.innerHTML = '⚔️';
+        indicator.title = `Équipé: ${weapon.name}`;
+        indicator.style.cssText = `
+            position: absolute; top: -5px; right: -5px; width: 25px; height: 25px;
+            background: #ffd700; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 12px; border: 2px solid white; z-index: 10;
+        `;
+        
+        characterElement.style.position = 'relative';
+        characterElement.appendChild(indicator);
+    }
+
+    hideUsedWeapon(weaponId) {
+        const weaponCard = document.querySelector(`[data-weapon-id="${weaponId}"]`);
+        if (weaponCard) {
+            weaponCard.style.opacity = '0.3';
+            weaponCard.style.pointerEvents = 'none';
+            weaponCard.draggable = false;
+        }
+    }
+
+    showCharacterStats(e) {
+        const character = e.target.closest('.character-target');
+        const power = parseInt(character.dataset.power);
+        const defense = parseInt(character.dataset.defense);
+        const hp = parseInt(character.dataset.hp);
+        const name = character.dataset.characterName;
+
+        let statsHtml = `<h6>${name}</h6><div>❤️ PV: ${hp}</div><div>⚔️ Puissance: ${power}</div><div>🛡️ Défense: ${defense}</div>`;
+
+        if (character.dataset.modifiedPower) {
+            const modPower = parseInt(character.dataset.modifiedPower);
+            const modDefense = parseInt(character.dataset.modifiedDefense);
+            const weaponName = character.dataset.equippedWeapon;
+
+            statsHtml += `<hr><small><strong>Avec ${weaponName}:</strong></small>`;
+            statsHtml += `<div>⚔️ Puissance: <span style="color: #00ff00">${modPower} (+${modPower - power})</span></div>`;
+            statsHtml += `<div>🛡️ Défense: <span style="color: #00ff00">${modDefense} (+${modDefense - defense})</span></div>`;
+        }
+
+        this.showStatsComparison(statsHtml);
+    }
+
+    hideCharacterStats() {
+        const overlay = document.querySelector('.stats-comparison');
+        if (overlay) overlay.style.display = 'none';
+    }
+
+    showStatsComparison(html) {
+        let overlay = document.querySelector('.stats-comparison');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'stats-comparison';
+            overlay.style.cssText = `
+                position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.9);
+                color: white; padding: 15px; border-radius: 10px; z-index: 1000;
+                min-width: 200px; font-size: 14px;
+            `;
+            document.body.appendChild(overlay);
+        }
+        overlay.innerHTML = html;
+        overlay.style.display = 'block';
+    }
+
+    showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        const bgColor = type === 'success' ? '#28a745' : '#ffc107';
+        const textColor = type === 'warning' ? '#212529' : 'white';
+        
+        notification.style.cssText = `
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: ${bgColor}; color: ${textColor}; padding: 10px 20px;
+            border-radius: 5px; z-index: 1001; font-weight: bold;
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => notification.remove(), 3000);
+    }
+
+    getEquippedWeapons() {
+        return this.equippedWeapons;
+    }
+}
+
+// Initialiser après le chargement
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        window.battleWeaponSystem = new BattleWeaponSystem();
+    }, 500);
+});
+</script>
 {% endblock %}

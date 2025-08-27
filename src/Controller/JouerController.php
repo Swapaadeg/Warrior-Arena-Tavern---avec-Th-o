@@ -6,6 +6,7 @@ namespace App\Controller;
 use App\Entity\Teams;
 use App\Repository\CharactersRepository;
 use App\Repository\UserRepository;
+use App\Repository\WeaponsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class JouerController extends AbstractController
 {
     #[Route('/jouer', name: 'jouer')]
-    public function index(Request $request, CharactersRepository $charactersRepository, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    public function index(Request $request, CharactersRepository $charactersRepository, EntityManagerInterface $entityManager, UserRepository $userRepository, WeaponsRepository $weaponsRepository): Response
     {
         $characters = $charactersRepository->findAllOrderedByRole();
 
@@ -46,12 +47,19 @@ final class JouerController extends AbstractController
                     ->innerJoin('u.team', 't')
                     ->andWhere('u != :me')->setParameter('me', $user);
                 $opponents = $qb->getQuery()->getResult();
-                $opponent = null; if (count($opponents) > 0) { $opponent = $opponents[random_int(0, count($opponents)-1)]; }
+                $opponent = null; 
+                if (count($opponents) > 0) { 
+                    $opponent = $opponents[random_int(0, count($opponents)-1)]; 
+                }
+
+                // Récupérer des armes aléatoires pour le joueur
+                $randomWeapons = $weaponsRepository->findRandomWeapons(3);
 
                 return $this->render('jouer/match.html.twig', [
                     'my_team' => $user->getTeam() ? $user->getTeam()->getCharacters() : [],
                     'opponent' => $opponent,
                     'opponent_team' => $opponent && $opponent->getTeam() ? $opponent->getTeam()->getCharacters() : [],
+                    'random_weapons' => $randomWeapons,
                 ]);
             } else {
                 $this->addFlash('danger', 'Vous devez sélectionner exactement 5 personnages.');
@@ -64,14 +72,44 @@ final class JouerController extends AbstractController
     }
 
     #[Route('/jouer/battle', name: 'jouer_battle', methods: ['POST'])]
-    public function battle(Request $request, UserRepository $userRepository): Response
+    public function battle(Request $request, UserRepository $userRepository, WeaponsRepository $weaponsRepository): Response
     {
         /** @var \App\Entity\User|null $user */
         $user = $this->getUser();
-        if (!$user instanceof \App\Entity\User) { $this->addFlash('danger', 'Vous devez être connecté pour jouer.'); return $this->redirectToRoute('login'); }
-        $opponentId = $request->request->get('opponentId');
-        $opponent = $userRepository->find($opponentId);
-        if (!$opponent || !$opponent->getTeam()) { $this->addFlash('danger', "L'adversaire n'a pas d'équipe valide."); return $this->redirectToRoute('jouer'); }
+        if (!$user instanceof \App\Entity\User) { 
+            $this->addFlash('danger', 'Vous devez être connecté pour jouer.'); 
+            return $this->redirectToRoute('login'); 
+        }
+
+        // Récupérer les armes équipées depuis la page de sélection
+        $equippedWeapons = $request->request->all('weapons');
+        /** @var \App\Entity\User|null $user */
+        $user = $this->getUser();
+        if (!$user instanceof \App\Entity\User) { 
+            $this->addFlash('danger', 'Vous devez être connecté pour jouer.'); 
+            return $this->redirectToRoute('login'); 
+        }
+
+        // Récupérer les armes équipées depuis la page de sélection
+        $equippedWeapons = $request->request->all('weapons');
+
+        // Sélectionner un adversaire automatiquement
+        $qb = $userRepository->createQueryBuilder('u')
+            ->innerJoin('u.team', 't')
+            ->andWhere('u != :me')->setParameter('me', $user);
+        $opponents = $qb->getQuery()->getResult();
+        
+        if (count($opponents) === 0) {
+            $this->addFlash('danger', "Aucun adversaire disponible pour le moment.");
+            return $this->redirectToRoute('jouer');
+        }
+        
+        $opponent = $opponents[random_int(0, count($opponents)-1)];
+
+        if (!$opponent || !$opponent->getTeam()) { 
+            $this->addFlash('danger', "L'adversaire n'a pas d'équipe valide."); 
+            return $this->redirectToRoute('jouer'); 
+        }
 
         $myTeam = $user->getTeam() ? $user->getTeam()->getCharacters() : [];
         $oppTeam = $opponent->getTeam()->getCharacters();
@@ -82,17 +120,34 @@ final class JouerController extends AbstractController
         $stateLeft = [];
         foreach ($leftArr as $c) {
             $id = 'L'.$c->getId();
+            
+            // Stats de base du personnage
+            $basePower = (int)($c->getPower() ?? 1);
+            $baseDefense = (int)($c->getDefense() ?? 0);
+            
+            // Appliquer les bonus d'armes si équipées
+            if (isset($equippedWeapons[$c->getId()])) {
+                $weaponId = $equippedWeapons[$c->getId()];
+                // Récupérer l'arme depuis la base de données
+                $weapon = $weaponsRepository->find($weaponId);
+                if ($weapon) {
+                    $basePower += (int)($weapon->getPower() ?? 0);
+                    $baseDefense += (int)($weapon->getDefense() ?? 0);
+                }
+            }
+            
             $stateLeft[$id] = [
                 'entity' => $c,
                 'hp' => max(0, (int)($c->getHP() ?? 1)),
                 'maxHp' => max(1, (int)($c->getHP() ?? 1)),
                 'alive' => true,
                 'name' => (string)$c->getName(),
-                'power' => (int)($c->getPower() ?? 1),
-                'defense' => (int)($c->getDefense() ?? 0),
+                'power' => $basePower,
+                'defense' => $baseDefense,
                 'role' => $c->getRole() ? (string)$c->getRole()->getName() : '',
             ];
         }
+
         $stateRight = [];
         foreach ($rightArr as $c) {
             $id = 'R'.$c->getId();
@@ -264,15 +319,24 @@ final class JouerController extends AbstractController
             array_combine(array_map(fn($c) => 'R'.$c->getId(), $rightArr), $rightArr)
         );
 
+        // Préparer les données des armes équipées pour le template
+        $equippedWeaponsData = [];
+        foreach ($equippedWeapons as $characterId => $weaponId) {
+            $weapon = $weaponsRepository->find($weaponId);
+            if ($weapon) {
+                $equippedWeaponsData[$characterId] = $weapon;
+            }
+        }
+
         $unitOwners = array_merge(
             array_combine(array_map(fn($c) => 'L'.$c->getId(), $leftArr), array_fill(0, count($leftArr), 'You')),
-            array_combine(array_map(fn($c) => 'R'.$c->getId(), $rightArr), array_fill(0, count($rightArr), (string)$opponent->getUsername()))
+            array_combine(array_map(fn($c) => 'R'.$c->getId(), $rightArr), array_fill(0, count($rightArr), $opponent ? (string)$opponent->getUsername() : 'Bot'))
         );
 
         // Build a minimal setup structure for the template debug view
         $setup = [
             'left' => array_map(fn($id, $s) => ['id' => $id, 'name' => $s['name'], 'hp' => $s['hp'], 'maxHp' => $s['maxHp'], 'power' => $s['power'], 'defense' => $s['defense'], 'role' => $s['role'], 'owner' => 'You'], array_keys($stateLeft), $stateLeft),
-            'right' => array_map(fn($id, $s) => ['id' => $id, 'name' => $s['name'], 'hp' => $s['hp'], 'maxHp' => $s['maxHp'], 'power' => $s['power'], 'defense' => $s['defense'], 'role' => $s['role'], 'owner' => (string)$opponent->getUsername()], array_keys($stateRight), $stateRight),
+            'right' => array_map(fn($id, $s) => ['id' => $id, 'name' => $s['name'], 'hp' => $s['hp'], 'maxHp' => $s['maxHp'], 'power' => $s['power'], 'defense' => $s['defense'], 'role' => $s['role'], 'owner' => $opponent ? (string)$opponent->getUsername() : 'Bot'], array_keys($stateRight), $stateRight),
             'seed' => 42,
         ];
 
@@ -285,6 +349,7 @@ final class JouerController extends AbstractController
             'unit_owners' => $unitOwners,
             'frames' => $frames,
             'result' => $result,
+            'equipped_weapons' => $equippedWeaponsData,
         ]);
     }
 }

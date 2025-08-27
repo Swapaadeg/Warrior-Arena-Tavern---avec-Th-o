@@ -1,0 +1,102 @@
+/* Styles pour le système de drag & drop des armes */
+.weapons-container {
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.weapon-card {
+    cursor: grab;
+    transition: all 0.3s ease;
+    margin: 0 10px;
+}
+
+.weapon-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.weapon-card.dragging {
+    cursor: grabbing;
+    opacity: 0.7;
+    transform: rotate(5deg) scale(0.9);
+}
+
+.character-target {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.character-target:hover {
+    transform: scale(1.05);
+}
+
+.character-target.drag-over {
+    box-shadow: 0 0 20px #ffd700;
+    border: 3px solid #ffd700;
+    transform: scale(1.1);
+    filter: brightness(1.2);
+}
+
+.character-target.equipped {
+    box-shadow: 0 0 15px #00ff00;
+    border: 2px solid #00ff00;
+}
+
+.weapon-equipped-indicator {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background: #ffd700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #333;
+    font-weight: bold;
+}
+
+.stats-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.character-target:hover .stats-overlay {
+    display: flex;
+}
+
+.stats-comparison {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    display: none;
+    z-index: 1000;
+    min-width: 200px;
+}
+
+.stat-change.positive {
+    color: #00ff00;
+}
+
+.stat-change.negative {
+    color: #ff0000;
+}

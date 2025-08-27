@@ -7,56 +7,76 @@
 <div class="match-page">
     <div class="players-names">
         <span class="player-name gold-animated">{{ app.user.username }}</span>
-        <span class="vs-label">VS</span>
-        {% if opponent %}
-            <span class="player-name gold-animated">{{ opponent.username }}</span>
-        {% endif %}
+        <span class="vs-label">Prêt au Combat</span>
     </div>
-    <div class="team-avatars">
-        {# Team 1: tanks #}
-        {% set tanks1 = my_team|filter(c => c.role and c.role.name|lower == 'tank') %}
-        {% for tank in tanks1 %}
-            <div class="avatar-container team1-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
-            </div>
-        {% endfor %}
-        {# Team 1: dps #}
-        {% set dps1 = my_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
-        {% for dps in dps1 %}
-            <div class="avatar-container team1-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
-            </div>
-        {% endfor %}
-        {# Team 1: heals #}
-        {% set heals1 = my_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
-        {% for heal in heals1 %}
-            <div class="avatar-container team1-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
-            </div>
-        {% endfor %}
-
-        {# Team 2: tanks #}
-        {% set tanks2 = opponent_team|filter(c => c.role and c.role.name|lower == 'tank') %}
-        {% for tank in tanks2 %}
-            <div class="avatar-container team2-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
-            </div>
-        {% endfor %}
-        {# Team 2: dps #}
-        {% set dps2 = opponent_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
-        {% for dps in dps2 %}
-            <div class="avatar-container team2-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
-            </div>
-        {% endfor %}
-        {# Team 2: heals #}
-        {% set heals2 = opponent_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
-        {% for heal in heals2 %}
-            <div class="avatar-container team2-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
+    
+    <!-- Masquer les avatars en position absolue sur cette page -->
+    <div class="team-avatars" style="display: none;">
+        {# Afficher seulement votre équipe #}
+        {% for character in my_team %}
+            <div class="avatar-container team1-{{ character.role ? character.role.name|lower : 'default' }}{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+                {% if character.imageName %}
+                    <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" class="avatar" title="{{ character.name }}">
+                {% else %}
+                    <div class="avatar placeholder" title="{{ character.name }}">?</div>
+                {% endif %}
             </div>
         {% endfor %}
     </div>
+    
+    <!-- Section d'équipement des armes -->
+    {% if random_weapons is defined and random_weapons|length > 0 %}
+    <div class="weapons-section">
+        <h2 class="section-title">Équipez vos héros</h2>
+        <p class="weapons-instruction">Glissez et déposez les armes sur vos personnages pour les équiper avant la bataille.</p>
+        
+        <!-- Équipe avec slots d'armes -->
+        <div class="team-equipment">
+            <h3>Votre Équipe</h3>
+            <div class="characters-grid" id="charactersGrid">
+                {% for character in my_team %}
+                <div class="character-card" data-character-id="{{ character.id }}" ondrop="dropWeapon(event)" ondragover="allowDrop(event)">
+                    {% if character.imageName %}
+                        <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" class="character-avatar">
+                    {% else %}
+                        <div class="character-avatar placeholder">?</div>
+                    {% endif %}
+                    <div class="character-name">{{ character.name }}</div>
+                    <div class="character-role">{{ character.role ? character.role.name : '' }}</div>
+                    <div class="weapon-slot" id="weapon-slot-{{ character.id }}">
+                        <span class="slot-text">Glissez une arme ici</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Armes disponibles -->
+        <div class="available-weapons">
+            <h3>Armes Disponibles</h3>
+            <div class="weapons-grid" id="weaponsGrid">
+                {% for weapon in random_weapons %}
+                <div class="weapon-card" draggable="true" data-weapon-id="{{ weapon.id }}" ondragstart="dragStart(event)">
+                    <div class="weapon-image">
+                        {% if weapon.imageName %}
+                            <img src="{{ asset('uploads/weapons/' ~ weapon.imageName) }}" alt="{{ weapon.name }}" class="weapon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="weapon-placeholder" style="display: none;">⚔️</div>
+                        {% else %}
+                            <div class="weapon-placeholder">⚔️</div>
+                        {% endif %}
+                    </div>
+                    <div class="weapon-name">{{ weapon.name }}</div>
+                    <div class="weapon-type">{{ weapon.types ? weapon.types.name : 'Sans type' }}</div>
+                    <div class="weapon-stats">
+                        ATK: {{ weapon.power }} | DEF: {{ weapon.defense }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
     <div class="match-info">
         <form method="post" action="{{ path('jouer_battle') }}">
             {% if opponent %}
@@ -68,4 +88,350 @@
         </form>
     </div>
 </div>
+
+<style>
+/* Styles pour la section d'armes */
+.weapons-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid #d4af37;
+    border-radius: 10px;
+}
+
+.section-title {
+    color: #d4af37;
+    font-family: 'Cinzel Decorative', serif;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.weapons-instruction {
+    text-align: center;
+    color: #ccc;
+    font-style: italic;
+    margin-bottom: 2rem;
+}
+
+.team-equipment, .available-weapons {
+    margin-bottom: 2rem;
+}
+
+.team-equipment h3, .available-weapons h3 {
+    color: #d4af37;
+    margin-bottom: 1rem;
+}
+
+.characters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.character-card {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #666;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.character-card.has-weapon {
+    border-color: #d4af37;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.character-card.drag-over {
+    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    transform: scale(1.05);
+}
+
+.character-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin: 0 auto 0.5rem;
+    border: 2px solid #666;
+}
+
+.character-avatar.placeholder {
+    background: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+}
+
+.avatar.placeholder {
+    background: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-weight: bold;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    border: 2px solid #666;
+    width: 60px;
+    height: 60px;
+}
+
+.character-name {
+    color: #ffffff;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.character-role {
+    color: #d4af37;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.weapon-slot {
+    min-height: 50px;
+    border: 2px dashed #666;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.weapon-slot.has-weapon {
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.equipped-weapon {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.3rem;
+}
+
+.equipped-weapon img {
+    width: 25px;
+    height: 25px;
+    border-radius: 3px;
+    margin-right: 0.5rem;
+}
+
+.remove-weapon {
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.7rem;
+    cursor: pointer;
+}
+
+.weapons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.weapon-card {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #666;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    cursor: grab;
+    transition: all 0.3s ease;
+}
+
+.weapon-card:hover {
+    border-color: #d4af37;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+}
+
+.weapon-card.dragging {
+    opacity: 0.5;
+    transform: rotate(5deg);
+    cursor: grabbing;
+}
+
+.weapon-card.used {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.weapon-image {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 0.5rem;
+    background: #333;
+    border-radius: 5px;
+    border: 1px solid #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.weapon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.weapon-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 1.5rem;
+    color: #666;
+}
+
+.weapon-name {
+    color: #e0e0e0;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    font-size: 0.8rem;
+}
+
+.weapon-type {
+    color: #d4af37;
+    font-size: 0.7rem;
+    margin-bottom: 0.3rem;
+}
+
+.weapon-stats {
+    color: #ccc;
+    font-size: 0.6rem;
+}
+</style>
+
+<script>
+let equippedWeapons = {};
+
+function dragStart(event) {
+    event.dataTransfer.setData("text/plain", event.target.dataset.weaponId);
+    event.target.classList.add('dragging');
+}
+
+function allowDrop(event) {
+    event.preventDefault();
+    event.target.closest('.character-card').classList.add('drag-over');
+}
+
+function dropWeapon(event) {
+    event.preventDefault();
+    const characterCard = event.target.closest('.character-card');
+    characterCard.classList.remove('drag-over');
+    
+    const weaponId = event.dataTransfer.getData("text/plain");
+    const characterId = characterCard.dataset.characterId;
+    const weaponSlot = characterCard.querySelector('.weapon-slot');
+    
+    // Vérifier si le personnage a déjà une arme
+    if (equippedWeapons[characterId]) {
+        // Libérer l'ancienne arme
+        const oldWeaponCard = document.querySelector(`[data-weapon-id="${equippedWeapons[characterId]}"]`);
+        if (oldWeaponCard) {
+            oldWeaponCard.classList.remove('used');
+        }
+    }
+    
+    // Équiper la nouvelle arme
+    const weaponCard = document.querySelector(`[data-weapon-id="${weaponId}"]`);
+    if (weaponCard && !weaponCard.classList.contains('used')) {
+        equippedWeapons[characterId] = weaponId;
+        
+        // Mettre à jour l'interface
+        weaponCard.classList.add('used');
+        characterCard.classList.add('has-weapon');
+        weaponSlot.classList.add('has-weapon');
+        
+        // Afficher l'arme équipée
+        const weaponName = weaponCard.querySelector('.weapon-name').textContent;
+        const weaponImage = weaponCard.querySelector('.weapon-img');
+        
+        weaponSlot.innerHTML = `
+            <div class="equipped-weapon">
+                <div>
+                    ${weaponImage ? `<img src="${weaponImage.src}" alt="${weaponName}">` : ''}
+                    <span>${weaponName}</span>
+                </div>
+                <button class="remove-weapon" onclick="removeWeapon('${characterId}')">×</button>
+            </div>
+        `;
+    }
+    
+    // Nettoyer l'état de drag
+    document.querySelectorAll('.weapon-card').forEach(card => {
+        card.classList.remove('dragging');
+    });
+}
+
+function removeWeapon(characterId) {
+    const weaponId = equippedWeapons[characterId];
+    if (weaponId) {
+        // Libérer l'arme
+        const weaponCard = document.querySelector(`[data-weapon-id="${weaponId}"]`);
+        if (weaponCard) {
+            weaponCard.classList.remove('used');
+        }
+        
+        // Nettoyer l'interface
+        const characterCard = document.querySelector(`[data-character-id="${characterId}"]`);
+        const weaponSlot = characterCard.querySelector('.weapon-slot');
+        
+        characterCard.classList.remove('has-weapon');
+        weaponSlot.classList.remove('has-weapon');
+        weaponSlot.innerHTML = '<span class="slot-text">Glissez une arme ici</span>';
+        
+        delete equippedWeapons[characterId];
+    }
+}
+
+// Modifier le formulaire de bataille pour inclure les armes équipées
+document.addEventListener('DOMContentLoaded', function() {
+    const battleForm = document.querySelector('form[action*="jouer_battle"]');
+    console.log('Form found:', battleForm);
+    
+    if (battleForm) {
+        battleForm.addEventListener('submit', function(e) {
+            console.log('Form submitted, equipped weapons:', equippedWeapons);
+            
+            // Ajouter les armes équipées au formulaire
+            for (let characterId in equippedWeapons) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = `weapons[${characterId}]`;
+                input.value = equippedWeapons[characterId];
+                battleForm.appendChild(input);
+                
+                console.log(`Added weapon ${equippedWeapons[characterId]} for character ${characterId}`);
+            }
+        });
+    } else {
+        console.error('Battle form not found!');
+    }
+});
+
+// Nettoyer les états de drag
+document.addEventListener('dragleave', function(event) {
+    if (!event.relatedTarget) {
+        document.querySelectorAll('.character-card').forEach(card => {
+            card.classList.remove('drag-over');
+        });
+        document.querySelectorAll('.weapon-card').forEach(card => {
+            card.classList.remove('dragging');
+        });
+    }
+});
+</script>
 {% endblock %}

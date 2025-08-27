@@ -27,7 +27,14 @@
         {% set roleClass = 'team1-3' %}
         {% if dpsIndex > 1 %}{% set offsetClass = 'offset-' ~ (dpsIndex - 1) %}{% endif %}
       {% endif %}
-      <img class="avatar {{ roleClass }} {{ offsetClass }}" src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}">
+      <img class="avatar {{ roleClass }} {{ offsetClass }} character-target" 
+           src="{{ asset('uploads/images/' ~ character.imageName) }}" 
+           alt="{{ character.name }}"
+           data-character-id="{{ character.id }}"
+           data-character-name="{{ character.name }}"
+           data-power="{{ character.power }}"
+           data-defense="{{ character.defense }}"
+           data-hp="{{ character.HP }}">
     {% endfor %}
 
     {# --- Equipe 2 --- #}
@@ -53,6 +60,55 @@
       {% endif %}
       <img class="avatar {{ roleClass }} {{ offsetClass }}" src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}">
     {% endfor %}
+  </div>
+</div>
+
+{# Section des armes drag & drop #}
+<div class="row mt-4 mb-4">
+  <div class="col-md-12">
+    <h3>⚔️ Armes disponibles</h3>
+    <p class="text-muted">Glissez-déposez une arme sur un de vos personnages pour l'équiper</p>
+    
+    {# DEBUG : Afficher le nombre d'armes #}
+    <div class="alert alert-info">
+      DEBUG: {{ randomWeapons|length }} arme(s) trouvée(s)
+      {% if randomWeapons|length == 0 %}
+        <br>Aucune arme disponible dans la base de données.
+      {% endif %}
+    </div>
+    
+    <div class="weapons-container d-flex justify-content-around">
+      {% for weapon in randomWeapons %}
+        <div class="weapon-card draggable" 
+             draggable="true"
+             data-weapon-id="{{ weapon.id }}"
+             data-weapon-name="{{ weapon.name }}"
+             data-weapon-power="{{ weapon.power }}"
+             data-weapon-defense="{{ weapon.defense }}">
+          <div class="card" style="width: 200px;">
+            {% if weapon.imageName %}
+              <img src="{{ asset('uploads/weapons/' ~ weapon.imageName) }}" 
+                   class="card-img-top" alt="{{ weapon.name }}" style="height: 120px; object-fit: cover;">
+            {% else %}
+              <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 120px;">
+                <i class="fas fa-sword fa-2x text-white"></i>
+              </div>
+            {% endif %}
+            <div class="card-body p-2">
+              <h6 class="card-title">{{ weapon.name }}</h6>
+              <small class="text-muted">{{ weapon.description|slice(0, 50) }}...</small>
+              <div class="stats mt-2">
+                <div><i class="fas fa-fist-raised text-danger"></i> {{ weapon.power }}</div>
+                <div><i class="fas fa-shield-alt text-primary"></i> {{ weapon.defense }}</div>
+                {% if weapon.types %}
+                  <div><i class="fas fa-tag text-success"></i> {{ weapon.types.name }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
   </div>
 </div>
 

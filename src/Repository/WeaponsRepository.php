@@ -16,6 +16,36 @@ class WeaponsRepository extends ServiceEntityRepository
         parent::__construct($registry, Weapons::class);
     }
 
+    /**
+     * Récupère un nombre spécifié d'armes aléatoires
+     */
+    public function findRandomWeapons(int $limit = 3): array
+    {
+        // Récupérer tous les IDs d'armes
+        $allIds = $this->createQueryBuilder('w')
+            ->select('w.id')
+            ->getQuery()
+            ->getArrayResult();
+        
+        if (empty($allIds)) {
+            return [];
+        }
+        
+        // Mélanger les IDs et prendre les premiers
+        $ids = array_column($allIds, 'id');
+        shuffle($ids);
+        $randomIds = array_slice($ids, 0, $limit);
+        
+        // Récupérer les objets Weapons complets avec leurs relations
+        return $this->createQueryBuilder('w')
+            ->leftJoin('w.types', 't')
+            ->addSelect('t')
+            ->where('w.id IN (:ids)')
+            ->setParameter('ids', $randomIds)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Weapons[] Returns an array of Weapons objects
     //     */

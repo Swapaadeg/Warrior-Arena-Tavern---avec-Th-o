@@ -239,3 +239,5 @@ class BattleWeaponSystem {
 document.addEventListener('DOMContentLoaded', () => {
     window.battleWeaponSystem = new BattleWeaponSystem();
 });
+
+

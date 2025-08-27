@@ -318,21 +318,39 @@
 let equippedWeapons = {};
 
 function dragStart(event) {
-    event.dataTransfer.setData("text/plain", event.target.dataset.weaponId);
-    event.target.classList.add('dragging');
+    // Ensure we get the weapon-card element even if the inner child was the event target
+    const weaponCard = event.target.closest ? event.target.closest('.weapon-card') : null;
+    if (!weaponCard) return;
+    const weaponId = weaponCard.dataset.weaponId;
+    event.dataTransfer.setData("text/plain", weaponId);
+    // also store some helpful meta so other handlers can read if needed
+    event.dataTransfer.setData("weapon-name", weaponCard.dataset.weaponName || '');
+    event.dataTransfer.setData("weapon-power", weaponCard.dataset.weaponPower || '0');
+    event.dataTransfer.setData("weapon-defense", weaponCard.dataset.weaponDefense || '0');
+    weaponCard.classList.add('dragging');
 }
 
 function allowDrop(event) {
     event.preventDefault();
-    event.target.closest('.character-card').classList.add('drag-over');
+    const card = event.target.closest ? event.target.closest('.character-card') : null;
+    if (card) card.classList.add('drag-over');
 }
 
 function dropWeapon(event) {
     event.preventDefault();
-    const characterCard = event.target.closest('.character-card');
+    const characterCard = event.target.closest ? event.target.closest('.character-card') : null;
+    if (!characterCard) return;
     characterCard.classList.remove('drag-over');
-    
-    const weaponId = event.dataTransfer.getData("text/plain");
+
+    // Try several keys to be resilient across browsers and our dragStart
+    let weaponId = event.dataTransfer.getData('text/plain') || event.dataTransfer.getData('weapon-id') || event.dataTransfer.getData('weaponId');
+    // As a last resort, if the drop originated from a nested element, try to find the dragging card
+    if (!weaponId) {
+        const dragging = document.querySelector('.weapon-card.dragging');
+        if (dragging) weaponId = dragging.dataset.weaponId;
+    }
+
+    console.log('dropWeapon: weaponId=', weaponId);
     const characterId = characterCard.dataset.characterId;
     const weaponSlot = characterCard.querySelector('.weapon-slot');
     
@@ -346,19 +364,20 @@ function dropWeapon(event) {
     }
     
     // Équiper la nouvelle arme
-    const weaponCard = document.querySelector(`[data-weapon-id="${weaponId}"]`);
+    const weaponCard = weaponId ? document.querySelector(`[data-weapon-id="${weaponId}"]`) : null;
     if (weaponCard && !weaponCard.classList.contains('used')) {
         equippedWeapons[characterId] = weaponId;
-        
+
         // Mettre à jour l'interface
         weaponCard.classList.add('used');
         characterCard.classList.add('has-weapon');
         weaponSlot.classList.add('has-weapon');
-        
+
         // Afficher l'arme équipée
-        const weaponName = weaponCard.querySelector('.weapon-name').textContent;
+        const weaponNameEl = weaponCard.querySelector('.weapon-name');
+        const weaponName = weaponNameEl ? weaponNameEl.textContent : '';
         const weaponImage = weaponCard.querySelector('.weapon-img');
-        
+
         weaponSlot.innerHTML = `
             <div class="equipped-weapon">
                 <div>
@@ -368,6 +387,8 @@ function dropWeapon(event) {
                 <button class="remove-weapon" onclick="removeWeapon('${characterId}')">×</button>
             </div>
         `;
+    } else {
+        console.warn('dropWeapon: pas d\'arme trouvée ou déjà utilisée', weaponId, weaponCard);
     }
     
     // Nettoyer l'état de drag

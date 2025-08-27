@@ -5,7 +5,9 @@ namespace App\Controller\Admin;
 use App\Entity\Characters;
 use App\Entity\Roles;
 use App\Entity\Types;
+use App\Entity\TypesArmes;
 use App\Entity\User;
+use App\Entity\Weapons;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -119,6 +121,9 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('🧙‍♂️ Personnages', 'fas fa-users', Characters::class);
         yield MenuItem::linkToCrud('🛡️ Rôles', 'fas fa-shield-alt', Roles::class);
         yield MenuItem::linkToCrud('🏛️ Types', 'fas fa-building', Types::class);
+        yield MenuItem::section('Armes');
+        yield MenuItem::linkToCrud('⚔️ Armes', 'fas fa-sword', Weapons::class);
+        yield MenuItem::linkToCrud('🗡️ Types d\'armes', 'fas fa-list', TypesArmes::class);
         yield MenuItem::section('Utilisateurs');
         yield MenuItem::linkToCrud('👤 Utilisateurs', 'fas fa-user', User::class);
     }

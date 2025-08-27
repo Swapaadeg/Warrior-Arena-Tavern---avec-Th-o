@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Arme - Warrior Arena Tavern{% endblock %}
+
+{% block body %}
+<div class="form-page">
+    <h1 class="form-page-title">Créer une nouvelle arme</h1>
+
+    <div class="character-wrapper">
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        
+        <div class="form-group">
+            {{ form_label(form.name) }}
+            {{ form_widget(form.name) }}
+            {{ form_errors(form.name) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description) }}
+            {{ form_errors(form.description) }}
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.power) }}
+                {{ form_widget(form.power) }}
+                {{ form_errors(form.power) }}
+            </div>
+            
+            <div class="form-group">
+                {{ form_label(form.defense) }}
+                {{ form_widget(form.defense) }}
+                {{ form_errors(form.defense) }}
+            </div>
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(form.types) }}
+            {{ form_widget(form.types) }}
+            {{ form_errors(form.types) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(form.imageFile) }}
+            {{ form_widget(form.imageFile) }}
+            {{ form_errors(form.imageFile) }}
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Créer l'arme</button>
+            <a href="{{ path('app_weapons_index') }}" class="btn btn-secondary">Annuler</a>
+        </div>
+        
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

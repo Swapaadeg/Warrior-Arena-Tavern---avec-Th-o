@@ -1,3 +1,4 @@
+{# templates/jouer/index.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Composer une équipe{% endblock %}
@@ -7,34 +8,32 @@
 
 <div class="play-page">
     <h1 class="play-title">Composer votre équipe</h1>
-    
-    <!-- Plateau de jeu -->
+
     <div class="battle-board">
         <img src="{{ asset('mapgemini.png') }}" alt="Plateau de combat">
         <div class="board-overlay">Arène de Combat</div>
     </div>
-    
-    <!-- Sélection des personnages -->
+
     <div class="characters-selection">
         <h2 class="section-title">Choisissez vos champions</h2>
-            <span class="subtitle">Sélectionner 5 champions, ctrl+click pour sélectionner</span>
+        <span class="subtitle">Sélectionner 5 champions, ctrl+click pour sélectionner</span>
 
         <form id="team-form" method="post">
             <div class="character-grid">
                 {% for character in characters %}
                     <div class="character-card" data-character-id="{{ character.id }}" data-index="{{ loop.index0 }}">
                         <div class="selection-indicator"></div>
-                        
+
                         {% if character.imageName %}
-                            <img src="{{ asset('uploads/images/' ~ character.imageName) }}" 
-                                 alt="{{ character.name }}" 
+                            <img src="{{ asset('uploads/images/' ~ character.imageName) }}"
+                                 alt="{{ character.name }}"
                                  class="character-avatar">
                         {% else %}
                             <div class="character-avatar placeholder">?</div>
                         {% endif %}
-                        
+
                         <h3 class="character-name">{{ character.name }}</h3>
-                        
+
                         <div class="character-role">
                             {% if character.role %}
                                 {% set roleClass = character.role.name|lower %}
@@ -48,7 +47,7 @@
                                 <span class="role-name">{{ character.role.name }}</span>
                             {% endif %}
                         </div>
-                        
+
                         <div class="character-quick-stats">
                             <div class="stat">
                                 <span class="stat-label">PV</span>
@@ -63,12 +62,12 @@
                                 <span class="stat-value">{{ character.defense }}</span>
                             </div>
                         </div>
-                        
+
                         <input type="checkbox" name="team[]" value="{{ character.id }}" class="character-checkbox" style="display:none;">
                     </div>
                 {% endfor %}
             </div>
-            
+
             <div class="play-section">
                 <div class="team-counter">
                     Équipe sélectionnée : <span class="count" id="team-count">0</span>/5
@@ -79,7 +78,6 @@
     </div>
 </div>
 
-<!-- Modale de détails du personnage -->
 <div class="character-modal" id="character-modal">
     <div class="modal-content">
         <button class="modal-close" id="modal-close">&times;</button>
@@ -120,8 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const teamCountEl = document.getElementById('team-count');
     const modal = document.getElementById('character-modal');
     const modalClose = document.getElementById('modal-close');
-    
-    // Données des personnages pour la modale
+
     const charactersData = {
         {% for character in characters %}
         {{ character.id }}: {
@@ -141,90 +138,70 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
         teamCountEl.textContent = selectedCount;
         playBtn.disabled = selectedCount !== 5;
-        
-        // Mettre à jour l'apparence des cartes
         characterCards.forEach((card, idx) => {
-            if (checkboxes[idx].checked) {
-                card.classList.add('selected');
-            } else {
-                card.classList.remove('selected');
-            }
+            if (checkboxes[idx].checked) card.classList.add('selected');
+            else card.classList.remove('selected');
         });
     }
 
-    // Gestion de la sélection et de la modale
     characterCards.forEach((card, idx) => {
         card.addEventListener('click', function(e) {
-            // Empêcher le déclenchement multiple si on clique sur la checkbox
             if (e.target.tagName.toLowerCase() === 'input') return;
-            
-            // Si on maintient Ctrl/Cmd ou on clique sur l'indicateur de sélection, on sélectionne
+
             if (e.ctrlKey || e.metaKey || e.target.classList.contains('selection-indicator')) {
-                // Limiter à 5 sélections maximum
-                const currentlySelected = Array.from(checkboxes).filter(cb => cb.checked).length;
-                if (!checkboxes[idx].checked && currentlySelected >= 5) {
-                    return;
-                }
-                
+                const selected = Array.from(checkboxes).filter(cb => cb.checked).length;
+                if (!checkboxes[idx].checked && selected >= 5) return;
                 checkboxes[idx].checked = !checkboxes[idx].checked;
                 updateTeamCounter();
                 return;
             }
-            
-            // Sinon, on ouvre la modale
+
             const characterId = card.dataset.characterId;
-            const character = charactersData[characterId];
-            
-            // Remplir la modale avec les données
-            document.getElementById('modal-name').textContent = character.name;
-            document.getElementById('modal-hp').textContent = character.hp;
-            document.getElementById('modal-power').textContent = character.power;
-            document.getElementById('modal-defense').textContent = character.defense;
-            document.getElementById('modal-description-text').textContent = character.description || "Aucune description disponible.";
-            
-            // Image
+            const c = charactersData[characterId];
+
+            document.getElementById('modal-name').textContent = c.name;
+            document.getElementById('modal-hp').textContent = c.hp;
+            document.getElementById('modal-power').textContent = c.power;
+            document.getElementById('modal-defense').textContent = c.defense;
+            document.getElementById('modal-description-text').textContent = c.description || "Aucune description disponible.";
+
             const modalAvatar = document.getElementById('modal-avatar');
-            if (character.imageName) {
-                modalAvatar.src = "{{ asset('uploads/images/') }}" + character.imageName;
-                modalAvatar.alt = character.name;
+            if (c.imageName) {
+                modalAvatar.src = "{{ asset('uploads/images/') }}" + c.imageName;
+                modalAvatar.alt = c.name;
                 modalAvatar.style.display = 'block';
             } else {
                 modalAvatar.style.display = 'none';
             }
-            
-            // Rôle
+
             const modalRole = document.getElementById('modal-role');
-            if (character.role) {
-                modalRole.innerHTML = '<span class="role-name">' + character.role + '</span>';
+            if (c.role) {
+                modalRole.innerHTML = '<span class="role-name">' + c.role + '</span>';
                 modalRole.style.display = 'flex';
             } else {
                 modalRole.style.display = 'none';
             }
-            // Type
+
             const modalType = document.getElementById('modal-type');
-            if (character.type) {
-                modalType.innerHTML = '<span class="tag-label">Type :</span> <span class="badge bg-info">' + character.type + '</span>';
+            if (c.type) {
+                modalType.innerHTML = '<span class="tag-label">Type :</span> <span class="badge bg-info">' + c.type + '</span>';
                 modalType.style.display = 'flex';
             } else {
                 modalType.style.display = 'none';
             }
-            
+
             modal.classList.add('active');
         });
     });
-    
-    // Fermeture de la modale
+
     modalClose.addEventListener('click', function() {
         modal.classList.remove('active');
     });
-    
+
     modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            modal.classList.remove('active');
-        }
+        if (e.target === modal) modal.classList.remove('active');
     });
-    
-    // Fermeture avec Escape
+
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && modal.classList.contains('active')) {
             modal.classList.remove('active');
@@ -234,5 +211,4 @@ document.addEventListener('DOMContentLoaded', function() {
     updateTeamCounter();
 });
 </script>
-
 {% endblock %}

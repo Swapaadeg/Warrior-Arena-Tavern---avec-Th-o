@@ -1,71 +1,66 @@
+{# templates/jouer/match.html.twig #}
 {% extends 'base.html.twig' %}
-
 {% block title %}Matchmaking{% endblock %}
 
 {% block body %}
-<img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
 <div class="match-page">
-    <div class="players-names">
-        <span class="player-name gold-animated">{{ app.user.username }}</span>
-        <span class="vs-label">VS</span>
-        {% if opponent %}
-            <span class="player-name gold-animated">{{ opponent.username }}</span>
-        {% endif %}
-    </div>
-    <div class="team-avatars">
-        {# Team 1: tanks #}
-        {% set tanks1 = my_team|filter(c => c.role and c.role.name|lower == 'tank') %}
-        {% for tank in tanks1 %}
-            <div class="avatar-container team1-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
-            </div>
-        {% endfor %}
-        {# Team 1: dps #}
-        {% set dps1 = my_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
-        {% for dps in dps1 %}
-            <div class="avatar-container team1-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
-            </div>
-        {% endfor %}
-        {# Team 1: heals #}
-        {% set heals1 = my_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
-        {% for heal in heals1 %}
-            <div class="avatar-container team1-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
-            </div>
-        {% endfor %}
+  <div class="players-names">
+    <span class="player-name gold-animated">{{ app.user.username }}</span>
+    <span class="vs-label">VS</span>
+    <span class="player-name gold-animated" id="opponent-name-ui" style="display:none;"></span>
+  </div>
 
-        {# Team 2: tanks #}
-        {% set tanks2 = opponent_team|filter(c => c.role and c.role.name|lower == 'tank') %}
-        {% for tank in tanks2 %}
-            <div class="avatar-container team2-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
-            </div>
-        {% endfor %}
-        {# Team 2: dps #}
-        {% set dps2 = opponent_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
-        {% for dps in dps2 %}
-            <div class="avatar-container team2-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
-            </div>
-        {% endfor %}
-        {# Team 2: heals #}
-        {% set heals2 = opponent_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
-        {% for heal in heals2 %}
-            <div class="avatar-container team2-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
-            </div>
-        {% endfor %}
+  <section id="searching-section">
+    <div class="mm-panel">
+      <p id="mm-status">Click “Rechercher un adversaire”.</p>
+      <p id="mm-waiting"></p>
+      <div class="mm-actions">
+        <button id="start-mm" class="btn btn-primary" type="button">Rechercher un adversaire</button>
+        <button id="cancel-mm" class="btn btn-secondary" type="button">Annuler</button>
+        <button id="play-suggested" class="btn btn-success" type="button" style="display:none;">Jouer l’adversaire proposé</button>
+      </div>
     </div>
-    <div class="match-info">
-        <form method="post" action="{{ path('jouer_battle') }}">
-            {% if opponent %}
-                <input type="hidden" name="opponentId" value="{{ opponent.id }}">
-                <button type="submit" class="play-btn match-btn">Lancer la bataille</button>
-            {% else %}
-                <div class="alert alert-warning">Aucun adversaire trouvé pour le matchmaking.</div>
-            {% endif %}
-        </form>
+  </section>
+
+  <section id="lobby-section" style="display:none;">
+    <div class="mm-panel">
+      <h3>Salon de match</h3>
+      <p>Adversaire : <strong id="opponent-name">—</strong></p>
+
+      <div class="mm-ready">
+        <p id="ready-status">En attente…</p>
+        <button id="ready-btn" class="btn btn-primary" type="button">Je suis prêt</button>
+      </div>
+
+      <div class="mm-launch" style="margin-top:1rem;">
+        <button id="launch-btn" class="btn btn-success" type="button" style="display:none;">Lancer le combat</button>
+      </div>
+
+      <div class="mm-cancel" style="margin-top:1rem;">
+        <button id="cancel-match" class="btn btn-secondary" type="button">Annuler le match</button>
+      </div>
     </div>
+  </section>
+
+  <form id="battle-form" action="{{ path('jouer_battle') }}" method="post" style="display:none;">
+    <input type="hidden" name="opponentId" id="opponentId" value="">
+  </form>
 </div>
+
+{% set my_team_id = my_team is defined and my_team.id is defined ? my_team.id : (my_team_id is defined ? my_team_id : null) %}
+<div id="mm-config"
+     data-join-url="{{ my_team_id ? path('jouer_mm_join', {id: my_team_id}) : '' }}"
+     data-cancel-url="{{ path('jouer_mm_cancel') }}"
+     data-ready-url-template="{{ path('jouer_mm_ready', {id: 0}) }}"
+     data-status-url-template="{{ path('jouer_mm_status', {id: 0}) }}"
+     data-launch-url-template="{{ path('jouer_mm_launch', {id: 0}) }}"
+     data-battle-action="{{ path('jouer_battle') }}">
+</div>
+
+{{ encore_entry_script_tags('matchmaking') }}
+
+<style>
+  .mm-panel { padding:1rem; border:1px solid #444; border-radius:.5rem; }
+  .mm-actions > * { margin-right:.5rem; }
+</style>
 {% endblock %}

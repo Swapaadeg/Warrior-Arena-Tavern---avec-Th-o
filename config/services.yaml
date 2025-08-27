@@ -6,7 +6,6 @@
 parameters:
 
 services:
-    # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
@@ -19,6 +18,22 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    # Configure LockFactory for MatchmakingService
+    mm_lock_store:
+        class: Symfony\Component\Lock\Store\FlockStore
+        
+    mm_lock_factory:
+        class: Symfony\Component\Lock\LockFactory
+        arguments: ['@mm_lock_store']
+        
+    App\Service\MatchmakingService:
+        autowire: false
+        arguments:
+           - '@cache.app'
+           - '@mm_lock_factory'
+           - '@App\Repository\TeamsRepository'
+           - 30
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

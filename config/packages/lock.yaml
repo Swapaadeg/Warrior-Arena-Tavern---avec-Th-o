@@ -1,0 +1,4 @@
+framework:
+  lock:
+    resources:
+      mm_lock: 'flock'   # en prod, remplacer par redis: 'redis://localhost'

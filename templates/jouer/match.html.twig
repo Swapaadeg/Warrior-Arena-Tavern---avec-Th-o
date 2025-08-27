@@ -1,71 +1,313 @@
+{# templates/jouer/match.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Matchmaking{% endblock %}
 
 {% block body %}
-<img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
-<div class="match-page">
-    <div class="players-names">
-        <span class="player-name gold-animated">{{ app.user.username }}</span>
-        <span class="vs-label">VS</span>
-        {% if opponent %}
-            <span class="player-name gold-animated">{{ opponent.username }}</span>
-        {% endif %}
-    </div>
-    <div class="team-avatars">
-        {# Team 1: tanks #}
-        {% set tanks1 = my_team|filter(c => c.role and c.role.name|lower == 'tank') %}
-        {% for tank in tanks1 %}
-            <div class="avatar-container team1-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
-            </div>
-        {% endfor %}
-        {# Team 1: dps #}
-        {% set dps1 = my_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
-        {% for dps in dps1 %}
-            <div class="avatar-container team1-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
-            </div>
-        {% endfor %}
-        {# Team 1: heals #}
-        {% set heals1 = my_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
-        {% for heal in heals1 %}
-            <div class="avatar-container team1-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
-            </div>
-        {% endfor %}
+  <img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
 
-        {# Team 2: tanks #}
+  {# expected context:
+     - my_team: Character[]
+     - my_team_id: int
+     - opponent (optional): User
+     - opponent_team (optional): Character[]
+  #}
+
+  <div class="match-page">
+    <div class="players-names">
+      <span class="player-name gold-animated">{{ app.user.username }}</span>
+      <span class="vs-label">VS</span>
+      {% if opponent is defined and opponent %}
+        <span class="player-name gold-animated">{{ opponent.username }}</span>
+      {% else %}
+        <span id="mm-waiting" class="player-name">searching…</span>
+      {% endif %}
+    </div>
+
+    <div class="team-avatars">
+      {# === TEAM 1 === #}
+      {% set tanks1 = my_team|filter(c => c.role and c.role.name|lower == 'tank') %}
+      {% for tank in tanks1 %}
+        <div class="avatar-container team1-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+          <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
+        </div>
+      {% endfor %}
+
+      {% set dps1 = my_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
+      {% for dps in dps1 %}
+        <div class="avatar-container team1-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+          <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
+        </div>
+      {% endfor %}
+
+      {% set heals1 = my_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
+      {% for heal in heals1 %}
+        <div class="avatar-container team1-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+          <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
+        </div>
+      {% endfor %}
+
+      {# === TEAM 2 (server-rendered when matched) === #}
+      {% if opponent_team is defined and opponent_team %}
         {% set tanks2 = opponent_team|filter(c => c.role and c.role.name|lower == 'tank') %}
         {% for tank in tanks2 %}
-            <div class="avatar-container team2-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
-            </div>
+          <div class="avatar-container team2-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+            <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
+          </div>
         {% endfor %}
-        {# Team 2: dps #}
+
         {% set dps2 = opponent_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
         {% for dps in dps2 %}
-            <div class="avatar-container team2-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
-            </div>
+          <div class="avatar-container team2-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+            <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
+          </div>
         {% endfor %}
-        {# Team 2: heals #}
+
         {% set heals2 = opponent_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
         {% for heal in heals2 %}
-            <div class="avatar-container team2-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
-            </div>
+          <div class="avatar-container team2-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+            <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
+          </div>
         {% endfor %}
+      {% endif %}
     </div>
+
     <div class="match-info">
-        <form method="post" action="{{ path('jouer_battle') }}">
-            {% if opponent %}
-                <input type="hidden" name="opponentId" value="{{ opponent.id }}">
-                <button type="submit" class="play-btn match-btn">Lancer la bataille</button>
-            {% else %}
-                <div class="alert alert-warning">Aucun adversaire trouvé pour le matchmaking.</div>
-            {% endif %}
-        </form>
+      <form id="battle-form" method="post" action="{{ path('jouer_battle') }}">
+        <input type="hidden" name="opponentId" id="opponentId" value="{% if opponent is defined and opponent %}{{ opponent.id }}{% endif %}">
+
+        {% if opponent is defined and opponent %}
+          <button type="submit" class="play-btn match-btn">Lancer la bataille</button>
+        {% else %}
+          <div id="searching-section">
+            <button type="button" id="play-suggested" class="play-btn match-btn" style="display:none">Jouer contre l'équipe proposée</button>
+            <button type="button" id="cancel-mm" class="btn btn-secondary">Annuler</button>
+            <div id="mm-status" class="alert alert-info" style="margin-top:.75rem">Recherche d'adversaire en cours…</div>
+          </div>
+        {% endif %}
+      </form>
     </div>
-</div>
+  </div>
+
+  {% if opponent is not defined or not opponent %}
+    {% if opponent is not defined or not opponent %}
+<script>
+(function () {
+  // Routes you already expose
+  const joinUrl    = "{{ path('jouer_mm_join', {id: my_team_id}) }}";
+  const cancelUrl  = "{{ path('jouer_mm_cancel') }}";
+  const processUrl = "{{ path('jouer_mm_process') }}";
+
+  // API used by the other code you showed (kept as-is)
+  const statusApi       = "/api/matchmaking/status";
+  const matchApi        = id => `/api/matchmaking/match/${id}`;
+  const markViewedApi   = id => `/api/matchmaking/match/${id}/mark-viewed`;
+
+  // DOM
+  const waitingEl = document.getElementById('mm-waiting');
+  const statusEl  = document.getElementById('mm-status');
+  const playBtn   = document.getElementById('play-suggested');
+  const cancelBtn = document.getElementById('cancel-mm');
+  const oppInput  = document.getElementById('opponentId');
+  const form      = document.getElementById('battle-form');
+
+  // State
+  let timer = null;
+  let pollCount = 0;
+  let stopped = false;
+
+  // Join once, then poll status
+  async function joinOnce() {
+    try {
+      await fetch(joinUrl, {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        credentials: 'same-origin'
+      });
+    } catch (e) {
+      if (statusEl) statusEl.textContent = 'Échec de connexion à la file.';
+    }
+  }
+
+  function start() {
+    if (timer) return;
+    timer = setInterval(tick, 2000);
+  }
+
+  function stop() {
+    if (!timer) return;
+    clearInterval(timer);
+    timer = null;
+  }
+
+  async function tick() {
+    if (stopped) return;
+
+    // Nudge your worker every 3 ticks
+    pollCount++;
+    if (pollCount % 3 === 0) {
+      try {
+        await fetch(processUrl, {
+          method: 'POST',
+          headers: {'X-Requested-With': 'XMLHttpRequest'},
+          credentials: 'same-origin'
+        });
+      } catch {}
+    }
+
+    // Primary: queue/users status
+    try {
+      const res = await fetch(statusApi, { headers: { 'Accept': 'application/json' }});
+      const data = await res.json();
+      handleStatus(data);
+      return;
+    } catch {}
+
+    // Fallback: legacy probe via your join endpoint
+    try {
+      const res = await fetch(joinUrl, {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        credentials: 'same-origin'
+      });
+      const data = await res.json();
+
+      if (data.matched === true) {
+        if (statusEl) statusEl.textContent = 'Adversaire trouvé. Chargement…';
+        location.reload();
+        return;
+      }
+
+      if (data.suggest_random_user) {
+        suggestRandom(data.suggest_random_user);
+      } else {
+        searchingUi();
+      }
+    } catch {
+      if (statusEl) statusEl.textContent = 'Erreur réseau, nouvelle tentative…';
+    }
+  }
+
+  function handleStatus(d) {
+    // Optional info
+    if (d.waiting_time != null && statusEl) {
+      statusEl.textContent = `Recherche d'adversaire en cours… (${d.waiting_time}s)`;
+    }
+
+    // Branch on status
+    switch (d.status) {
+      case 'SEARCHING':
+      case 'IN_QUEUE':
+        searchingUi();
+        break;
+
+      case 'NO_PLAYERS':
+      case 'SUGGEST_RANDOM':
+        if (d.suggest_random_user) suggestRandom(d.suggest_random_user);
+        else searchingUi();
+        break;
+
+      case 'MATCH_FOUND':
+        if (statusEl) statusEl.textContent = 'Adversaire trouvé. Chargement…';
+        stop();
+        location.reload();
+        break;
+
+      case 'MATCH_RESULT_PENDING':
+        stop();
+        announcePending(d.match);
+        break;
+
+      case 'NOT_IN_QUEUE':
+      default:
+        stop();
+        break;
+    }
+  }
+
+  function searchingUi() {
+    if (waitingEl) waitingEl.textContent = 'searching…';
+    if (statusEl)  statusEl.textContent  = 'Recherche d\'adversaire en cours…';
+    if (playBtn)   playBtn.style.display = 'none';
+  }
+
+  function suggestRandom(userId) {
+    if (waitingEl) waitingEl.textContent = 'random';
+    if (statusEl)  statusEl.textContent  = 'Aucun joueur connecté. Adversaire aléatoire disponible.';
+    if (oppInput)  oppInput.value        = userId;
+    if (playBtn)   playBtn.style.display = '';
+  }
+
+  // Pending-result UI + ticket fetch/mark
+  function announcePending(match) {
+    if (!match || !match.id) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'combat-pending-notification';
+    wrap.innerHTML = `
+      <div class="pending-combat-card">
+        <div class="pending-header">
+          <h3>⚔️ Combat Terminé</h3>
+          <p>Voulez-vous voir le déroulement ?</p>
+        </div>
+        <div class="pending-actions">
+          <button class="btn-view-combat" data-id="${match.id}"><i class="fas fa-eye"></i> Voir le combat</button>
+          <button class="btn-skip-combat" data-id="${match.id}"><i class="fas fa-forward"></i> Passer</button>
+        </div>
+      </div>`;
+    document.body.appendChild(wrap);
+
+    wrap.querySelector('.btn-view-combat')?.addEventListener('click', async (e) => {
+      const id = e.currentTarget.getAttribute('data-id');
+      try { await fetch(markViewedApi(id), { method: 'POST' }); } catch {}
+      wrap.remove();
+      if (window.gameInterface && window.gameInterface.showCombatVisualization) {
+        await window.gameInterface.showCombatVisualization(id);
+      }
+    });
+
+    wrap.querySelector('.btn-skip-combat')?.addEventListener('click', async (e) => {
+      const id = e.currentTarget.getAttribute('data-id');
+      try { await fetch(markViewedApi(id), { method: 'POST' }); } catch {}
+      wrap.remove();
+      showSimpleMatchResult(id);
+    });
+  }
+
+  async function showSimpleMatchResult(id) {
+    try {
+      const r = await fetch(matchApi(id));
+      const m = await r.json();
+      const msg = m.is_winner ? 'Victoire' : 'Défaite';
+      if (window.showNotification) window.showNotification(msg, m.is_winner ? 'success' : 'error');
+    } catch {}
+  }
+
+  // Cancel
+  cancelBtn?.addEventListener('click', async () => {
+    stopped = true;
+    stop();
+    try {
+      await fetch(cancelUrl, {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        credentials: 'same-origin'
+      });
+    } finally {
+      if (statusEl)  statusEl.textContent  = 'Recherche annulée.';
+      if (waitingEl) waitingEl.textContent = '';
+      if (playBtn)   playBtn.style.display = 'none';
+    }
+  });
+
+  // Accept suggested opponent
+  playBtn?.addEventListener('click', () => form?.submit());
+
+  // Boot
+  joinOnce().finally(start);
+})();
+</script>
+{% endif %}
+
+  {% endif %}
 {% endblock %}

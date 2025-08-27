@@ -28,9 +28,16 @@ class Teams
     #[ORM\Column]
     private ?int $totalPower = null;
 
+    /**
+     * @var Collection<int, QueueTicket>
+     */
+    #[ORM\OneToMany(targetEntity: QueueTicket::class, mappedBy: 'team')]
+    private Collection $queueTickets;
+
     public function __construct()
     {
         $this->characters = new ArrayCollection();
+        $this->queueTickets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -82,6 +89,36 @@ class Teams
     public function setTotalPower(int $totalPower): static
     {
         $this->totalPower = $totalPower;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, QueueTicket>
+     */
+    public function getQueueTickets(): Collection
+    {
+        return $this->queueTickets;
+    }
+
+    public function addQueueTicket(QueueTicket $queueTicket): static
+    {
+        if (!$this->queueTickets->contains($queueTicket)) {
+            $this->queueTickets->add($queueTicket);
+            $queueTicket->setTeam($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQueueTicket(QueueTicket $queueTicket): static
+    {
+        if ($this->queueTickets->removeElement($queueTicket)) {
+            // set the owning side to null (unless already changed)
+            if ($queueTicket->getTeam() === $this) {
+                $queueTicket->setTeam(null);
+            }
+        }
 
         return $this;
     }

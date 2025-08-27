@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -49,10 +51,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Teams $team = null;
 
+    /**
+     * @var Collection<int, QueueTicket>
+     */
+    #[ORM\OneToMany(targetEntity: QueueTicket::class, mappedBy: 'user')]
+    private Collection $queueTickets;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->queueTickets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -223,5 +232,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __wakeup(): void
     {
         $this->profileImageFile = null;
+    }
+
+    /**
+     * @return Collection<int, QueueTicket>
+     */
+    public function getQueueTickets(): Collection
+    {
+        return $this->queueTickets;
+    }
+
+    public function addQueueTicket(QueueTicket $queueTicket): static
+    {
+        if (!$this->queueTickets->contains($queueTicket)) {
+            $this->queueTickets->add($queueTicket);
+            $queueTicket->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQueueTicket(QueueTicket $queueTicket): static
+    {
+        if ($this->queueTickets->removeElement($queueTicket)) {
+            // set the owning side to null (unless already changed)
+            if ($queueTicket->getUser() === $this) {
+                $queueTicket->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

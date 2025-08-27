@@ -3,236 +3,247 @@
 {% block title %}Composer une équipe{% endblock %}
 
 {% block body %}
-<img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
+  <img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
 
-<div class="play-page">
+  <div class="play-page">
     <h1 class="play-title">Composer votre équipe</h1>
-    
+
     <!-- Plateau de jeu -->
     <div class="battle-board">
-        <img src="{{ asset('mapgemini.png') }}" alt="Plateau de combat">
-        <div class="board-overlay">Arène de Combat</div>
+      <img src="{{ asset('mapgemini.png') }}" alt="Plateau de combat">
+      <div class="board-overlay">Arène de Combat</div>
     </div>
-    
+
     <!-- Sélection des personnages -->
     <div class="characters-selection">
-        <h2 class="section-title">Choisissez vos champions</h2>
-            <span class="subtitle">Sélectionner 5 champions, ctrl+click pour sélectionner</span>
+      <h2 class="section-title">Choisissez vos champions</h2>
+      <span class="subtitle">Sélectionner 5 champions, ctrl+click pour sélectionner</span>
 
-        <form id="team-form" method="post">
-            <div class="character-grid">
-                {% for character in characters %}
-                    <div class="character-card" data-character-id="{{ character.id }}" data-index="{{ loop.index0 }}">
-                        <div class="selection-indicator"></div>
-                        
-                        {% if character.imageName %}
-                            <img src="{{ asset('uploads/images/' ~ character.imageName) }}" 
-                                 alt="{{ character.name }}" 
-                                 class="character-avatar">
-                        {% else %}
-                            <div class="character-avatar placeholder">?</div>
-                        {% endif %}
-                        
-                        <h3 class="character-name">{{ character.name }}</h3>
-                        
-                        <div class="character-role">
-                            {% if character.role %}
-                                {% set roleClass = character.role.name|lower %}
-                                {% if roleClass == 'tank' %}
-                                    <i class="fa-solid fa-shield-halved role-icon tank"></i>
-                                {% elseif roleClass == 'healer' or roleClass == 'heal' %}
-                                    <i class="fa-solid fa-heart role-icon healer"></i>
-                                {% else %}
-                                    <i class="fa-solid fa-burst role-icon dps"></i>
-                                {% endif %}
-                                <span class="role-name">{{ character.role.name }}</span>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="character-quick-stats">
-                            <div class="stat">
-                                <span class="stat-label">PV</span>
-                                <span class="stat-value">{{ character.HP }}</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">ATK</span>
-                                <span class="stat-value">{{ character.power }}</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">DEF</span>
-                                <span class="stat-value">{{ character.defense }}</span>
-                            </div>
-                        </div>
-                        
-                        <input type="checkbox" name="team[]" value="{{ character.id }}" class="character-checkbox" style="display:none;">
-                    </div>
-                {% endfor %}
-            </div>
-            
-            <div class="play-section">
-                <div class="team-counter">
-                    Équipe sélectionnée : <span class="count" id="team-count">0</span>/5
+      <form id="team-form" method="post">
+        <div class="character-grid">
+          {% for character in characters %}
+            <div class="character-card" data-character-id="{{ character.id }}" data-index="{{ loop.index0 }}">
+              <div class="selection-indicator"></div>
+
+              {% if character.imageName %}
+                <img
+                  src="{{ asset('uploads/images/' ~ character.imageName) }}"
+                  alt="{{ character.name }}"
+                  class="character-avatar">
+              {% else %}
+                <div class="character-avatar placeholder">?</div>
+              {% endif %}
+
+              <h3 class="character-name">{{ character.name }}</h3>
+
+              <div class="character-role">
+                {% if character.role %}
+                  {% set roleClass = character.role.name|lower %}
+                  {% if roleClass == 'tank' %}
+                    <i class="fa-solid fa-shield-halved role-icon tank"></i>
+                  {% elseif roleClass == 'healer' or roleClass == 'heal' %}
+                    <i class="fa-solid fa-heart role-icon healer"></i>
+                  {% else %}
+                    <i class="fa-solid fa-burst role-icon dps"></i>
+                  {% endif %}
+                  <span class="role-name">{{ character.role.name }}</span>
+                {% endif %}
+              </div>
+
+              <div class="character-quick-stats">
+                <div class="stat">
+                  <span class="stat-label">PV</span>
+                  <span class="stat-value">{{ character.HP }}</span>
                 </div>
-                <button type="submit" class="play-btn" id="play-btn" disabled>Commencer le Combat !</button>
-            </div>
-        </form>
-    </div>
-</div>
+                <div class="stat">
+                  <span class="stat-label">ATK</span>
+                  <span class="stat-value">{{ character.power }}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">DEF</span>
+                  <span class="stat-value">{{ character.defense }}</span>
+                </div>
+              </div>
 
-<!-- Modale de détails du personnage -->
-<div class="character-modal" id="character-modal">
+              <input
+                type="checkbox"
+                name="team[]"
+                value="{{ character.id }}"
+                class="character-checkbox"
+                style="display:none;">
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="play-section">
+          <div class="team-counter">
+            Équipe sélectionnée : <span class="count" id="team-count">0</span>/5
+          </div>
+          <button type="submit" class="play-btn" id="play-btn" disabled>
+            Chercher un adversaire !
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modale de détails du personnage -->
+  <div class="character-modal" id="character-modal">
     <div class="modal-content">
-        <button class="modal-close" id="modal-close">&times;</button>
-        <div class="modal-header">
-            <img src="" alt="" class="modal-avatar" id="modal-avatar">
-            <h3 class="modal-name" id="modal-name"></h3>
-            <div class="modal-role" id="modal-role"></div>
-            <div class="character-tags">
-                <div class="tag-group" id="modal-type"></div>
-            </div>
-        </div>
-        <div class="modal-stats" id="modal-stats">
-            <div class="stat">
-                <span class="stat-value" id="modal-hp"></span>
-                <span class="stat-label">Points de Vie</span>
-            </div>
-            <div class="stat">
-                <span class="stat-value" id="modal-power"></span>
-                <span class="stat-label">Puissance</span>
-            </div>
-            <div class="stat">
-                <span class="stat-value" id="modal-defense"></span>
-                <span class="stat-label">Défense</span>
-            </div>
-        </div>
-        <div class="modal-description">
-            <h4>Description</h4>
-            <p id="modal-description-text"></p>
-        </div>
-    </div>
-</div>
+      <button class="modal-close" id="modal-close">&times;</button>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const characterCards = document.querySelectorAll('.character-card');
-    const checkboxes = document.querySelectorAll('.character-checkbox');
-    const playBtn = document.getElementById('play-btn');
-    const teamCountEl = document.getElementById('team-count');
-    const modal = document.getElementById('character-modal');
-    const modalClose = document.getElementById('modal-close');
-    
-    // Données des personnages pour la modale
-    const charactersData = {
+      <div class="modal-header">
+        <img src="" alt="" class="modal-avatar" id="modal-avatar">
+        <h3 class="modal-name" id="modal-name"></h3>
+        <div class="modal-role" id="modal-role"></div>
+        <div class="character-tags">
+          <div class="tag-group" id="modal-type"></div>
+        </div>
+      </div>
+
+      <div class="modal-stats" id="modal-stats">
+        <div class="stat">
+          <span class="stat-value" id="modal-hp"></span>
+          <span class="stat-label">Points de Vie</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="modal-power"></span>
+          <span class="stat-label">Puissance</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="modal-defense"></span>
+          <span class="stat-label">Défense</span>
+        </div>
+      </div>
+
+      <div class="modal-description">
+        <h4>Description</h4>
+        <p id="modal-description-text"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const characterCards = document.querySelectorAll('.character-card');
+      const checkboxes = document.querySelectorAll('.character-checkbox');
+      const playBtn = document.getElementById('play-btn');
+      const teamCountEl = document.getElementById('team-count');
+      const modal = document.getElementById('character-modal');
+      const modalClose = document.getElementById('modal-close');
+
+      // Données des personnages pour la modale
+      const charactersData = {
         {% for character in characters %}
         {{ character.id }}: {
-            name: "{{ character.name }}",
-            hp: {{ character.HP }},
-            power: {{ character.power }},
-            defense: {{ character.defense }},
-            description: "{{ character.description|escape('js') }}",
-            imageName: "{{ character.imageName }}",
-            role: {% if character.role %}"{{ character.role.name }}"{% else %}null{% endif %},
-            type: {% if character.type %}"{{ character.type.name }}"{% else %}null{% endif %}
+          name: "{{ character.name }}",
+          hp: {{ character.HP }},
+          power: {{ character.power }},
+          defense: {{ character.defense }},
+          description: "{{ character.description|escape('js') }}",
+          imageName: "{{ character.imageName }}",
+          role: {% if character.role %}"{{ character.role.name }}"{% else %}null{% endif %},
+          type: {% if character.type %}"{{ character.type.name }}"{% else %}null{% endif %}
         }{% if not loop.last %},{% endif %}
         {% endfor %}
-    };
+      };
 
-    function updateTeamCounter() {
+      function updateTeamCounter() {
         const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
         teamCountEl.textContent = selectedCount;
         playBtn.disabled = selectedCount !== 5;
-        
+
         // Mettre à jour l'apparence des cartes
         characterCards.forEach((card, idx) => {
-            if (checkboxes[idx].checked) {
-                card.classList.add('selected');
-            } else {
-                card.classList.remove('selected');
-            }
+          if (checkboxes[idx].checked) {
+            card.classList.add('selected');
+          } else {
+            card.classList.remove('selected');
+          }
         });
-    }
+      }
 
-    // Gestion de la sélection et de la modale
-    characterCards.forEach((card, idx) => {
-        card.addEventListener('click', function(e) {
-            // Empêcher le déclenchement multiple si on clique sur la checkbox
-            if (e.target.tagName.toLowerCase() === 'input') return;
-            
-            // Si on maintient Ctrl/Cmd ou on clique sur l'indicateur de sélection, on sélectionne
-            if (e.ctrlKey || e.metaKey || e.target.classList.contains('selection-indicator')) {
-                // Limiter à 5 sélections maximum
-                const currentlySelected = Array.from(checkboxes).filter(cb => cb.checked).length;
-                if (!checkboxes[idx].checked && currentlySelected >= 5) {
-                    return;
-                }
-                
-                checkboxes[idx].checked = !checkboxes[idx].checked;
-                updateTeamCounter();
-                return;
-            }
-            
-            // Sinon, on ouvre la modale
-            const characterId = card.dataset.characterId;
-            const character = charactersData[characterId];
-            
-            // Remplir la modale avec les données
-            document.getElementById('modal-name').textContent = character.name;
-            document.getElementById('modal-hp').textContent = character.hp;
-            document.getElementById('modal-power').textContent = character.power;
-            document.getElementById('modal-defense').textContent = character.defense;
-            document.getElementById('modal-description-text').textContent = character.description || "Aucune description disponible.";
-            
-            // Image
-            const modalAvatar = document.getElementById('modal-avatar');
-            if (character.imageName) {
-                modalAvatar.src = "{{ asset('uploads/images/') }}" + character.imageName;
-                modalAvatar.alt = character.name;
-                modalAvatar.style.display = 'block';
-            } else {
-                modalAvatar.style.display = 'none';
-            }
-            
-            // Rôle
-            const modalRole = document.getElementById('modal-role');
-            if (character.role) {
-                modalRole.innerHTML = '<span class="role-name">' + character.role + '</span>';
-                modalRole.style.display = 'flex';
-            } else {
-                modalRole.style.display = 'none';
-            }
-            // Type
-            const modalType = document.getElementById('modal-type');
-            if (character.type) {
-                modalType.innerHTML = '<span class="tag-label">Type :</span> <span class="badge bg-info">' + character.type + '</span>';
-                modalType.style.display = 'flex';
-            } else {
-                modalType.style.display = 'none';
-            }
-            
-            modal.classList.add('active');
+      // Gestion de la sélection et de la modale
+      characterCards.forEach((card, idx) => {
+        card.addEventListener('click', function (e) {
+          // Empêcher le déclenchement multiple si on clique sur la checkbox
+          if (e.target.tagName.toLowerCase() === 'input') return;
+
+          // Si on maintient Ctrl/Cmd ou on clique sur l'indicateur de sélection, on sélectionne
+          if (e.ctrlKey || e.metaKey || e.target.classList.contains('selection-indicator')) {
+            // Limiter à 5 sélections maximum
+            const currentlySelected = Array.from(checkboxes).filter(cb => cb.checked).length;
+            if (!checkboxes[idx].checked && currentlySelected >= 5) return;
+
+            checkboxes[idx].checked = !checkboxes[idx].checked;
+            updateTeamCounter();
+            return;
+          }
+
+          // Sinon, on ouvre la modale
+          const characterId = card.dataset.characterId;
+          const character = charactersData[characterId];
+
+          // Remplir la modale avec les données
+          document.getElementById('modal-name').textContent = character.name;
+          document.getElementById('modal-hp').textContent = character.hp;
+          document.getElementById('modal-power').textContent = character.power;
+          document.getElementById('modal-defense').textContent = character.defense;
+          document.getElementById('modal-description-text').textContent =
+            character.description || "Aucune description disponible.";
+
+          // Image
+          const modalAvatar = document.getElementById('modal-avatar');
+          if (character.imageName) {
+            modalAvatar.src = "{{ asset('uploads/images/') }}" + character.imageName;
+            modalAvatar.alt = character.name;
+            modalAvatar.style.display = 'block';
+          } else {
+            modalAvatar.style.display = 'none';
+          }
+
+          // Rôle
+          const modalRole = document.getElementById('modal-role');
+          if (character.role) {
+            modalRole.innerHTML = '<span class="role-name">' + character.role + '</span>';
+            modalRole.style.display = 'flex';
+          } else {
+            modalRole.style.display = 'none';
+          }
+
+          // Type
+          const modalType = document.getElementById('modal-type');
+          if (character.type) {
+            modalType.innerHTML =
+              '<span class="tag-label">Type :</span> <span class="badge bg-info">' + character.type + '</span>';
+            modalType.style.display = 'flex';
+          } else {
+            modalType.style.display = 'none';
+          }
+
+          modal.classList.add('active');
         });
-    });
-    
-    // Fermeture de la modale
-    modalClose.addEventListener('click', function() {
+      });
+
+      // Fermeture de la modale
+      modalClose.addEventListener('click', function () {
         modal.classList.remove('active');
-    });
-    
-    modal.addEventListener('click', function(e) {
+      });
+
+      modal.addEventListener('click', function (e) {
         if (e.target === modal) {
-            modal.classList.remove('active');
+          modal.classList.remove('active');
         }
-    });
-    
-    // Fermeture avec Escape
-    document.addEventListener('keydown', function(e) {
+      });
+
+      // Fermeture avec Escape
+      document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && modal.classList.contains('active')) {
-            modal.classList.remove('active');
+          modal.classList.remove('active');
         }
+      });
+
+      updateTeamCounter();
     });
-
-    updateTeamCounter();
-});
-</script>
-
+  </script>
 {% endblock %}

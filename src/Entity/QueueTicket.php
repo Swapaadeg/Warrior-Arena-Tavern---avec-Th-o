@@ -35,17 +35,17 @@ class QueueTicket
         return $this->id;
     }
 
-    // public function getMmr(): ?int
-    // {
-    //     return $this->mmr;
-    // }
+    public function getMmr(): ?int
+    {
+        return $this->mmr;
+    }
 
-    // public function setMmr(int $mmr): static
-    // {
-    //     $this->mmr = $mmr;
+    public function setMmr(int $mmr): static
+    {
+        $this->mmr = $mmr;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
     public function getStatus(): ?string
     {

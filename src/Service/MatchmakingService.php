@@ -35,7 +35,7 @@ class MatchmakingService
 
         // vérifie si le joueur est déjà en recherche
         $existingTicket = $this->entityManager->getRepository(QueueTicket::class)
-            ->findOneBy(['player' => $player, 'status' => 'SEARCHING']);
+            ->findOneBy(['user' => $player, 'status' => 'SEARCHING']);
 
         if ($existingTicket) {
             $this->logger->warning(' [MATCHMAKING] Tentative de double inscription', [
@@ -49,7 +49,7 @@ class MatchmakingService
         $ticket = new QueueTicket();
         $ticket->setUser($player);
         $ticket->setTeam($team);
-        // $ticket->setMmr(1000); // met le mmr par défaut
+        $ticket->setMmr(1000); // met le mmr par défaut
         $ticket->setStatus('SEARCHING');
         $ticket->setCreatedAt(new \DateTimeImmutable());
 
@@ -74,7 +74,7 @@ class MatchmakingService
         ]);
 
         $ticket = $this->entityManager->getRepository(QueueTicket::class)
-            ->findOneBy(['player' => $player, 'status' => 'SEARCHING']);
+            ->findOneBy(['user' => $player, 'status' => 'SEARCHING']);
 
         if (!$ticket) {
             $this->logger->warning(' [MATCHMAKING] Aucune queue active à annuler', [
@@ -98,7 +98,7 @@ class MatchmakingService
     public function getUserStatus(Player $player): ?array
     {
         $ticket = $this->entityManager->getRepository(QueueTicket::class)
-            ->findOneBy(['player' => $player, 'status' => 'SEARCHING']);
+            ->findOneBy(['user' => $player, 'status' => 'SEARCHING']);
 
         if (!$ticket) {
             return null;
@@ -130,7 +130,7 @@ class MatchmakingService
 
     public function processQueue(): array
     {
-        $startTime = microtime(true); // AJOUTER CETTE LIGNE
+        $startTime = microtime(true);
         
         $tickets = $this->entityManager->getRepository(QueueTicket::class)
             ->findBy(['status' => 'SEARCHING'], ['createdAt' => 'ASC']);

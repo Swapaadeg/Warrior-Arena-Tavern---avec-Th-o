@@ -90,20 +90,16 @@
   </div>
 
   {% if opponent is not defined or not opponent %}
-    {% if opponent is not defined or not opponent %}
 <script>
 (function () {
-  // Routes you already expose
-  const joinUrl    = "{{ path('jouer_mm_join', {id: my_team_id}) }}";
-  const cancelUrl  = "{{ path('jouer_mm_cancel') }}";
-  const processUrl = "{{ path('jouer_mm_process') }}";
+  if (window.__WAT_MM_ACTIVE) return;
+  window.__WAT_MM_ACTIVE = true;
 
-  // API used by the other code you showed (kept as-is)
-  const statusApi       = "/api/matchmaking/status";
-  const matchApi        = id => `/api/matchmaking/match/${id}`;
-  const markViewedApi   = id => `/api/matchmaking/match/${id}/mark-viewed`;
+  const joinUrl     = "{{ path('jouer_mm_join', {id: my_team_id}) }}";
+  const cancelUrl   = "{{ path('jouer_mm_cancel') }}";
+  const processUrl  = "{{ path('jouer_mm_process') }}";
+  const statusUrl   = "{{ path('jouer_mm_status') }}";
 
-  // DOM
   const waitingEl = document.getElementById('mm-waiting');
   const statusEl  = document.getElementById('mm-status');
   const playBtn   = document.getElementById('play-suggested');
@@ -111,41 +107,41 @@
   const oppInput  = document.getElementById('opponentId');
   const form      = document.getElementById('battle-form');
 
-  // State
   let timer = null;
-  let pollCount = 0;
   let stopped = false;
+  let inFlight = false;
+  let tickCount = 0;
 
-  // Join once, then poll status
   async function joinOnce() {
     try {
+      // Join exactly once; backend reads team from {id} in the URL
       await fetch(joinUrl, {
         method: 'POST',
         headers: {'X-Requested-With': 'XMLHttpRequest'},
         credentials: 'same-origin'
       });
     } catch (e) {
-      if (statusEl) statusEl.textContent = 'Échec de connexion à la file.';
+      // If already in queue, backend may 400. Keep going and just poll status.
+      console.debug('join failed (continuing to poll status):', e);
     }
   }
 
   function start() {
-    if (timer) return;
-    timer = setInterval(tick, 2000);
+    if (!timer) timer = setInterval(tick, 2000);
   }
-
   function stop() {
-    if (!timer) return;
-    clearInterval(timer);
+    if (timer) clearInterval(timer);
     timer = null;
+    window.__WAT_MM_ACTIVE = false;
   }
 
   async function tick() {
-    if (stopped) return;
+    if (stopped || inFlight) return;
+    inFlight = true;
+    tickCount++;
 
-    // Nudge your worker every 3 ticks
-    pollCount++;
-    if (pollCount % 3 === 0) {
+    // Nudge the server processing every 3 ticks
+    if (tickCount % 3 === 0) {
       try {
         await fetch(processUrl, {
           method: 'POST',
@@ -155,62 +151,66 @@
       } catch {}
     }
 
-    // Primary: queue/users status
     try {
-      const res = await fetch(statusApi, { headers: { 'Accept': 'application/json' }});
-      const data = await res.json();
-      handleStatus(data);
-      return;
-    } catch {}
-
-    // Fallback: legacy probe via your join endpoint
-    try {
-      const res = await fetch(joinUrl, {
-        method: 'POST',
+      const r = await fetch(statusUrl, {
         headers: {'X-Requested-With': 'XMLHttpRequest'},
         credentials: 'same-origin'
       });
-      const data = await res.json();
-
-      if (data.matched === true) {
-        if (statusEl) statusEl.textContent = 'Adversaire trouvé. Chargement…';
-        location.reload();
-        return;
-      }
-
-      if (data.suggest_random_user) {
-        suggestRandom(data.suggest_random_user);
-      } else {
-        searchingUi();
-      }
-    } catch {
+      const d = await r.json();
+      handleStatus(d);
+    } catch (e) {
       if (statusEl) statusEl.textContent = 'Erreur réseau, nouvelle tentative…';
+    } finally {
+      inFlight = false;
     }
   }
 
   function handleStatus(d) {
-    // Optional info
-    if (d.waiting_time != null && statusEl) {
-      statusEl.textContent = `Recherche d'adversaire en cours… (${d.waiting_time}s)`;
-    }
-
-    // Branch on status
     switch (d.status) {
       case 'SEARCHING':
-      case 'IN_QUEUE':
-        searchingUi();
-        break;
-
-      case 'NO_PLAYERS':
-      case 'SUGGEST_RANDOM':
-        if (d.suggest_random_user) suggestRandom(d.suggest_random_user);
-        else searchingUi();
+        if (waitingEl) waitingEl.textContent = 'searching…';
+        if (statusEl)  statusEl.textContent  =
+          'Recherche d\'adversaire en cours…' + (d.waiting_time != null ? ` (${d.waiting_time}s)` : '');
+        if (d.suggest_random_user) {
+          if (waitingEl) waitingEl.textContent = 'random';
+          if (oppInput)  oppInput.value = d.suggest_random_user;
+          if (playBtn)   playBtn.style.display = '';
+        } else {
+          if (playBtn)   playBtn.style.display = 'none';
+        }
         break;
 
       case 'MATCH_FOUND':
-        if (statusEl) statusEl.textContent = 'Adversaire trouvé. Chargement…';
+        if (statusEl) statusEl.textContent = 'Adversaire trouvé!';
+        
+        // Update opponent name in the VS section
+        if (waitingEl) {
+          waitingEl.textContent = d.match.opponent_username;
+          waitingEl.className = 'player-name gold-animated';
+        }
+        
+        // Update the form with opponent data
+        if (oppInput) oppInput.value = d.match.opponent_id;
+        
+        // Hide search controls
+        if (playBtn) playBtn.style.display = 'none';
+        if (cancelBtn) cancelBtn.style.display = 'none';
+        
+        // Hide searching section and show battle button
+        const searchingSection = document.getElementById('searching-section');
+        if (searchingSection) {
+          searchingSection.style.display = 'none';
+          
+          // Create and show the battle button
+          const battleButton = document.createElement('button');
+          battleButton.type = 'submit';
+          battleButton.className = 'play-btn match-btn';
+          battleButton.textContent = 'Lancer la bataille';
+          battleButton.style.marginTop = '1rem';
+          form.appendChild(battleButton);
+        }
+        
         stop();
-        location.reload();
         break;
 
       case 'MATCH_RESULT_PENDING':
@@ -220,28 +220,15 @@
 
       case 'NOT_IN_QUEUE':
       default:
-        stop();
+        // Idle; keep polling to catch a late match or manual join
+        if (waitingEl) waitingEl.textContent = '';
+        if (playBtn)   playBtn.style.display = 'none';
         break;
     }
   }
 
-  function searchingUi() {
-    if (waitingEl) waitingEl.textContent = 'searching…';
-    if (statusEl)  statusEl.textContent  = 'Recherche d\'adversaire en cours…';
-    if (playBtn)   playBtn.style.display = 'none';
-  }
-
-  function suggestRandom(userId) {
-    if (waitingEl) waitingEl.textContent = 'random';
-    if (statusEl)  statusEl.textContent  = 'Aucun joueur connecté. Adversaire aléatoire disponible.';
-    if (oppInput)  oppInput.value        = userId;
-    if (playBtn)   playBtn.style.display = '';
-  }
-
-  // Pending-result UI + ticket fetch/mark
   function announcePending(match) {
     if (!match || !match.id) return;
-
     const wrap = document.createElement('div');
     wrap.className = 'combat-pending-notification';
     wrap.innerHTML = `
@@ -259,16 +246,14 @@
 
     wrap.querySelector('.btn-view-combat')?.addEventListener('click', async (e) => {
       const id = e.currentTarget.getAttribute('data-id');
-      try { await fetch(markViewedApi(id), { method: 'POST' }); } catch {}
       wrap.remove();
-      if (window.gameInterface && window.gameInterface.showCombatVisualization) {
+      if (window.gameInterface?.showCombatVisualization) {
         await window.gameInterface.showCombatVisualization(id);
       }
     });
 
     wrap.querySelector('.btn-skip-combat')?.addEventListener('click', async (e) => {
       const id = e.currentTarget.getAttribute('data-id');
-      try { await fetch(markViewedApi(id), { method: 'POST' }); } catch {}
       wrap.remove();
       showSimpleMatchResult(id);
     });
@@ -276,14 +261,13 @@
 
   async function showSimpleMatchResult(id) {
     try {
-      const r = await fetch(matchApi(id));
+      const r = await fetch(`/api/matchmaking/match/${id}`);
       const m = await r.json();
       const msg = m.is_winner ? 'Victoire' : 'Défaite';
       if (window.showNotification) window.showNotification(msg, m.is_winner ? 'success' : 'error');
     } catch {}
   }
 
-  // Cancel
   cancelBtn?.addEventListener('click', async () => {
     stopped = true;
     stop();
@@ -300,14 +284,17 @@
     }
   });
 
-  // Accept suggested opponent
   playBtn?.addEventListener('click', () => form?.submit());
 
-  // Boot
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stop();
+    else if (!stopped) start();
+  });
+  window.addEventListener('beforeunload', stop);
+
   joinOnce().finally(start);
 })();
 </script>
 {% endif %}
 
-  {% endif %}
 {% endblock %}

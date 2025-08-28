@@ -1,7 +1,228 @@
 @use "../abstracts/variables" as *;
 @use "../abstracts/mixins" as *;
 
-// ==========================================================================
-// RESPONSIVE DESIGN - WARRIOR ARENA TAVERN
-// ==========================================================================
+// ====================================
+// NAVBAR RESPONSIVE
+// ====================================
+@media (max-width: 1350px) {
+  .navbar {
+    padding: 1rem 5vw;
 
+    // Burger visible — make button transparent and remove native appearance
+    .burger {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      padding: 6px;
+      box-shadow: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+
+      &:focus {
+        outline: none;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      span {
+        display: block;
+        width: 25px;
+        height: 3px;
+        background-color: $accent-gold !important;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+        box-shadow: none !important;
+      }
+
+      &.active {
+        span:nth-child(1) {
+          transform: rotate(45deg) translate(5px, 5px);
+        }
+        span:nth-child(2) {
+          opacity: 0;
+        }
+        span:nth-child(3) {
+          transform: rotate(-45deg) translate(5px, -5px);
+        }
+      }
+    }
+
+    // Nav links vertical dropdown — ensure it overlays content
+    .nav-links {
+      @include flex(column, flex-start, center);
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: rgba($primary-dark, 0.98);
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.35s ease, opacity 0.2s ease;
+      padding: 0;
+      gap: 1rem;
+      z-index: 4000;
+      box-shadow: 0 10px 30px rgba($primary-dark, 0.6);
+
+      li {
+        width: 100%;
+        text-align: center;
+        padding: 0.8rem 0;
+
+        &::after {
+          display: none;
+        }
+      }
+
+      &.open {
+        max-height: 600px;
+        padding: 1rem 0;
+        opacity: 1;
+      }
+    }
+
+    // Auth nav en colonne
+    .auth-nav {
+      @include flex(column, center, center);
+      margin-top: 1rem;
+      gap: 0.8rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .rules-content {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    }
+    .rules-section .rules-content img {
+        width: 100%;
+        height: auto;
+    }
+    .rules-section .rules-content .rules-text {
+        width: 100%;
+    // Remove decorative absolute image on small screens to prevent overflow
+    &::after {
+      display: none;
+    }
+    }
+
+    // Compact form controls and buttons for main form wrappers
+    .register-wrapper,
+    .login-wrapper,
+    .contact-wrapper,
+    .character-wrapper {
+      padding: 2rem 2rem;
+      min-height: auto;
+      max-width: 95%;
+
+      > * {
+        max-width: 100%;
+      }
+
+      // Inputs inside wrappers
+      input[type="text"],
+      input[type="email"],
+      input[type="password"],
+      textarea,
+      select,
+      .form-control {
+        width: 90% !important;
+        max-width: 100% !important;
+        padding: 0.6rem 0.8rem !important;
+        font-size: 0.95rem !important;
+      }
+
+      // Buttons
+      .btn,
+      button,
+      input[type="submit"] {
+        padding: 0.7rem 1.6rem !important;
+        font-size: 1rem !important;
+        max-width: 100% !important;
+        width: auto !important;
+      }
+    }
+}
+
+
+// ====================================
+// FOOTER RESPONSIVE
+// ====================================
+@media (max-width: 900px) {
+  .site-footer {
+
+    .footer-content {
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+      max-width: 100%;
+
+      .footer-section {
+        width: 100%;
+        text-align: center;
+
+        h3 {
+          text-align: center;
+        }
+
+        .footer-links {
+          @include flex(column, center, center);
+          gap: 0.5rem;
+
+          li a {
+            font-size: 0.95rem;
+          }
+        }
+
+        .footer-contact p {
+          font-size: 0.95rem;
+        }
+      }
+
+      .footer-center {
+        order: 2;
+
+        .footer-logo {
+          height: 60px;
+        }
+      }
+    }
+
+    .footer-copy {
+      padding: 1rem 0 2rem;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .site-footer {
+    .footer-content {
+      gap: 0.8rem;
+
+      .footer-section {
+        h3 {
+          font-size: 1.4rem;
+        }
+
+        .footer-links li a {
+          font-size: 0.9rem;
+        }
+      }
+
+      .footer-center .footer-logo {
+        height: 48px;
+      }
+    }
+
+    .footer-copy {
+      font-size: 0.75rem;
+    }
+  }
+}

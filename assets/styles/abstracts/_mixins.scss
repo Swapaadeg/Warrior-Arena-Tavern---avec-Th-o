@@ -9,3 +9,15 @@
     align-items: $align;
     flex-wrap: $wrap;
 }
+
+@mixin decorative-image($image, $position, $offset-x, $offset-y) {
+    content: '';
+    position: absolute;
+    top: $offset-y;
+    #{$position}: $offset-x;
+    transform: translateY(-50%);
+    width: 200px;
+    height: 200px;
+    background: url(../../img/#{$image}) center/contain no-repeat;
+    z-index: 1;
+}

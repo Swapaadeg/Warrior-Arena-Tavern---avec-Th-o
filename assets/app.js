@@ -7,7 +7,6 @@
 
 import './styles/app.scss';
 import './script.js';
-import './scripts/battle.js';
-import './battle-weapons.js'
+import './battle.js';
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

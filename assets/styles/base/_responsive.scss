@@ -107,9 +107,9 @@
     .rules-section .rules-content .rules-text {
         width: 100%;
     // Remove decorative absolute image on small screens to prevent overflow
-    &::after {
-      display: none;
-    }
+        &::after {
+        display: none;
+        }
     }
 
     // Compact form controls and buttons for main form wrappers

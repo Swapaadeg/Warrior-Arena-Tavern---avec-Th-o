@@ -73,7 +73,7 @@
     <h2>Liste des personnages</h2>
     <div class="character-list">
         {% for character in characters %}
-            <div class="character-item">
+            <div class="character-item" data-image="{% if character.imageName %}{{ asset('uploads/images/' ~ character.imageName) }}{% endif %}" role="button" tabindex="0" aria-label="Voir {{ character.name }}">
                 {% if character.imageName %}
                     <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" class="character-avatar">
                 {% else %}
@@ -120,4 +120,12 @@
     </div>
 </div>
 </div>
+<!-- Character image modal -->
+<div class="character-modal" id="characterImageModal" aria-hidden="true">
+    <div class="modal-content">
+        <button class="modal-close" id="characterImageModalClose" aria-label="Fermer">&times;</button>
+        <img src="" alt="" id="characterImageModalImg" style="width:100%; height:auto; border-radius:8px; display:block;">
+    </div>
+</div>
+
 {% endblock %}

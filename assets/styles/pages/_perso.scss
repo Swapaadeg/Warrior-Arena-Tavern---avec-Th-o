@@ -42,6 +42,30 @@
             box-shadow: 0 8px 25px rgba($primary-dark, 0.3);
             border-color: $primary-brown;
         }
+        // Make whole card clickable
+        cursor: pointer;
+        position: relative;
+
+        // Decorative custom pointer
+        &::after {
+            content: '';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border-right: 2px solid rgba($primary-brown, 0.9);
+            border-bottom: 2px solid rgba($primary-brown, 0.9);
+            transform: translateY(-50%) rotate(-45deg);
+            opacity: 0.6;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        &:hover::after {
+            transform: translateY(-50%) rotate(-45deg) translateX(4px);
+            opacity: 1;
+        }
         
         .character-avatar {
             width: 80px;

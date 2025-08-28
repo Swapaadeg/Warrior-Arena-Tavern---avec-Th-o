@@ -1,0 +1,30 @@
+2025-08-28 10:45:16.476 [info] update#setState idle
+2025-08-28 10:45:36.200 [info] Extension host with pid 20192 exited with code: 0, signal: unknown.
+2025-08-28 10:45:46.409 [info] update#setState checking for updates
+2025-08-28 10:45:46.512 [info] update#setState idle
+2025-08-28 10:47:34.198 [error] [UtilityProcess type: shared-process, pid: 2540]: crashed with code -1 and reason 'crashed'
+2025-08-28 10:47:34.200 [info] Extension host with pid 12440 exited with code: 18446744073709552000, signal: unknown.
+2025-08-28 10:47:34.203 [error] [UtilityProcess id: 2, type: extensionHost, pid: 12440]: crashed with code -1 and reason 'crashed'
+2025-08-28 10:47:34.207 [error] [UtilityProcessWorker]: terminated unexpectedly with code 18446744073709552000, signal: unknown
+2025-08-28 10:47:34.208 [error] [UtilityProcess id: 1, type: fileWatcher, pid: 26016]: crashed with code -1 and reason 'crashed'
+2025-08-28 10:47:34.211 [error] ptyHost terminated unexpectedly with code 18446744073709552000
+2025-08-28 10:47:34.215 [warning] [UtilityProcess type: ptyHost, pid: 17584]: unable to kill the process
+2025-08-28 10:49:56.651 [info] Extension host with pid 23712 exited with code: 18446744073709552000, signal: unknown.
+2025-08-28 10:49:56.651 [error] [UtilityProcess id: 3, type: extensionHost, pid: 23712]: crashed with code -1 and reason 'crashed'
+2025-08-28 10:49:56.653 [error] ptyHost terminated unexpectedly with code 18446744073709552000
+2025-08-28 10:49:56.653 [warning] [UtilityProcess type: ptyHost, pid: 14404]: unable to kill the process
+2025-08-28 10:49:56.658 [error] [UtilityProcessWorker]: terminated unexpectedly with code 18446744073709552000, signal: unknown
+2025-08-28 10:49:56.658 [error] [UtilityProcess id: 1, type: fileWatcher, pid: 19212]: crashed with code -1 and reason 'crashed'
+2025-08-28 10:50:07.273 [info] Extension host with pid 18116 exited with code: 0, signal: unknown.
+2025-08-28 10:50:08.883 [error] #4: https://update.code.visualstudio.com/api/update/win32-x64/stable/6f17636121051a53c88d3e605c491d22af2ba755 - error undefined net::ERR_FAILED
+2025-08-28 10:50:08.884 [error] update#isLatestVersion(): failed to check for updates
+2025-08-28 10:50:08.884 [error] Error: net::ERR_FAILED
+    at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/browser_init:2:123921)
+    at SimpleURLLoaderWrapper.emit (node:events:518:28)
+2025-08-28 10:52:51.147 [info] Extension host with pid 26716 exited with code: 0, signal: unknown.
+2025-08-28 10:52:53.847 [error] #5: https://update.code.visualstudio.com/api/update/win32-x64/stable/6f17636121051a53c88d3e605c491d22af2ba755 - error undefined net::ERR_FAILED
+2025-08-28 10:52:53.847 [error] update#isLatestVersion(): failed to check for updates
+2025-08-28 10:52:53.848 [error] Error: net::ERR_FAILED
+    at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/browser_init:2:123921)
+    at SimpleURLLoaderWrapper.emit (node:events:518:28)
+2025-08-28 10:54:07.063 [info] Extension host with pid 22472 exited with code: 0, signal: unknown.

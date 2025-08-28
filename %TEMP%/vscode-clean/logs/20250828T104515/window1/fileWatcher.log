@@ -1,0 +1,2 @@
+2025-08-28 10:47:34.481 [error] [File Watcher (universal)] restarting watcher after unexpected error: terminated by itself unexpectedly with code 18446744073709552000, signal: unknown (ETERM)
+2025-08-28 10:49:56.724 [error] [File Watcher (universal)] restarting watcher after unexpected error: terminated by itself unexpectedly with code 18446744073709552000, signal: unknown (ETERM)

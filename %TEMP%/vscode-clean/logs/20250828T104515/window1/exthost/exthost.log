@@ -1,0 +1,91 @@
+2025-08-28 10:45:20.375 [info] Extension host with pid 20192 started
+2025-08-28 10:45:20.642 [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+2025-08-28 10:45:20.776 [info] ExtensionService#_doActivateExtension vscode.git-base, startup: true, activationEvent: '*', root cause: vscode.git
+2025-08-28 10:45:20.809 [info] ExtensionService#_doActivateExtension vscode.git, startup: true, activationEvent: '*'
+2025-08-28 10:45:20.916 [info] ExtensionService#_doActivateExtension vscode.github, startup: true, activationEvent: '*'
+2025-08-28 10:45:21.191 [info] Eager extensions activated
+2025-08-28 10:45:21.195 [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:45:21.202 [info] ExtensionService#_doActivateExtension vscode.merge-conflict, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:45:36.171 [info] Extension host terminating: renderer closed the MessagePort
+2025-08-28 10:45:36.200 [info] Extension host with pid 20192 exiting with code 0
+2025-08-28 10:45:38.899 [info] Extension host with pid 12440 started
+2025-08-28 10:45:38.900 [info] Skipping acquiring lock for c:\wamp\www\symfony\wat\%TEMP%\vscode-clean\User\workspaceStorage\cfab9f8d025208f444d128b68a9ecb00.
+2025-08-28 10:45:38.925 [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+2025-08-28 10:45:38.993 [info] ExtensionService#_doActivateExtension vscode.emmet, startup: false, activationEvent: 'onLanguage'
+2025-08-28 10:45:39.191 [info] ExtensionService#_doActivateExtension vscode.git-base, startup: true, activationEvent: '*'
+2025-08-28 10:45:39.197 [info] ExtensionService#_doActivateExtension vscode.npm, startup: true, activationEvent: 'workspaceContains:package.json'
+2025-08-28 10:45:39.273 [info] ExtensionService#_doActivateExtension vscode.github, startup: true, activationEvent: '*'
+2025-08-28 10:45:39.477 [info] Eager extensions activated
+2025-08-28 10:45:39.530 [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:45:39.540 [info] ExtensionService#_doActivateExtension vscode.merge-conflict, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:45:41.432 [info] ExtensionService#_doActivateExtension vscode.git, startup: false, activationEvent: 'api', root cause: vscode.github
+2025-08-28 10:45:44.519 [info] ExtensionService#_doActivateExtension vscode.configuration-editing, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:45:44.534 [info] ExtensionService#_doActivateExtension vscode.extension-editing, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:45:44.558 [info] ExtensionService#_doActivateExtension vscode.json-language-features, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:45:51.542 [info] ExtensionService#_doActivateExtension vscode.terminal-suggest, startup: false, activationEvent: 'onTerminalShellIntegration:*'
+2025-08-28 10:47:35.871 [info] Extension host with pid 23712 started
+2025-08-28 10:47:35.871 [info] Skipping acquiring lock for c:\wamp\www\symfony\wat\%TEMP%\vscode-clean\User\workspaceStorage\cfab9f8d025208f444d128b68a9ecb00.
+2025-08-28 10:47:35.889 [info] ExtensionService#_doActivateExtension vscode.terminal-suggest, startup: false, activationEvent: 'onTerminalShellIntegration:*'
+2025-08-28 10:47:35.957 [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+2025-08-28 10:47:36.018 [info] ExtensionService#_doActivateExtension vscode.emmet, startup: false, activationEvent: 'onLanguage'
+2025-08-28 10:47:36.061 [info] ExtensionService#_doActivateExtension vscode.configuration-editing, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:47:36.081 [info] ExtensionService#_doActivateExtension vscode.extension-editing, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:47:36.108 [info] ExtensionService#_doActivateExtension vscode.json-language-features, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:47:36.265 [info] ExtensionService#_doActivateExtension vscode.npm, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:47:36.795 [info] ExtensionService#_doActivateExtension vscode.git-base, startup: true, activationEvent: '*', root cause: vscode.git
+2025-08-28 10:47:36.802 [info] ExtensionService#_doActivateExtension vscode.git, startup: true, activationEvent: '*'
+2025-08-28 10:47:36.867 [info] ExtensionService#_doActivateExtension vscode.github, startup: true, activationEvent: '*'
+2025-08-28 10:47:37.094 [info] Eager extensions activated
+2025-08-28 10:47:37.102 [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:47:37.107 [info] ExtensionService#_doActivateExtension vscode.merge-conflict, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:49:58.065 [info] Extension host with pid 18116 started
+2025-08-28 10:49:58.065 [info] Skipping acquiring lock for c:\wamp\www\symfony\wat\%TEMP%\vscode-clean\User\workspaceStorage\cfab9f8d025208f444d128b68a9ecb00.
+2025-08-28 10:49:58.086 [info] ExtensionService#_doActivateExtension vscode.terminal-suggest, startup: false, activationEvent: 'onTerminalShellIntegration:*'
+2025-08-28 10:49:58.148 [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+2025-08-28 10:49:58.190 [info] ExtensionService#_doActivateExtension vscode.emmet, startup: false, activationEvent: 'onLanguage'
+2025-08-28 10:49:58.219 [info] ExtensionService#_doActivateExtension vscode.configuration-editing, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:49:58.237 [info] ExtensionService#_doActivateExtension vscode.extension-editing, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:49:58.262 [info] ExtensionService#_doActivateExtension vscode.json-language-features, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:49:58.382 [info] ExtensionService#_doActivateExtension vscode.npm, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:49:58.920 [info] ExtensionService#_doActivateExtension vscode.git-base, startup: true, activationEvent: '*', root cause: vscode.git
+2025-08-28 10:49:58.930 [info] ExtensionService#_doActivateExtension vscode.git, startup: true, activationEvent: '*'
+2025-08-28 10:49:59.004 [info] ExtensionService#_doActivateExtension vscode.github, startup: true, activationEvent: '*'
+2025-08-28 10:49:59.198 [info] Eager extensions activated
+2025-08-28 10:49:59.201 [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:49:59.208 [info] ExtensionService#_doActivateExtension vscode.merge-conflict, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:50:07.238 [info] Extension host terminating: renderer closed the MessagePort
+2025-08-28 10:50:07.272 [info] Extension host with pid 18116 exiting with code 0
+2025-08-28 10:50:09.462 [info] Extension host with pid 26716 started
+2025-08-28 10:50:09.463 [info] Skipping acquiring lock for c:\wamp\www\symfony\wat\%TEMP%\vscode-clean\User\workspaceStorage\ee26bc70c83c87142fac38bab4d97733.
+2025-08-28 10:50:09.480 [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+2025-08-28 10:50:09.517 [info] ExtensionService#_doActivateExtension vscode.emmet, startup: false, activationEvent: 'onLanguage'
+2025-08-28 10:50:09.609 [info] ExtensionService#_doActivateExtension vscode.git-base, startup: true, activationEvent: '*', root cause: vscode.git
+2025-08-28 10:50:09.620 [info] ExtensionService#_doActivateExtension vscode.npm, startup: true, activationEvent: 'workspaceContains:package.json'
+2025-08-28 10:50:09.659 [info] ExtensionService#_doActivateExtension vscode.git, startup: true, activationEvent: '*'
+2025-08-28 10:50:09.727 [info] ExtensionService#_doActivateExtension vscode.github, startup: true, activationEvent: '*'
+2025-08-28 10:50:09.998 [info] Eager extensions activated
+2025-08-28 10:50:10.004 [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:50:10.009 [info] ExtensionService#_doActivateExtension vscode.merge-conflict, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:50:12.027 [info] ExtensionService#_doActivateExtension vscode.terminal-suggest, startup: false, activationEvent: 'onTerminalShellIntegration:*'
+2025-08-28 10:50:15.286 [info] ExtensionService#_doActivateExtension vscode.configuration-editing, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:50:15.300 [info] ExtensionService#_doActivateExtension vscode.extension-editing, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:50:15.322 [info] ExtensionService#_doActivateExtension vscode.json-language-features, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:52:51.111 [info] Extension host terminating: renderer closed the MessagePort
+2025-08-28 10:52:51.145 [info] Extension host with pid 26716 exiting with code 0
+2025-08-28 10:52:53.631 [info] Extension host with pid 22472 started
+2025-08-28 10:52:53.631 [info] Skipping acquiring lock for c:\wamp\www\symfony\wat\%TEMP%\vscode-clean\User\workspaceStorage\cfab9f8d025208f444d128b68a9ecb00.
+2025-08-28 10:52:53.670 [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+2025-08-28 10:52:53.722 [info] ExtensionService#_doActivateExtension vscode.emmet, startup: false, activationEvent: 'onLanguage'
+2025-08-28 10:52:53.755 [info] ExtensionService#_doActivateExtension vscode.terminal-suggest, startup: false, activationEvent: 'onTerminalShellIntegration:*'
+2025-08-28 10:52:53.958 [info] ExtensionService#_doActivateExtension vscode.git-base, startup: true, activationEvent: '*', root cause: vscode.git
+2025-08-28 10:52:53.964 [info] ExtensionService#_doActivateExtension vscode.npm, startup: true, activationEvent: 'workspaceContains:package.json'
+2025-08-28 10:52:54.062 [info] ExtensionService#_doActivateExtension vscode.git, startup: true, activationEvent: '*'
+2025-08-28 10:52:54.145 [info] ExtensionService#_doActivateExtension vscode.github, startup: true, activationEvent: '*'
+2025-08-28 10:52:54.484 [info] Eager extensions activated
+2025-08-28 10:52:54.497 [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:52:54.501 [info] ExtensionService#_doActivateExtension vscode.merge-conflict, startup: false, activationEvent: 'onStartupFinished'
+2025-08-28 10:52:59.644 [info] ExtensionService#_doActivateExtension vscode.configuration-editing, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:52:59.658 [info] ExtensionService#_doActivateExtension vscode.extension-editing, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:52:59.679 [info] ExtensionService#_doActivateExtension vscode.json-language-features, startup: false, activationEvent: 'onLanguage:json'
+2025-08-28 10:54:07.020 [info] Extension host terminating: renderer closed the MessagePort
+2025-08-28 10:54:07.062 [info] Extension host with pid 22472 exiting with code 0

@@ -7,8 +7,16 @@ use Doctrine\Common\Collections\Collection;
 
 class CombatService
 {
-    public function simulateBattle(User $player, User $opponent): array
+    public function simulateBattle(User $player, User $opponent, ?int $seed = null): array
     {
+        // Si aucun seed n'est fourni, en générer un
+        if ($seed === null) {
+            $seed = random_int(100000, 999999);
+        }
+
+        // Initialiser le générateur de nombres aléatoires avec le seed
+        srand($seed);
+
         $myTeam = $player->getTeam() ? $player->getTeam()->getCharacters() : [];
         $oppTeam = $opponent->getTeam()->getCharacters();
         $leftArr = is_array($myTeam) ? $myTeam : (method_exists($myTeam, 'toArray') ? $myTeam->toArray() : []);
@@ -105,7 +113,7 @@ class CombatService
             }
 
             // Randomize which team acts first this tick: 'left' or 'right'
-            $firstTeam = random_int(0, 1) === 0 ? 'left' : 'right';
+            $firstTeam = rand(0, 1) === 0 ? 'left' : 'right';
 
             // closure to play actions for a team
             $playTeamActions = function(string $team, array &$actorState, array &$enemyState) use (&$actions, &$events, $opponent, &$damageTakenLeft, &$damageTakenRight, &$healedLeft, &$healedRight) {
@@ -140,7 +148,7 @@ class CombatService
                             $targetId = $aliveEnemies[array_rand($aliveEnemies)];
                         }
                         // 10% chance to land a critical hit: deals 50% more damage and ignores defense
-                        $isCrit = random_int(1, 100) <= 10;
+                        $isCrit = rand(1, 100) <= 10;
                         if ($isCrit) {
                             $dmg = max(1, (int) floor($actorState[$actorId]['power'] * 1.5));
                         } else {
@@ -211,7 +219,7 @@ class CombatService
         $setup = [
             'left' => array_map(fn($id, $s) => ['id' => $id, 'name' => $s['name'], 'hp' => $s['hp'], 'maxHp' => $s['maxHp'], 'power' => $s['power'], 'defense' => $s['defense'], 'role' => $s['role'], 'owner' => 'You'], array_keys($stateLeft), $stateLeft),
             'right' => array_map(fn($id, $s) => ['id' => $id, 'name' => $s['name'], 'hp' => $s['hp'], 'maxHp' => $s['maxHp'], 'power' => $s['power'], 'defense' => $s['defense'], 'role' => $s['role'], 'owner' => (string)$opponent->getUsername()], array_keys($stateRight), $stateRight),
-            'seed' => 42,
+            'seed' => $seed,
         ];
 
         return [

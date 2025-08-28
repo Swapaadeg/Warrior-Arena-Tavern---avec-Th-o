@@ -1,0 +1,89 @@
+{
+    "telemetry.machineId": "3e94a6acfec3a61937ea6b8bccddd03bbfd5e6ba18c05848b2a4652bd01a85b4",
+    "telemetry.sqmId": "{A801F42E-A9A1-4569-B39F-6C95FA900360}",
+    "telemetry.devDeviceId": "2fbcfd22-cef6-4d0f-b3d5-e8d331b1e316",
+    "backupWorkspaces": {
+        "workspaces": [],
+        "folders": [
+            {
+                "folderUri": "file:///c%3A/wamp/www/symfony/wat"
+            },
+            {
+                "folderUri": "file:///c%3A/wamp/www/symfony/FNLR"
+            }
+        ],
+        "emptyWindows": [
+            {
+                "backupFolder": "1756370716969"
+            }
+        ]
+    },
+    "windowControlHeight": 35,
+    "profileAssociations": {
+        "workspaces": {
+            "file:///c%3A/wamp/www/symfony/wat": "__default__profile__",
+            "file:///c%3A/wamp/www/symfony/FNLR": "__default__profile__"
+        },
+        "emptyWindows": {}
+    },
+    "theme": "vs-dark",
+    "themeBackground": "#1f1f1f",
+    "windowSplash": {
+        "zoomLevel": 0,
+        "baseTheme": "vs-dark",
+        "colorInfo": {
+            "foreground": "#cccccc",
+            "background": "#1f1f1f",
+            "editorBackground": "#1f1f1f",
+            "titleBarBackground": "#181818",
+            "titleBarBorder": "#2b2b2b",
+            "activityBarBackground": "#181818",
+            "activityBarBorder": "#2b2b2b",
+            "sideBarBackground": "#181818",
+            "sideBarBorder": "#2b2b2b",
+            "statusBarBackground": "#181818",
+            "statusBarBorder": "#2b2b2b",
+            "statusBarNoFolderBackground": "#1f1f1f"
+        },
+        "layoutInfo": {
+            "sideBarSide": "left",
+            "editorPartMinWidth": 220,
+            "titleBarHeight": 35,
+            "activityBarWidth": 48,
+            "sideBarWidth": 300,
+            "auxiliaryBarWidth": 300,
+            "statusBarHeight": 22,
+            "windowBorder": false
+        }
+    },
+    "windowsState": {
+        "lastActiveWindow": {
+            "folder": "file:///c%3A/wamp/www/symfony/wat",
+            "backupPath": "C:\\wamp\\www\\symfony\\wat\\%TEMP%\\vscode-clean\\Backups\\efc3c6c83253ac46bfe07f0f88637c59",
+            "uiState": {
+                "mode": 1,
+                "x": 40,
+                "y": 0,
+                "width": 1200,
+                "height": 800
+            }
+        },
+        "openedWindows": []
+    },
+    "windowSplashWorkspaceOverride": {
+        "layoutInfo": {
+            "sideBarWidth": 300,
+            "auxiliaryBarWidth": 300,
+            "workspaces": {
+                "cfab9f8d025208f444d128b68a9ecb00": {
+                    "sideBarVisible": true,
+                    "auxiliaryBarVisible": true
+                },
+                "ee26bc70c83c87142fac38bab4d97733": {
+                    "sideBarVisible": true,
+                    "auxiliaryBarVisible": true
+                }
+            }
+        }
+    }
+}

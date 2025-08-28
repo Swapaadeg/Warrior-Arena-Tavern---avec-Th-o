@@ -229,8 +229,8 @@ class MatchmakingService
     }
     private function createMatch(QueueTicket $ticket1, QueueTicket $ticket2): WATMatch
     {
-        $rngSeed = rand(1000, 9999);
-        
+        $rngSeed = random_int(100000, 999999);
+
         $this->logger->info('🎮 [MATCHMAKING] Création d\'un nouveau match', [
             'team_a' => $ticket1->getTeam()->getId(),
             'team_b' => $ticket2->getTeam()->getId(),
@@ -243,7 +243,7 @@ class MatchmakingService
         $match->setTeamA($ticket1->getTeam());
         $match->setTeamB($ticket2->getTeam());
         $match->setStatus('QUEUED');
-        // $match->setRngSeed($rngSeed);
+        $match->setSeed($rngSeed);
 
         $this->entityManager->persist($match);
 
@@ -255,14 +255,14 @@ class MatchmakingService
 
         $this->logger->info('✅ [MATCHMAKING] Match créé avec succès', [
             'match_id' => $match->getId(),
-            // 'rng_seed' => $match->getRngSeed(),
+            'rng_seed' => $match->getSeed(),
             'status' => $match->getStatus()
         ]);
 
-        // 🔥 NOUVEAU : Lancer automatiquement le combat
+        // 🔥 NOUVEAU : Lancer automatiquement le combat avec le seed
         $this->logger->info('⚔️ [MATCHMAKING] Lancement automatique du combat');
         try {
-            $this->combatService->simulateBattle($ticket1->getUser(), $ticket2->getUser());
+            $this->combatService->simulateBattle($ticket1->getUser(), $ticket2->getUser(), $match->getSeed());
             $this->logger->info('🏆 [MATCHMAKING] Combat terminé avec succès');
         } catch (\Exception $e) {
             $this->logger->error('❌ [MATCHMAKING] Erreur pendant le combat', [

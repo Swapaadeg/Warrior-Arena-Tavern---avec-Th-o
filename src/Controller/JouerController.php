@@ -79,8 +79,11 @@ final class JouerController extends AbstractController
             return $this->redirectToRoute('jouer'); 
         }
 
-        // Use the CombatService to simulate the battle
-        $battleResult = $combatService->simulateBattle($user, $opponent);
+        // Générer un seed pour cette bataille directe
+        $seed = random_int(100000, 999999);
+
+        // Use the CombatService to simulate the battle with the seed
+        $battleResult = $combatService->simulateBattle($user, $opponent, $seed);
 
         return $this->render('jouer/battle.html.twig', $battleResult);
     }

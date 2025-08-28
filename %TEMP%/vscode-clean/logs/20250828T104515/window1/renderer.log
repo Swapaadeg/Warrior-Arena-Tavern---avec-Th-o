@@ -1,0 +1,42 @@
+2025-08-28 10:45:18.206 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-vsliveshare.vsliveshare' wants API proposal 'notebookCellExecutionState' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:45:18.221 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-python.gather' wants API proposal 'notebookCellExecutionState' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:45:18.222 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-python.vscode-pylance' wants API proposal 'mcpConfigurationProvider' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:45:18.817 [info] Started local extension host with pid 20192.
+2025-08-28 10:45:18.892 [info] Started initializing default profile extensions in extensions installation folder. file:///c%3A/wamp/www/symfony/wat/%25TEMP%25/vscode-exts
+2025-08-28 10:45:19.370 [info] Completed initializing default profile extensions in extensions installation folder. file:///c%3A/wamp/www/symfony/wat/%25TEMP%25/vscode-exts
+2025-08-28 10:45:19.732 [info] ChatSessionStore: Migrating 0 chat sessions from storage service to file system
+2025-08-28 10:45:19.995 [info] Settings Sync: Account status changed from uninitialized to unavailable
+2025-08-28 10:45:23.549 [info] [perf] Render performance baseline is 41ms
+2025-08-28 10:45:36.705 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-vsliveshare.vsliveshare' wants API proposal 'notebookCellExecutionState' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:45:36.706 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-python.gather' wants API proposal 'notebookCellExecutionState' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:45:36.707 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-python.vscode-pylance' wants API proposal 'mcpConfigurationProvider' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:45:37.105 [info] ChatSessionStore: Migrating 0 chat sessions from storage service to file system
+2025-08-28 10:45:37.571 [info] Started local extension host with pid 12440.
+2025-08-28 10:45:38.991 [info] Settings Sync: Account status changed from uninitialized to unavailable
+2025-08-28 10:45:40.039 [info] [perf] Render performance baseline is 43ms
+2025-08-28 10:47:34.274 [error] Extension host (LocalProcess pid: 12440) terminated unexpectedly. The following extensions were running: vscode.github-authentication, vscode.emmet, vscode.git-base, vscode.npm, vscode.github, vscode.debug-auto-launch, vscode.merge-conflict, vscode.git, vscode.configuration-editing, vscode.extension-editing, vscode.json-language-features, vscode.terminal-suggest
+2025-08-28 10:47:34.275 [info] Automatically restarting the extension host.
+2025-08-28 10:47:34.356 [error] [UtilityProcessWorker]: terminated unexpectedly with code 18446744073709552000, signal: unknown
+2025-08-28 10:47:34.365 [error] [File Watcher (universal)] restarting watcher after unexpected error: terminated by itself unexpectedly with code 18446744073709552000, signal: unknown (ETERM)
+2025-08-28 10:47:34.515 [info] Started local extension host with pid 23712.
+2025-08-28 10:49:56.664 [error] Extension host (LocalProcess pid: 23712) terminated unexpectedly. The following extensions were running: vscode.github-authentication, vscode.emmet, vscode.git-base, vscode.npm, vscode.github, vscode.debug-auto-launch, vscode.merge-conflict, vscode.git, vscode.configuration-editing, vscode.extension-editing, vscode.json-language-features, vscode.terminal-suggest
+2025-08-28 10:49:56.664 [info] Automatically restarting the extension host.
+2025-08-28 10:49:56.723 [error] [UtilityProcessWorker]: terminated unexpectedly with code 18446744073709552000, signal: unknown
+2025-08-28 10:49:56.725 [error] [File Watcher (universal)] restarting watcher after unexpected error: terminated by itself unexpectedly with code 18446744073709552000, signal: unknown (ETERM)
+2025-08-28 10:49:56.786 [info] Started local extension host with pid 18116.
+2025-08-28 10:50:07.250 [warning] [backup tracker] suspended, ignoring unregister event file:///c%3A/wamp/www/symfony/wat/package.json 
+2025-08-28 10:50:07.819 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-vsliveshare.vsliveshare' wants API proposal 'notebookCellExecutionState' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:50:07.819 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-python.gather' wants API proposal 'notebookCellExecutionState' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:50:07.820 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-python.vscode-pylance' wants API proposal 'mcpConfigurationProvider' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:50:08.158 [info] ChatSessionStore: Migrating 0 chat sessions from storage service to file system
+2025-08-28 10:50:08.569 [info] Started local extension host with pid 26716.
+2025-08-28 10:50:11.352 [info] [perf] Render performance baseline is 51ms
+2025-08-28 10:52:51.132 [warning] [backup tracker] suspended, ignoring unregister event file:///c%3A/wamp/www/symfony/FNLR/vendor/symfony/ux-turbo/assets/package.json 
+2025-08-28 10:52:51.133 [warning] [backup tracker] suspended, ignoring unregister event file:///c%3A/wamp/www/symfony/FNLR/package.json 
+2025-08-28 10:52:51.819 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-vsliveshare.vsliveshare' wants API proposal 'notebookCellExecutionState' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:52:51.819 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-python.gather' wants API proposal 'notebookCellExecutionState' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:52:51.820 [warning] Via 'product.json#extensionEnabledApiProposals' extension 'ms-python.vscode-pylance' wants API proposal 'mcpConfigurationProvider' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+2025-08-28 10:52:52.744 [info] Started local extension host with pid 22472.
+2025-08-28 10:52:55.276 [info] [perf] Render performance baseline is 46ms
+2025-08-28 10:54:07.040 [warning] [backup tracker] suspended, ignoring unregister event file:///c%3A/wamp/www/symfony/wat/vendor/symfony/ux-turbo/assets/package.json 
+2025-08-28 10:54:07.041 [warning] [backup tracker] suspended, ignoring unregister event file:///c%3A/wamp/www/symfony/wat/package.json 

@@ -27,6 +27,9 @@ class WATMatch
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $status = null;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $seed = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -76,6 +79,18 @@ class WATMatch
     public function setStatus(?string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getSeed(): ?int
+    {
+        return $this->seed;
+    }
+
+    public function setSeed(?int $seed): static
+    {
+        $this->seed = $seed;
 
         return $this;
     }

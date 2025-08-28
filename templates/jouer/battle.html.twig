@@ -114,6 +114,18 @@
         <div class="round-counter">
             <span id="round-counter">Round: 0</span>
         </div>
+
+        <!-- Affichage du seed RNG pour vérification -->
+        <div class="seed-info">
+            <strong>RNG Seed:</strong>
+            <span class="seed-value" style="font-family: monospace; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; color: #333;">
+                {{ setup.seed }}
+            </span>
+            <small style="color: #666; display: block; margin-top: 2px;">
+                Les deux joueurs doivent voir le même seed pour une bataille identique
+            </small>
+        </div>
+
         <div class="battle-log-section">
             <h3 class="log-title">Journal du combat</h3>
             <div id="battle-log" class="battle-log"></div>

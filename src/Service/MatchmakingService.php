@@ -242,7 +242,7 @@ class MatchmakingService
         $match = new WATMatch();
         $match->setTeamA($ticket1->getTeam());
         $match->setTeamB($ticket2->getTeam());
-        $match->setStatus('QUEUED');
+        $match->setStatus('READY'); // Changé de QUEUED à READY
         $match->setSeed($rngSeed);
 
         $this->entityManager->persist($match);
@@ -259,17 +259,7 @@ class MatchmakingService
             'status' => $match->getStatus()
         ]);
 
-        // 🔥 NOUVEAU : Lancer automatiquement le combat avec le seed
-        $this->logger->info('⚔️ [MATCHMAKING] Lancement automatique du combat');
-        try {
-            $this->combatService->simulateBattle($ticket1->getUser(), $ticket2->getUser(), $match->getSeed());
-            $this->logger->info('🏆 [MATCHMAKING] Combat terminé avec succès');
-        } catch (\Exception $e) {
-            $this->logger->error('❌ [MATCHMAKING] Erreur pendant le combat', [
-                'error' => $e->getMessage(),
-                'match_id' => $match->getId()
-            ]);
-        }
+        // Le combat sera lancé manuellement par les joueurs avec le seed stocké
 
         return $match;
     }

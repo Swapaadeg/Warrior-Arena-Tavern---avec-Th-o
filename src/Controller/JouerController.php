@@ -63,7 +63,7 @@ final class JouerController extends AbstractController
     }
 
     #[Route('/jouer/battle', name: 'jouer_battle', methods: ['POST'])]
-    public function battle(Request $request, UserRepository $userRepository, CombatService $combatService): Response
+    public function battle(Request $request, UserRepository $userRepository, CombatService $combatService, EntityManagerInterface $em): Response
     {
         /** @var \App\Entity\User|null $user */
         $user = $this->getUser();
@@ -79,8 +79,36 @@ final class JouerController extends AbstractController
             return $this->redirectToRoute('jouer'); 
         }
 
-        // Générer un seed pour cette bataille directe
-        $seed = random_int(100000, 999999);
+        $seed = null;
+
+        // Chercher un match existant entre ces deux joueurs
+        $userTeam = $user->getTeam();
+        $opponentTeam = $opponent->getTeam();
+
+        if ($userTeam && $opponentTeam) {
+            $match = $em->getRepository(WATMatch::class)->createQueryBuilder('m')
+                ->where('(m.teamA = :userTeam AND m.teamB = :opponentTeam) OR (m.teamA = :opponentTeam AND m.teamB = :userTeam)')
+                ->andWhere('m.status IN (:statuses)')
+                ->setParameter('userTeam', $userTeam)
+                ->setParameter('opponentTeam', $opponentTeam)
+                ->setParameter('statuses', ['READY', 'QUEUED'])
+                ->orderBy('m.id', 'DESC')
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getOneOrNullResult();
+
+            if ($match && $match->getSeed()) {
+                $seed = $match->getSeed();
+                // Marquer le match comme en cours
+                $match->setStatus('RUNNING');
+                $em->flush();
+            }
+        }
+
+        // Si pas de match trouvé (bataille directe), générer un nouveau seed
+        if ($seed === null) {
+            $seed = random_int(100000, 999999);
+        }
 
         // Use the CombatService to simulate the battle with the seed
         $battleResult = $combatService->simulateBattle($user, $opponent, $seed);
@@ -214,7 +242,7 @@ final class JouerController extends AbstractController
 
         if ($match) {
             $st = $match->getStatus();
-            if (in_array($st, ['QUEUED','RUNNING'])) {
+            if (in_array($st, ['READY', 'QUEUED','RUNNING'])) {
                 // Get opponent info
                 $opponentTeam = $match->getTeamA() === $team ? $match->getTeamB() : $match->getTeamA();
                 $opponent = $opponentTeam->getUser();
@@ -225,7 +253,8 @@ final class JouerController extends AbstractController
                         'id' => $match->getId(),
                         'opponent_id' => $opponent->getId(),
                         'opponent_username' => $opponent->getUsername(),
-                        'opponent_team_id' => $opponentTeam->getId()
+                        'opponent_team_id' => $opponentTeam->getId(),
+                        'seed' => $match->getSeed() // Ajouter le seed pour debug
                     ]
                 ]);
             }

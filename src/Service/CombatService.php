@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\Collection;
 
 class CombatService
 {
+    private int $seedState;
+
     public function simulateBattle(User $player, User $opponent, ?int $seed = null): array
     {
         // Si aucun seed n'est fourni, en générer un
@@ -14,8 +16,8 @@ class CombatService
             $seed = random_int(100000, 999999);
         }
 
-        // Initialiser le générateur de nombres aléatoires avec le seed
-        srand($seed);
+        // Initialiser notre générateur déterministe
+        $this->seedState = $seed;
 
         $myTeam = $player->getTeam() ? $player->getTeam()->getCharacters() : [];
         $oppTeam = $opponent->getTeam()->getCharacters();
@@ -113,12 +115,12 @@ class CombatService
             }
 
             // Randomize which team acts first this tick: 'left' or 'right'
-            $firstTeam = rand(0, 1) === 0 ? 'left' : 'right';
+            $firstTeam = $this->deterministicRand(0, 1) === 0 ? 'left' : 'right';
 
             // closure to play actions for a team
             $playTeamActions = function(string $team, array &$actorState, array &$enemyState) use (&$actions, &$events, $opponent, &$damageTakenLeft, &$damageTakenRight, &$healedLeft, &$healedRight) {
                 $order = array_keys(array_filter($actorState, fn($s) => $s['alive']));
-                shuffle($order);
+                $this->deterministicShuffle($order);
                 foreach ($order as $actorId) {
                     if (!$actorState[$actorId]['alive']) continue;
                     $role = strtolower($actorState[$actorId]['role'] ?? '');
@@ -127,7 +129,7 @@ class CombatService
                         $teammates = array_keys(array_filter($actorState, fn($s, $k) => $s['alive'] && $k !== $actorId && $s['hp'] < $s['maxHp'], ARRAY_FILTER_USE_BOTH));
                         // if no damaged teammates, healer skips
                         if (count($teammates) === 0) continue;
-                        $targetId = $teammates[array_rand($teammates)];
+                        $targetId = $teammates[$this->deterministicRand(0, count($teammates) - 1)];
                         $amount = max(1, (int)$actorState[$actorId]['power']);
                         $actorState[$targetId]['hp'] = min($actorState[$targetId]['maxHp'], $actorState[$targetId]['hp'] + $amount);
                         $actorState[$targetId]['alive'] = $actorState[$targetId]['hp'] > 0;
@@ -143,12 +145,12 @@ class CombatService
                         if (count($aliveEnemies) === 0) break;
                         $tankCandidates = array_keys(array_filter($enemyState, fn($s) => $s['alive'] && str_contains(strtolower($s['role'] ?? ''), 'tank')));
                         if (count($tankCandidates) > 0) {
-                            $targetId = $tankCandidates[array_rand($tankCandidates)];
+                            $targetId = $tankCandidates[$this->deterministicRand(0, count($tankCandidates) - 1)];
                         } else {
-                            $targetId = $aliveEnemies[array_rand($aliveEnemies)];
+                            $targetId = $aliveEnemies[$this->deterministicRand(0, count($aliveEnemies) - 1)];
                         }
                         // 10% chance to land a critical hit: deals 50% more damage and ignores defense
-                        $isCrit = rand(1, 100) <= 10;
+                        $isCrit = $this->deterministicRand(1, 100) <= 10;
                         if ($isCrit) {
                             $dmg = max(1, (int) floor($actorState[$actorId]['power'] * 1.5));
                         } else {
@@ -232,5 +234,30 @@ class CombatService
             'frames' => $frames,
             'result' => $result,
         ];
+    }
+
+    /**
+     * Générateur de nombres aléatoires déterministe basé sur le seed
+     */
+    private function deterministicRand(int $min, int $max): int
+    {
+        // Linear Congruential Generator simple mais efficace
+        $this->seedState = ($this->seedState * 1103515245 + 12345) & 0x7fffffff;
+        $range = $max - $min + 1;
+        return $min + ($this->seedState % $range);
+    }
+
+    /**
+     * Shuffle déterministe d'un tableau
+     */
+    private function deterministicShuffle(array &$array): void
+    {
+        $count = count($array);
+        for ($i = $count - 1; $i > 0; $i--) {
+            $j = $this->deterministicRand(0, $i);
+            $temp = $array[$i];
+            $array[$i] = $array[$j];
+            $array[$j] = $temp;
+        }
     }
 }

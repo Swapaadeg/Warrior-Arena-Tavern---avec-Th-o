@@ -8,7 +8,6 @@ use App\Entity\WATMatch;
 use App\Service\CombatService;
 use App\Repository\UserRepository;
 use App\Service\MatchmakingService;
-use App\Repository\WeaponsRepository;
 use App\Repository\CharactersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class JouerController extends AbstractController
 {
     #[Route('/jouer', name: 'jouer')]
-    public function index(Request $request, CharactersRepository $charactersRepository, EntityManagerInterface $entityManager, UserRepository $userRepository, WeaponsRepository $weaponsRepository): Response
+    public function index(Request $request, CharactersRepository $charactersRepository, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
         $characters = $charactersRepository->findAllOrderedByRole();
 
@@ -141,12 +140,9 @@ final class JouerController extends AbstractController
         }
     }
 
-    #[Route('/jouer/mm/process', name: 'jouer_mm_process', methods: ['POST'])]
-    public function processMatchmaking(
-        Request $request,
-        MatchmakingService $matchmakingService,
-        UserRepository $userRepository
-    ): Response {
+    #[Route('/jouer/mm/cancel', name: 'jouer_mm_cancel', methods: ['POST'])]
+    public function cancelMatchmaking(Request $request, MatchmakingService $matchmakingService): JsonResponse
+    {
         if (!$request->isXmlHttpRequest()) {
             throw $this->createNotFoundException();
         }
@@ -157,90 +153,110 @@ final class JouerController extends AbstractController
             return $this->json(['error' => 'Not authenticated'], 401);
         }
 
-        $opponentId = $request->request->get('opponentId');
-        $opponent = $userRepository->find($opponentId);
-        if (!$opponent || !$opponent->getTeam()) {
-            return $this->json(['error' => "L'adversaire n'a pas d'équipe valide"], 400);
+        $success = $matchmakingService->cancelQueue($user);
+        
+        return $this->json(['success' => $success]);
+    }
+#[Route('/jouer/mm/status', name: 'jouer_mm_status', methods: ['GET'])]
+    public function matchmakingStatus(
+        Request $request,
+        MatchmakingService $matchmakingService,
+        EntityManagerInterface $em,
+        UserRepository $userRepository
+    ): JsonResponse {
+        if (!$request->isXmlHttpRequest()) {
+            throw $this->createNotFoundException();
         }
-
-        $myTeam = $user->getTeam();
-        $oppTeam = $opponent->getTeam();
-
-        if (!$myTeam || !$oppTeam) {
-            return $this->json(['error' => 'Une des deux équipes est manquante'], 400);
+    
+        /** @var \App\Entity\User|null $user */
+        $user = $this->getUser();
+        if (!$user instanceof \App\Entity\User) {
+            return $this->json(['error' => 'Not authenticated'], 401);
         }
-
-        // État initial des équipes
-        $stateLeft = [];
-        $stateRight = [];
-        foreach ($myTeam->getCharacters() as $char) {
-            $stateLeft['L'.$char->getId()] = [
-                'name' => $char->getName(),
-                'hp' => $char->getHp(),
-                'maxHp' => $char->getHp(),
-                'power' => $char->getPower(),
-                'defense' => $char->getDefense(),
-                'role' => $char->getRole(),
-                'alive' => true,
+    
+        $team = $user->getTeam();
+        if (!$team) {
+            return $this->json(['status' => 'NOT_IN_QUEUE']);
+        }
+    
+        // Still in queue?
+        $queued = $matchmakingService->getUserStatus($user);
+        if ($queued) {
+            $resp = [
+                'status'         => 'SEARCHING',
+                'waiting_time'   => $queued['waiting_time'] ?? null,
+                'players_in_queue' => $matchmakingService->getQueueSize(),
             ];
+            // Optional: propose a random opponent if nobody available
+            if (($resp['players_in_queue'] ?? 0) <= 1) {
+                $cand = $userRepository->createQueryBuilder('u')
+                    ->innerJoin('u.team', 't')
+                    ->andWhere('u != :me')->setParameter('me', $user)
+                    ->setMaxResults(1)
+                    ->getQuery()->getOneOrNullResult();
+                if ($cand) {
+                    $resp['suggest_random_user'] = $cand->getId();
+                }
+            }
+            return $this->json($resp);
         }
-        foreach ($oppTeam->getCharacters() as $char) {
-            $stateRight['R'.$char->getId()] = [
-                'name' => $char->getName(),
-                'hp' => $char->getHp(),
-                'maxHp' => $char->getHp(),
-                'power' => $char->getPower(),
-                'defense' => $char->getDefense(),
-                'role' => $char->getRole(),
-                'alive' => true,
-            ];
+    
+        // Not queued: check if a match exists for this team
+        $match = $em->getRepository(WATMatch::class)->createQueryBuilder('m')
+            ->where('m.teamA = :team OR m.teamB = :team')
+            ->setParameter('team', $team)
+            ->orderBy('m.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()->getOneOrNullResult();
+
+        if ($match) {
+            $st = $match->getStatus();
+            if (in_array($st, ['QUEUED','RUNNING'])) {
+                // Get opponent info
+                $opponentTeam = $match->getTeamA() === $team ? $match->getTeamB() : $match->getTeamA();
+                $opponent = $opponentTeam->getUser();
+                
+                return $this->json([
+                    'status' => 'MATCH_FOUND', 
+                    'match' => [
+                        'id' => $match->getId(),
+                        'opponent_id' => $opponent->getId(),
+                        'opponent_username' => $opponent->getUsername(),
+                        'opponent_team_id' => $opponentTeam->getId()
+                    ]
+                ]);
+            }
+            if (in_array($st, ['COMPLETED','DONE','FINISHED'])) {
+                return $this->json(['status' => 'MATCH_RESULT_PENDING', 'match' => ['id' => $match->getId()]]);
+            }
+        }        return $this->json(['status' => 'NOT_IN_QUEUE']);
+    }
+    #[Route('/jouer/mm/process', name: 'jouer_mm_process', methods: ['POST'])]
+    public function processMatchmaking(Request $request, MatchmakingService $matchmakingService): JsonResponse
+    {
+        if (!$request->isXmlHttpRequest()) {
+            throw $this->createNotFoundException();
         }
 
-        // Ici tu pourrais ajouter ta logique de simulation des frames
-        $frames = []; // TODO: remplir avec des étapes d’animation/combat
+        /** @var \App\Entity\User|null $user */
+        $user = $this->getUser();
+        if (!$user instanceof \App\Entity\User) {
+            return $this->json(['error' => 'Not authenticated'], 401);
+        }
 
-        // Détermination du vainqueur (simple comparaison vivants restants)
-        $leftAliveCount = count(array_filter($stateLeft, fn($s) => $s['alive']));
-        $rightAliveCount = count(array_filter($stateRight, fn($s) => $s['alive']));
-        $winner = 'draw';
-        if ($leftAliveCount > $rightAliveCount) $winner = 'left';
-        if ($rightAliveCount > $leftAliveCount) $winner = 'right';
-
-        $result = [
-            'winnerTeamId' => $winner,
-            'ticks' => count($frames),
-        ];
-
-        // Mappages utiles
-        $unitMap = array_merge($stateLeft, $stateRight);
-        $unitOwners = array_merge(
-            array_fill_keys(array_keys($stateLeft), 'You'),
-            array_fill_keys(array_keys($stateRight), $opponent->getUsername())
-        );
-
-        // Structure setup pour debug/template
-        $setup = [
-            'left' => array_map(
-                fn($id, $s) => ['id' => $id] + $s + ['owner' => 'You'],
-                array_keys($stateLeft),
-                $stateLeft
-            ),
-            'right' => array_map(
-                fn($id, $s) => ['id' => $id] + $s + ['owner' => $opponent->getUsername()],
-                array_keys($stateRight),
-                $stateRight
-            ),
-            'seed' => 42,
-        ];
-
-        return $this->render('jouer/battle.html.twig', [
-            'opponent' => $opponent,
-            'opponent_team' => $oppTeam,
-            'setup' => $setup,
-            'unit_map' => $unitMap,
-            'unit_owners' => $unitOwners,
-            'frames' => $frames,
-            'result' => $result,
-        ]);
+        // Process the matchmaking queue directly
+        try {
+            $result = $matchmakingService->processQueue();
+            return $this->json([
+                'success' => true, 
+                'message' => 'Matchmaking processing completed',
+                'result' => $result
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false, 
+                'message' => 'Failed to process matchmaking: ' . $e->getMessage()
+            ]);
+        }
     }
 }

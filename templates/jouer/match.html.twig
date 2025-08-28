@@ -75,6 +75,7 @@
     <div class="match-info">
       <form id="battle-form" method="post" action="{{ path('jouer_battle') }}">
         <input type="hidden" name="opponentId" id="opponentId" value="{% if opponent is defined and opponent %}{{ opponent.id }}{% endif %}">
+        <input type="hidden" name="matchSeed" id="matchSeed" value="">
 
         {% if opponent is defined and opponent %}
           <button type="submit" class="play-btn match-btn">Lancer la bataille</button>
@@ -105,6 +106,7 @@
   const playBtn   = document.getElementById('play-suggested');
   const cancelBtn = document.getElementById('cancel-mm');
   const oppInput  = document.getElementById('opponentId');
+  const seedInput = document.getElementById('matchSeed');
   const form      = document.getElementById('battle-form');
 
   let timer = null;
@@ -189,9 +191,10 @@
           waitingEl.className = 'player-name gold-animated';
         }
         
-        // Update the form with opponent data
+        // Update the form with opponent data AND seed
         if (oppInput) oppInput.value = d.match.opponent_id;
-        
+        if (seedInput && d.match.seed) seedInput.value = d.match.seed;
+
         // Hide search controls
         if (playBtn) playBtn.style.display = 'none';
         if (cancelBtn) cancelBtn.style.display = 'none';

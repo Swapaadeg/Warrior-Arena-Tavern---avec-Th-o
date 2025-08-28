@@ -81,31 +81,37 @@ final class JouerController extends AbstractController
 
         $seed = null;
 
-        // Chercher un match existant entre ces deux joueurs
-        $userTeam = $user->getTeam();
-        $opponentTeam = $opponent->getTeam();
+        // D'abord, vérifier si un seed a été transmis par le formulaire (matchmaking)
+        $matchSeed = $request->request->get('matchSeed');
+        if ($matchSeed && is_numeric($matchSeed)) {
+            $seed = (int)$matchSeed;
+        } else {
+            // Sinon, chercher un match existant entre ces deux joueurs
+            $userTeam = $user->getTeam();
+            $opponentTeam = $opponent->getTeam();
 
-        if ($userTeam && $opponentTeam) {
-            $match = $em->getRepository(WATMatch::class)->createQueryBuilder('m')
-                ->where('(m.teamA = :userTeam AND m.teamB = :opponentTeam) OR (m.teamA = :opponentTeam AND m.teamB = :userTeam)')
-                ->andWhere('m.status IN (:statuses)')
-                ->setParameter('userTeam', $userTeam)
-                ->setParameter('opponentTeam', $opponentTeam)
-                ->setParameter('statuses', ['READY', 'QUEUED'])
-                ->orderBy('m.id', 'DESC')
-                ->setMaxResults(1)
-                ->getQuery()
-                ->getOneOrNullResult();
+            if ($userTeam && $opponentTeam) {
+                $match = $em->getRepository(WATMatch::class)->createQueryBuilder('m')
+                    ->where('(m.teamA = :userTeam AND m.teamB = :opponentTeam) OR (m.teamA = :opponentTeam AND m.teamB = :userTeam)')
+                    ->andWhere('m.status IN (:statuses)')
+                    ->setParameter('userTeam', $userTeam)
+                    ->setParameter('opponentTeam', $opponentTeam)
+                    ->setParameter('statuses', ['READY', 'QUEUED'])
+                    ->orderBy('m.id', 'DESC')
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->getOneOrNullResult();
 
-            if ($match && $match->getSeed()) {
-                $seed = $match->getSeed();
-                // Marquer le match comme en cours
-                $match->setStatus('RUNNING');
-                $em->flush();
+                if ($match && $match->getSeed()) {
+                    $seed = $match->getSeed();
+                    // Marquer le match comme en cours
+                    $match->setStatus('RUNNING');
+                    $em->flush();
+                }
             }
         }
 
-        // Si pas de match trouvé (bataille directe), générer un nouveau seed
+        // Si toujours pas de seed trouvé (bataille directe), générer un nouveau seed
         if ($seed === null) {
             $seed = random_int(100000, 999999);
         }

@@ -1,458 +1,300 @@
+{# templates/jouer/match.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Matchmaking{% endblock %}
 
 {% block body %}
-<img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
-<div class="match-page">
+  <img src="{{ asset('bottom.png') }}" alt="Décoration" class="form-page-decoration">
+
+  {# expected context:
+     - my_team: Character[]
+     - my_team_id: int
+     - opponent (optional): User
+     - opponent_team (optional): Character[]
+  #}
+
+  <div class="match-page">
     <div class="players-names">
-        <span class="player-name gold-animated">{{ app.user.username }}</span>
-        <span class="vs-label">Prêt au Combat</span>
+      <span class="player-name gold-animated">{{ app.user.username }}</span>
+      <span class="vs-label">VS</span>
+      {% if opponent is defined and opponent %}
+        <span class="player-name gold-animated">{{ opponent.username }}</span>
+      {% else %}
+        <span id="mm-waiting" class="player-name">searching…</span>
+      {% endif %}
     </div>
-    
-    <!-- Masquer les avatars en position absolue sur cette page -->
-    <div class="team-avatars" style="display: none;">
-        {# Afficher seulement votre équipe #}
-        {% for character in my_team %}
-            <div class="avatar-container team1-{{ character.role ? character.role.name|lower : 'default' }}{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
-                {% if character.imageName %}
-                    <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" class="avatar" title="{{ character.name }}">
-                {% else %}
-                    <div class="avatar placeholder" title="{{ character.name }}">?</div>
-                {% endif %}
-            </div>
+
+    <div class="team-avatars">
+      {# === TEAM 1 === #}
+      {% set tanks1 = my_team|filter(c => c.role and c.role.name|lower == 'tank') %}
+      {% for tank in tanks1 %}
+        <div class="avatar-container team1-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+          <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
+        </div>
+      {% endfor %}
+
+      {% set dps1 = my_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
+      {% for dps in dps1 %}
+        <div class="avatar-container team1-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+          <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
+        </div>
+      {% endfor %}
+
+      {% set heals1 = my_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
+      {% for heal in heals1 %}
+        <div class="avatar-container team1-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+          <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
+        </div>
+      {% endfor %}
+
+      {# === TEAM 2 (server-rendered when matched) === #}
+      {% if opponent_team is defined and opponent_team %}
+        {% set tanks2 = opponent_team|filter(c => c.role and c.role.name|lower == 'tank') %}
+        {% for tank in tanks2 %}
+          <div class="avatar-container team2-tank{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+            <img src="{{ asset('uploads/images/' ~ tank.imageName) }}" alt="{{ tank.name }}" class="avatar" title="{{ tank.name }}">
+          </div>
         {% endfor %}
+
+        {% set dps2 = opponent_team|filter(c => c.role and c.role.name|lower in ['dps','damage']) %}
+        {% for dps in dps2 %}
+          <div class="avatar-container team2-dps{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+            <img src="{{ asset('uploads/images/' ~ dps.imageName) }}" alt="{{ dps.name }}" class="avatar" title="{{ dps.name }}">
+          </div>
+        {% endfor %}
+
+        {% set heals2 = opponent_team|filter(c => c.role and c.role.name|lower in ['heal','healer']) %}
+        {% for heal in heals2 %}
+          <div class="avatar-container team2-heal{% if loop.index0 > 0 %} offset-{{ loop.index0 }}{% endif %}">
+            <img src="{{ asset('uploads/images/' ~ heal.imageName) }}" alt="{{ heal.name }}" class="avatar" title="{{ heal.name }}">
+          </div>
+        {% endfor %}
+      {% endif %}
     </div>
-    
-    <!-- Section d'équipement des armes -->
-    {% if random_weapons is defined and random_weapons|length > 0 %}
-    <div class="weapons-section">
-        <h2 class="section-title">Équipez vos héros</h2>
-        <p class="weapons-instruction">Glissez et déposez les armes sur vos personnages pour les équiper avant la bataille.</p>
-        
-        <!-- Équipe avec slots d'armes -->
-        <div class="team-equipment">
-            <h3>Votre Équipe</h3>
-            <div class="characters-grid" id="charactersGrid">
-                {% for character in my_team %}
-                <div class="character-card" data-character-id="{{ character.id }}" ondrop="dropWeapon(event)" ondragover="allowDrop(event)">
-                    {% if character.imageName %}
-                        <img src="{{ asset('uploads/images/' ~ character.imageName) }}" alt="{{ character.name }}" class="character-avatar">
-                    {% else %}
-                        <div class="character-avatar placeholder">?</div>
-                    {% endif %}
-                    <div class="character-name">{{ character.name }}</div>
-                    <div class="character-role">{{ character.role ? character.role.name : '' }}</div>
-                    <div class="weapon-slot" id="weapon-slot-{{ character.id }}">
-                        <span class="slot-text">Glissez une arme ici</span>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        
-        <!-- Armes disponibles -->
-        <div class="available-weapons">
-            <h3>Armes Disponibles</h3>
-            <div class="weapons-grid" id="weaponsGrid">
-                {% for weapon in random_weapons %}
-                <div class="weapon-card" draggable="true" data-weapon-id="{{ weapon.id }}" ondragstart="dragStart(event)">
-                    <div class="weapon-image">
-                        {% if weapon.imageName %}
-                            <img src="{{ asset('uploads/weapons/' ~ weapon.imageName) }}" alt="{{ weapon.name }}" class="weapon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="weapon-placeholder" style="display: none;">⚔️</div>
-                        {% else %}
-                            <div class="weapon-placeholder">⚔️</div>
-                        {% endif %}
-                    </div>
-                    <div class="weapon-name">{{ weapon.name }}</div>
-                    <div class="weapon-type">{{ weapon.types ? weapon.types.name : 'Sans type' }}</div>
-                    <div class="weapon-stats">
-                        ATK: {{ weapon.power }} | DEF: {{ weapon.defense }}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-    {% endif %}
-    
+
     <div class="match-info">
-        <form method="post" action="{{ path('jouer_battle') }}">
-            {% if opponent %}
-                <input type="hidden" name="opponentId" value="{{ opponent.id }}">
-                <button type="submit" class="play-btn match-btn">Lancer la bataille</button>
-            {% else %}
-                <div class="alert alert-warning">Aucun adversaire trouvé pour le matchmaking.</div>
-            {% endif %}
-        </form>
+      <form id="battle-form" method="post" action="{{ path('jouer_battle') }}">
+        <input type="hidden" name="opponentId" id="opponentId" value="{% if opponent is defined and opponent %}{{ opponent.id }}{% endif %}">
+
+        {% if opponent is defined and opponent %}
+          <button type="submit" class="play-btn match-btn">Lancer la bataille</button>
+        {% else %}
+          <div id="searching-section">
+            <button type="button" id="play-suggested" class="play-btn match-btn" style="display:none">Jouer contre l'équipe proposée</button>
+            <button type="button" id="cancel-mm" class="btn btn-secondary">Annuler</button>
+            <div id="mm-status" class="alert alert-info" style="margin-top:.75rem">Recherche d'adversaire en cours…</div>
+          </div>
+        {% endif %}
+      </form>
     </div>
-</div>
+  </div>
 
-<style>
-/* Styles pour la section d'armes */
-.weapons-section {
-    margin: 2rem 0;
-    padding: 2rem;
-    background: rgba(0, 0, 0, 0.3);
-    border: 2px solid #d4af37;
-    border-radius: 10px;
-}
-
-.section-title {
-    color: #d4af37;
-    font-family: 'Cinzel Decorative', serif;
-    text-align: center;
-    margin-bottom: 1rem;
-}
-
-.weapons-instruction {
-    text-align: center;
-    color: #ccc;
-    font-style: italic;
-    margin-bottom: 2rem;
-}
-
-.team-equipment, .available-weapons {
-    margin-bottom: 2rem;
-}
-
-.team-equipment h3, .available-weapons h3 {
-    color: #d4af37;
-    margin-bottom: 1rem;
-}
-
-.characters-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.character-card {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid #666;
-    border-radius: 8px;
-    padding: 1rem;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.character-card.has-weapon {
-    border-color: #d4af37;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-}
-
-.character-card.drag-over {
-    border-color: #ff6b6b;
-    background: rgba(255, 107, 107, 0.1);
-    transform: scale(1.05);
-}
-
-.character-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    margin: 0 auto 0.5rem;
-    border: 2px solid #666;
-}
-
-.character-avatar.placeholder {
-    background: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-}
-
-.avatar.placeholder {
-    background: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    font-weight: bold;
-    font-size: 1.5rem;
-    border-radius: 50%;
-    border: 2px solid #666;
-    width: 60px;
-    height: 60px;
-}
-
-.character-name {
-    color: #ffffff;
-    font-weight: bold;
-    margin-bottom: 0.3rem;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-.character-role {
-    color: #d4af37;
-    font-size: 0.8rem;
-    margin-bottom: 0.5rem;
-}
-
-.weapon-slot {
-    min-height: 50px;
-    border: 2px dashed #666;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #999;
-    font-size: 0.8rem;
-    transition: all 0.3s ease;
-}
-
-.weapon-slot.has-weapon {
-    border-color: #d4af37;
-    background: rgba(212, 175, 55, 0.1);
-}
-
-.equipped-weapon {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.3rem;
-}
-
-.equipped-weapon img {
-    width: 25px;
-    height: 25px;
-    border-radius: 3px;
-    margin-right: 0.5rem;
-}
-
-.remove-weapon {
-    background: #ff4444;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    padding: 0.1rem 0.3rem;
-    font-size: 0.7rem;
-    cursor: pointer;
-}
-
-.weapons-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-}
-
-.weapon-card {
-    background: rgba(0, 0, 0, 0.5);
-    border: 2px solid #666;
-    border-radius: 8px;
-    padding: 1rem;
-    text-align: center;
-    cursor: grab;
-    transition: all 0.3s ease;
-}
-
-.weapon-card:hover {
-    border-color: #d4af37;
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-}
-
-.weapon-card.dragging {
-    opacity: 0.5;
-    transform: rotate(5deg);
-    cursor: grabbing;
-}
-
-.weapon-card.used {
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-.weapon-image {
-    width: 50px;
-    height: 50px;
-    margin: 0 auto 0.5rem;
-    background: #333;
-    border-radius: 5px;
-    border: 1px solid #666;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.weapon-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 5px;
-}
-
-.weapon-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    font-size: 1.5rem;
-    color: #666;
-}
-
-.weapon-name {
-    color: #e0e0e0;
-    font-weight: bold;
-    margin-bottom: 0.3rem;
-    font-size: 0.8rem;
-}
-
-.weapon-type {
-    color: #d4af37;
-    font-size: 0.7rem;
-    margin-bottom: 0.3rem;
-}
-
-.weapon-stats {
-    color: #ccc;
-    font-size: 0.6rem;
-}
-</style>
-
+  {% if opponent is not defined or not opponent %}
 <script>
-let equippedWeapons = {};
+(function () {
+  if (window.__WAT_MM_ACTIVE) return;
+  window.__WAT_MM_ACTIVE = true;
 
-function dragStart(event) {
-    // Ensure we get the weapon-card element even if the inner child was the event target
-    const weaponCard = event.target.closest ? event.target.closest('.weapon-card') : null;
-    if (!weaponCard) return;
-    const weaponId = weaponCard.dataset.weaponId;
-    event.dataTransfer.setData("text/plain", weaponId);
-    // also store some helpful meta so other handlers can read if needed
-    event.dataTransfer.setData("weapon-name", weaponCard.dataset.weaponName || '');
-    event.dataTransfer.setData("weapon-power", weaponCard.dataset.weaponPower || '0');
-    event.dataTransfer.setData("weapon-defense", weaponCard.dataset.weaponDefense || '0');
-    weaponCard.classList.add('dragging');
-}
+  const joinUrl     = "{{ path('jouer_mm_join', {id: my_team_id}) }}";
+  const cancelUrl   = "{{ path('jouer_mm_cancel') }}";
+  const processUrl  = "{{ path('jouer_mm_process') }}";
+  const statusUrl   = "{{ path('jouer_mm_status') }}";
 
-function allowDrop(event) {
-    event.preventDefault();
-    const card = event.target.closest ? event.target.closest('.character-card') : null;
-    if (card) card.classList.add('drag-over');
-}
+  const waitingEl = document.getElementById('mm-waiting');
+  const statusEl  = document.getElementById('mm-status');
+  const playBtn   = document.getElementById('play-suggested');
+  const cancelBtn = document.getElementById('cancel-mm');
+  const oppInput  = document.getElementById('opponentId');
+  const form      = document.getElementById('battle-form');
 
-function dropWeapon(event) {
-    event.preventDefault();
-    const characterCard = event.target.closest ? event.target.closest('.character-card') : null;
-    if (!characterCard) return;
-    characterCard.classList.remove('drag-over');
+  let timer = null;
+  let stopped = false;
+  let inFlight = false;
+  let tickCount = 0;
 
-    // Try several keys to be resilient across browsers and our dragStart
-    let weaponId = event.dataTransfer.getData('text/plain') || event.dataTransfer.getData('weapon-id') || event.dataTransfer.getData('weaponId');
-    // As a last resort, if the drop originated from a nested element, try to find the dragging card
-    if (!weaponId) {
-        const dragging = document.querySelector('.weapon-card.dragging');
-        if (dragging) weaponId = dragging.dataset.weaponId;
+  async function joinOnce() {
+    try {
+      // Join exactly once; backend reads team from {id} in the URL
+      await fetch(joinUrl, {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        credentials: 'same-origin'
+      });
+    } catch (e) {
+      // If already in queue, backend may 400. Keep going and just poll status.
+      console.debug('join failed (continuing to poll status):', e);
+    }
+  }
+
+  function start() {
+    if (!timer) timer = setInterval(tick, 2000);
+  }
+  function stop() {
+    if (timer) clearInterval(timer);
+    timer = null;
+    window.__WAT_MM_ACTIVE = false;
+  }
+
+  async function tick() {
+    if (stopped || inFlight) return;
+    inFlight = true;
+    tickCount++;
+
+    // Nudge the server processing every 3 ticks
+    if (tickCount % 3 === 0) {
+      try {
+        await fetch(processUrl, {
+          method: 'POST',
+          headers: {'X-Requested-With': 'XMLHttpRequest'},
+          credentials: 'same-origin'
+        });
+      } catch {}
     }
 
-    console.log('dropWeapon: weaponId=', weaponId);
-    const characterId = characterCard.dataset.characterId;
-    const weaponSlot = characterCard.querySelector('.weapon-slot');
-    
-    // Vérifier si le personnage a déjà une arme
-    if (equippedWeapons[characterId]) {
-        // Libérer l'ancienne arme
-        const oldWeaponCard = document.querySelector(`[data-weapon-id="${equippedWeapons[characterId]}"]`);
-        if (oldWeaponCard) {
-            oldWeaponCard.classList.remove('used');
+    try {
+      const r = await fetch(statusUrl, {
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        credentials: 'same-origin'
+      });
+      const d = await r.json();
+      handleStatus(d);
+    } catch (e) {
+      if (statusEl) statusEl.textContent = 'Erreur réseau, nouvelle tentative…';
+    } finally {
+      inFlight = false;
+    }
+  }
+
+  function handleStatus(d) {
+    switch (d.status) {
+      case 'SEARCHING':
+        if (waitingEl) waitingEl.textContent = 'searching…';
+        if (statusEl)  statusEl.textContent  =
+          'Recherche d\'adversaire en cours…' + (d.waiting_time != null ? ` (${d.waiting_time}s)` : '');
+        if (d.suggest_random_user) {
+          if (waitingEl) waitingEl.textContent = 'random';
+          if (oppInput)  oppInput.value = d.suggest_random_user;
+          if (playBtn)   playBtn.style.display = '';
+        } else {
+          if (playBtn)   playBtn.style.display = 'none';
         }
+        break;
+
+      case 'MATCH_FOUND':
+        if (statusEl) statusEl.textContent = 'Adversaire trouvé!';
+        
+        // Update opponent name in the VS section
+        if (waitingEl) {
+          waitingEl.textContent = d.match.opponent_username;
+          waitingEl.className = 'player-name gold-animated';
+        }
+        
+        // Update the form with opponent data
+        if (oppInput) oppInput.value = d.match.opponent_id;
+        
+        // Hide search controls
+        if (playBtn) playBtn.style.display = 'none';
+        if (cancelBtn) cancelBtn.style.display = 'none';
+        
+        // Hide searching section and show battle button
+        const searchingSection = document.getElementById('searching-section');
+        if (searchingSection) {
+          searchingSection.style.display = 'none';
+          
+          // Create and show the battle button
+          const battleButton = document.createElement('button');
+          battleButton.type = 'submit';
+          battleButton.className = 'play-btn match-btn';
+          battleButton.textContent = 'Lancer la bataille';
+          battleButton.style.marginTop = '1rem';
+          form.appendChild(battleButton);
+        }
+        
+        stop();
+        break;
+
+      case 'MATCH_RESULT_PENDING':
+        stop();
+        announcePending(d.match);
+        break;
+
+      case 'NOT_IN_QUEUE':
+      default:
+        // Idle; keep polling to catch a late match or manual join
+        if (waitingEl) waitingEl.textContent = '';
+        if (playBtn)   playBtn.style.display = 'none';
+        break;
     }
-    
-    // Équiper la nouvelle arme
-    const weaponCard = weaponId ? document.querySelector(`[data-weapon-id="${weaponId}"]`) : null;
-    if (weaponCard && !weaponCard.classList.contains('used')) {
-        equippedWeapons[characterId] = weaponId;
+  }
 
-        // Mettre à jour l'interface
-        weaponCard.classList.add('used');
-        characterCard.classList.add('has-weapon');
-        weaponSlot.classList.add('has-weapon');
+  function announcePending(match) {
+    if (!match || !match.id) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'combat-pending-notification';
+    wrap.innerHTML = `
+      <div class="pending-combat-card">
+        <div class="pending-header">
+          <h3>⚔️ Combat Terminé</h3>
+          <p>Voulez-vous voir le déroulement ?</p>
+        </div>
+        <div class="pending-actions">
+          <button class="btn-view-combat" data-id="${match.id}"><i class="fas fa-eye"></i> Voir le combat</button>
+          <button class="btn-skip-combat" data-id="${match.id}"><i class="fas fa-forward"></i> Passer</button>
+        </div>
+      </div>`;
+    document.body.appendChild(wrap);
 
-        // Afficher l'arme équipée
-        const weaponNameEl = weaponCard.querySelector('.weapon-name');
-        const weaponName = weaponNameEl ? weaponNameEl.textContent : '';
-        const weaponImage = weaponCard.querySelector('.weapon-img');
-
-        weaponSlot.innerHTML = `
-            <div class="equipped-weapon">
-                <div>
-                    ${weaponImage ? `<img src="${weaponImage.src}" alt="${weaponName}">` : ''}
-                    <span>${weaponName}</span>
-                </div>
-                <button class="remove-weapon" onclick="removeWeapon('${characterId}')">×</button>
-            </div>
-        `;
-    } else {
-        console.warn('dropWeapon: pas d\'arme trouvée ou déjà utilisée', weaponId, weaponCard);
-    }
-    
-    // Nettoyer l'état de drag
-    document.querySelectorAll('.weapon-card').forEach(card => {
-        card.classList.remove('dragging');
+    wrap.querySelector('.btn-view-combat')?.addEventListener('click', async (e) => {
+      const id = e.currentTarget.getAttribute('data-id');
+      wrap.remove();
+      if (window.gameInterface?.showCombatVisualization) {
+        await window.gameInterface.showCombatVisualization(id);
+      }
     });
-}
 
-function removeWeapon(characterId) {
-    const weaponId = equippedWeapons[characterId];
-    if (weaponId) {
-        // Libérer l'arme
-        const weaponCard = document.querySelector(`[data-weapon-id="${weaponId}"]`);
-        if (weaponCard) {
-            weaponCard.classList.remove('used');
-        }
-        
-        // Nettoyer l'interface
-        const characterCard = document.querySelector(`[data-character-id="${characterId}"]`);
-        const weaponSlot = characterCard.querySelector('.weapon-slot');
-        
-        characterCard.classList.remove('has-weapon');
-        weaponSlot.classList.remove('has-weapon');
-        weaponSlot.innerHTML = '<span class="slot-text">Glissez une arme ici</span>';
-        
-        delete equippedWeapons[characterId];
-    }
-}
+    wrap.querySelector('.btn-skip-combat')?.addEventListener('click', async (e) => {
+      const id = e.currentTarget.getAttribute('data-id');
+      wrap.remove();
+      showSimpleMatchResult(id);
+    });
+  }
 
-// Modifier le formulaire de bataille pour inclure les armes équipées
-document.addEventListener('DOMContentLoaded', function() {
-    const battleForm = document.querySelector('form[action*="jouer_battle"]');
-    console.log('Form found:', battleForm);
-    
-    if (battleForm) {
-        battleForm.addEventListener('submit', function(e) {
-            console.log('Form submitted, equipped weapons:', equippedWeapons);
-            
-            // Ajouter les armes équipées au formulaire
-            for (let characterId in equippedWeapons) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = `weapons[${characterId}]`;
-                input.value = equippedWeapons[characterId];
-                battleForm.appendChild(input);
-                
-                console.log(`Added weapon ${equippedWeapons[characterId]} for character ${characterId}`);
-            }
-        });
-    } else {
-        console.error('Battle form not found!');
-    }
-});
+  async function showSimpleMatchResult(id) {
+    try {
+      const r = await fetch(`/api/matchmaking/match/${id}`);
+      const m = await r.json();
+      const msg = m.is_winner ? 'Victoire' : 'Défaite';
+      if (window.showNotification) window.showNotification(msg, m.is_winner ? 'success' : 'error');
+    } catch {}
+  }
 
-// Nettoyer les états de drag
-document.addEventListener('dragleave', function(event) {
-    if (!event.relatedTarget) {
-        document.querySelectorAll('.character-card').forEach(card => {
-            card.classList.remove('drag-over');
-        });
-        document.querySelectorAll('.weapon-card').forEach(card => {
-            card.classList.remove('dragging');
-        });
+  cancelBtn?.addEventListener('click', async () => {
+    stopped = true;
+    stop();
+    try {
+      await fetch(cancelUrl, {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        credentials: 'same-origin'
+      });
+    } finally {
+      if (statusEl)  statusEl.textContent  = 'Recherche annulée.';
+      if (waitingEl) waitingEl.textContent = '';
+      if (playBtn)   playBtn.style.display = 'none';
     }
-});
+  });
+
+  playBtn?.addEventListener('click', () => form?.submit());
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stop();
+    else if (!stopped) start();
+  });
+  window.addEventListener('beforeunload', stop);
+
+  joinOnce().finally(start);
+})();
 </script>
+{% endif %}
+
 {% endblock %}

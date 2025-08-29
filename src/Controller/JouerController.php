@@ -80,6 +80,7 @@ final class JouerController extends AbstractController
         }
 
         $seed = null;
+        $match = null;
 
         // D'abord, vérifier si un seed a été transmis par le formulaire (matchmaking)
         $matchSeed = $request->request->get('matchSeed');
@@ -96,7 +97,8 @@ final class JouerController extends AbstractController
                     ->andWhere('m.status IN (:statuses)')
                     ->setParameter('userTeam', $userTeam)
                     ->setParameter('opponentTeam', $opponentTeam)
-                    ->setParameter('statuses', ['READY', 'QUEUED'])
+                    // Inclure RUNNING pour une transmission robuste même si la bataille démarre côté pair
+                    ->setParameter('statuses', ['READY', 'QUEUED', 'RUNNING'])
                     ->orderBy('m.id', 'DESC')
                     ->setMaxResults(1)
                     ->getQuery()
@@ -111,9 +113,20 @@ final class JouerController extends AbstractController
             }
         }
 
-        // Si toujours pas de seed trouvé (bataille directe), générer un nouveau seed
+        // Si toujours pas de seed trouvé (bataille directe), créer un match persistant avec seed partagé
         if ($seed === null) {
             $seed = random_int(100000, 999999);
+            $userTeam = $user->getTeam();
+            $opponentTeam = $opponent->getTeam();
+            if ($userTeam && $opponentTeam) {
+                $match = new WATMatch();
+                $match->setTeamA($userTeam);
+                $match->setTeamB($opponentTeam);
+                $match->setStatus('RUNNING');
+                $match->setSeed($seed);
+                $em->persist($match);
+                $em->flush();
+            }
         }
 
         // Use the CombatService to simulate the battle with the seed

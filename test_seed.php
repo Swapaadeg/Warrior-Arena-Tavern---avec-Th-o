@@ -21,6 +21,12 @@ class FakeTeam {
     public function getCharacters() { return $this->characters; }
 }
 
+class FakeRole {
+    private string $name;
+    public function __construct(string $name) { $this->name = $name; }
+    public function getName(): string { return $this->name; }
+}
+
 class FakeCharacter {
     private $id, $name, $hp, $power, $defense, $role;
     public function __construct($id, $name, $hp, $power, $defense, $role) {
@@ -32,7 +38,7 @@ class FakeCharacter {
     public function getHP() { return $this->hp; }
     public function getPower() { return $this->power; }
     public function getDefense() { return $this->defense; }
-    public function getRole() { return (object)['getName' => fn() => $this->role]; }
+    public function getRole() { return new FakeRole($this->role); }
 }
 
 // Créer des équipes de test

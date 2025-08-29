@@ -24,6 +24,10 @@ class CombatService
         $leftArr = is_array($myTeam) ? $myTeam : (method_exists($myTeam, 'toArray') ? $myTeam->toArray() : []);
         $rightArr = is_array($oppTeam) ? $oppTeam : (method_exists($oppTeam, 'toArray') ? $oppTeam->toArray() : []);
 
+        // Stabiliser l'ordre des unités pour garantir un déterminisme cross-client
+        usort($leftArr, fn($a, $b) => ($a->getId() <=> $b->getId()));
+        usort($rightArr, fn($a, $b) => ($a->getId() <=> $b->getId()));
+
         // Build initial unit state from entities. Use 'L'/'R' prefixes for ids.
         $stateLeft = [];
         foreach ($leftArr as $c) {
